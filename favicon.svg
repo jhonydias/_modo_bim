@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="5" fill="#8B1D1D"/>
+  <text x="16" y="21" text-anchor="middle"
+        font-family="Montserrat, sans-serif"
+        font-weight="500"
+        font-size="13"
+        fill="#EFEEE9">_m</text>
+</svg>
