@@ -3,325 +3,1257 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@jhonydias</title>
+    <meta name="description" content="Cadastro Modo BIM. Ative seu modo BIM." />
+    <title>_modo_bim — cadastro</title>
+
+    <!-- Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ============================================
+           DESIGN TOKENS
+           ============================================ */
+        :root {
+            --cereja: #8B1D1D;
+            --cereja-deep: #6F1515;
+            --cloud: #EFEEE9;
+            --cloud-soft: rgba(239, 238, 233, 0.7);
+            --cloud-muted: rgba(239, 238, 233, 0.45);
+            --cloud-faint: rgba(239, 238, 233, 0.18);
+            --cloud-line: rgba(239, 238, 233, 0.35);
+            --sage: #C7BDB5;
+            --militar: #3D3232;
+
+            --serif: 'Montserrat', sans-serif;
+            --sans: 'Montserrat', sans-serif;
+
+            --ease: cubic-bezier(0.65, 0.05, 0.36, 1);
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
+        /* ============================================
+           RESET
+           ============================================ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--sans);
+            font-weight: 400;
+            background: var(--cereja);
+            color: var(--cloud);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 48px 16px 64px;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
         }
 
-        .container {
-            width: 100%;
-            max-width: 540px;
+        button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        input, select, textarea { font-family: inherit; }
+
+        /* ============================================
+           BACKGROUND TEXTURE — subtle blueprint grid
+           ============================================ */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                    linear-gradient(var(--cloud-faint) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--cloud-faint) 1px, transparent 1px);
+            background-size: 80px 80px;
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center top, transparent 0%, rgba(0,0,0,0.15) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================
+           APP CONTAINER
+           ============================================ */
+        .app {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 60px 60px;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
-        /* ── Avatar ── */
-        .avatar {
-            width: 96px;
-            height: 96px;
-            border-radius: 22px;
-            overflow: hidden;
-            margin-bottom: 18px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-        }
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* ── Profile Info ── */
-        .profile-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-            letter-spacing: -0.01em;
-        }
-        .profile-bio {
-            font-size: 0.88rem;
-            color: #a0aec0;
-            text-align: center;
-            margin-bottom: 24px;
-            line-height: 1.6;
-            max-width: 320px;
-        }
-
-        /* ── Social Icons ── */
-        .social-icons {
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
             display: flex;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-        .social-icons a {
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--cloud-line);
+        }
+        .wordmark {
+            font-family: var(--sans);
+            font-weight: 500;
+            font-size: 18px;
+            letter-spacing: 0.02em;
+            color: var(--cloud);
             text-decoration: none;
-            color: #cbd5e0;
-            transition: background 0.2s, transform 0.15s, border-color 0.2s;
         }
-        .social-icons a:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.3);
-            transform: scale(1.1);
-            color: #fff;
-        }
-        .social-icons a svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* ── Section Header ── */
-        .section-header {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: #4a5568;
-            text-align: center;
-            margin: 16px 0 10px;
-            letter-spacing: 0.08em;
+        .wordmark .underscore { color: var(--cloud-muted); }
+        .header-meta {
+            font-size: 11px;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            width: 100%;
+            color: var(--cloud-soft);
+            font-weight: 500;
         }
 
-        /* ── Link Button ── */
-        .link-btn {
+        /* ============================================
+           PROGRESS BAR
+           ============================================ */
+        .progress {
+            margin-top: 32px;
             display: flex;
-            align-items: center;
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 12px;
-            text-decoration: none;
-            color: #e2e8f0;
-            margin-bottom: 10px;
-            overflow: hidden;
-            transition: background 0.18s, transform 0.12s, box-shadow 0.18s, border-color 0.18s;
-            min-height: 58px;
+            gap: 8px;
         }
-        .link-btn:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-        .link-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Em Breve button */
-        .link-btn.coming-soon {
-            cursor: default;
-            opacity: 0.65;
-        }
-        .link-btn.coming-soon:hover {
-            transform: none;
-            box-shadow: none;
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.09);
-        }
-        .badge-soon {
-            font-size: 0.62rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, #7928ca, #ff0080);
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 999px;
-            margin-left: 8px;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .link-icon {
-            width: 58px;
-            height: 58px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .link-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .link-icon svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .link-text {
+        .progress-segment {
             flex: 1;
-            padding: 12px 16px;
-            text-align: center;
+            height: 1px;
+            background: var(--cloud-faint);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.5s var(--ease);
         }
-        .link-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            line-height: 1.3;
+        .progress-segment.active {
+            height: 2px;
+            background: var(--cloud-faint);
+        }
+        .progress-segment.active::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--cloud);
+            transform-origin: left;
+            animation: fillSegment 0.7s var(--ease-out) forwards;
+        }
+        .progress-segment.completed {
+            height: 2px;
+            background: var(--cloud);
+        }
+        @keyframes fillSegment {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        /* ============================================
+           MAIN CONTENT — STAGES
+           ============================================ */
+        .stage {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            padding: 80px 0 40px;
+            animation: stageIn 0.6s var(--ease-out);
+        }
+        .stage.active { display: flex; }
+        @keyframes stageIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--cloud-soft);
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .headline {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: clamp(48px, 7vw, 88px);
+            line-height: 0.98;
+            letter-spacing: -0.02em;
+            color: var(--cloud);
+            max-width: 14ch;
+            margin-bottom: 28px;
+        }
+        .headline em {
+            font-style: italic;
+            font-weight: 300;
+        }
+
+        .subhead {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--cloud-soft);
+            max-width: 52ch;
+            margin-bottom: 56px;
+            font-weight: 300;
+        }
+
+        /* ============================================
+           COVER (FRAME 1) SPECIFIC
+           ============================================ */
+        #stage-cover {
+            justify-content: center;
+        }
+        .cover-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--cloud);
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--cloud);
+            align-self: flex-start;
+            transition: gap 0.4s var(--ease-out), letter-spacing 0.4s var(--ease-out);
+        }
+        .cover-cta:hover {
+            gap: 22px;
+            letter-spacing: 0.01em;
+        }
+        .cover-cta .arrow {
+            font-family: var(--sans);
+            font-style: normal;
+            font-weight: 300;
+            font-size: 24px;
+            transition: transform 0.4s var(--ease-out);
+        }
+        .cover-cta:hover .arrow { transform: translateX(4px); }
+
+        /* ============================================
+           FORM FIELDS — minimal underline style
+           ============================================ */
+        .fields {
+            display: grid;
+            gap: 36px;
+            max-width: 720px;
+            margin-bottom: 64px;
+        }
+        .fields.two-col {
+            grid-template-columns: 1fr 1fr;
+            gap: 36px 48px;
+        }
+        .field-full { grid-column: 1 / -1; }
+
+        .field {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .field label {
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--cloud-soft);
+            font-weight: 500;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 4px;
+            gap: 8px;
         }
-        .link-subtitle {
-            font-size: 0.75rem;
-            color: #718096;
-            margin-top: 3px;
-        }
-
-        .link-spacer {
-            width: 58px;
-            flex-shrink: 0;
+        .field label .required { color: var(--cloud); font-weight: 400; }
+        .field label .optional {
+            text-transform: lowercase;
+            letter-spacing: 0.05em;
+            font-size: 10px;
+            font-style: italic;
+            color: var(--cloud-muted);
+            font-weight: 300;
+            margin-left: 4px;
         }
 
-        .links-group {
+        .field input,
+        .field select {
             width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--cloud-line);
+            color: var(--cloud);
+            font-family: var(--serif);
+            font-size: 22px;
+            font-weight: 400;
+            padding: 8px 0 12px;
+            transition: border-color 0.3s var(--ease), padding 0.3s var(--ease);
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
         }
 
-        /* ── Divider ── */
-        .divider {
+        .field input::placeholder {
+            color: var(--cloud-muted);
+            font-style: italic;
+            font-weight: 300;
+            font-size: 18px;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-bottom-color: var(--cloud);
+            border-bottom-width: 1px;
+        }
+
+        .field input:focus + .field-bar,
+        .field select:focus + .field-bar {
+            transform: scaleX(1);
+        }
+        .field-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
             height: 1px;
-            background: rgba(255,255,255,0.06);
-            margin: 10px 0 4px;
+            background: var(--cloud);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s var(--ease-out);
+            pointer-events: none;
         }
 
-        /* ── Footer ── */
-        .footer {
-            margin-top: 40px;
-            font-size: 0.72rem;
-            color: #4a5568;
+        /* Select dropdown */
+        .field select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EFEEE9' stroke-width='1' stroke-opacity='0.7'><path d='M6 9l6 6 6-6'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 0 center;
+            background-size: 22px;
+            padding-right: 30px;
+        }
+        .field select option {
+            background: var(--cereja-deep);
+            color: var(--cloud);
+            font-family: var(--sans);
+            font-size: 14px;
+        }
+
+        /* Hint text */
+        .field-hint {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 14px;
+            color: var(--cloud-soft);
+            margin-top: 8px;
+            font-weight: 300;
+        }
+
+        /* Validation states */
+        .field.error input,
+        .field.error select { border-bottom-color: #FFB4B4; }
+        .field.error label { color: #FFB4B4; }
+        .field-error {
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            color: #FFB4B4;
+            margin-top: 8px;
+            font-weight: 400;
+            font-style: italic;
+            display: none;
+        }
+        .field.error .field-error { display: block; }
+
+        .field.valid::after {
+            content: '✓';
+            position: absolute;
+            right: 0;
+            top: 36px;
+            color: var(--sage);
+            font-size: 18px;
+            font-weight: 300;
+            animation: checkIn 0.4s var(--ease-out);
+        }
+        @keyframes checkIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CEP loading */
+        .field.loading::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 38px;
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--cloud-faint);
+            border-top-color: var(--cloud);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================
+           NAVIGATION (back / next)
+           ============================================ */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 32px;
+            border-top: 1px solid var(--cloud-line);
+        }
+        .nav-btn {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--cloud);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 0;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s var(--ease), gap 0.3s var(--ease-out), opacity 0.3s var(--ease);
+        }
+        .nav-btn:hover {
+            border-bottom-color: var(--cloud);
+        }
+        .nav-btn.next:hover { gap: 18px; }
+        .nav-btn.back:hover { gap: 18px; }
+        .nav-btn.back .arrow { transform: scaleX(-1); }
+        .nav-btn.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .nav-btn .arrow {
+            font-family: var(--sans);
+            font-style: normal;
+            font-weight: 300;
+            font-size: 20px;
+            transition: transform 0.3s var(--ease-out);
+        }
+        .nav-btn.submit {
+            font-size: 26px;
+        }
+
+        /* ============================================
+           SUCCESS SCREEN
+           ============================================ */
+        #stage-success {
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            line-height: 1.8;
+            padding: 40px 0;
         }
-        .footer a {
-            color: #4a5568;
-            text-decoration: none;
+
+        .success-seal {
+            width: 96px;
+            height: 96px;
+            border: 1px solid var(--cloud);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 48px;
+            animation: sealIn 1s var(--ease-out);
+            position: relative;
         }
-        .footer a:hover {
-            color: #718096;
+        .success-seal svg {
+            width: 36px;
+            height: 36px;
+            stroke: var(--cloud);
+            fill: none;
+            stroke-width: 1;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 60;
+            stroke-dashoffset: 60;
+            animation: drawCheck 0.8s 0.4s var(--ease-out) forwards;
+        }
+        @keyframes sealIn {
+            from { opacity: 0; transform: scale(0.8) rotate(-12deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        @keyframes drawCheck {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .success-headline {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: clamp(56px, 8vw, 96px);
+            font-weight: 300;
+            line-height: 1;
+            margin-bottom: 24px;
+        }
+        .success-text {
+            font-size: 16px;
+            font-weight: 300;
+            color: var(--cloud-soft);
+            max-width: 44ch;
+            margin: 0 auto 56px;
+            line-height: 1.6;
+        }
+
+        .protocol-card {
+            border-top: 1px solid var(--cloud-line);
+            border-bottom: 1px solid var(--cloud-line);
+            padding: 28px 64px;
+            display: inline-block;
+            margin-bottom: 48px;
+        }
+        .protocol-label {
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--cloud-soft);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .protocol-number {
+            font-family: var(--serif);
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            color: var(--cloud);
+        }
+
+        .success-footer {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--cloud-muted);
+            font-weight: 500;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 32px;
+            border-top: 1px solid var(--cloud-line);
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--cloud-muted);
+            font-weight: 500;
+            margin-top: auto;
+        }
+
+        /* ============================================
+           LOADING / SUBMITTING STATE
+           ============================================ */
+        .submitting {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .submitting .nav-btn.submit::after {
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin-left: 12px;
+            border: 1px solid var(--cloud-faint);
+            border-top-color: var(--cloud);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+
+        /* ============================================
+           ERROR BANNER
+           ============================================ */
+        .error-banner {
+            display: none;
+            padding: 16px 20px;
+            border: 1px solid #FFB4B4;
+            color: #FFB4B4;
+            font-size: 13px;
+            margin-bottom: 32px;
+            font-style: italic;
+            font-family: var(--serif);
+            font-size: 16px;
+        }
+        .error-banner.visible { display: block; animation: stageIn 0.4s var(--ease-out); }
+
+        /* ============================================
+           HONEYPOT
+           ============================================ */
+        .honeypot {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .app { padding: 24px 24px 32px; }
+            .header { padding-bottom: 20px; }
+            .header-meta { font-size: 9px; }
+            .stage { padding: 40px 0 24px; }
+            .headline { font-size: 44px; }
+            .subhead { font-size: 14px; margin-bottom: 40px; }
+            .fields { gap: 28px; margin-bottom: 40px; }
+            .fields.two-col {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+            .field input, .field select { font-size: 18px; }
+            .nav-btn { font-size: 18px; }
+            .nav-btn.submit { font-size: 20px; }
+            .cover-cta { font-size: 22px; }
+            .protocol-card { padding: 20px 32px; }
+            .protocol-number { font-size: 24px; }
+            body::before { background-size: 50px 50px; }
+        }
+
+        @media (max-width: 480px) {
+            .app { padding: 20px 20px 28px; }
+            .headline { font-size: 36px; }
+            .field input, .field select { font-size: 16px; }
         }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <!-- Avatar / Logo -->
-    <div class="avatar">
-        <img
-                src="logo.png"
-                onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f0f1a%22/><text x=%2250%22 y=%2268%22 text-anchor=%22middle%22 font-size=%2260%22 font-family=%22Arial%22 fill=%22white%22>J</text></svg>'"
-                id="logo-img"
-                alt="Jhony Dias"
-        />
+<div class="app">
+
+    <!-- ============================================
+         HEADER (always visible)
+         ============================================ -->
+    <header class="header">
+        <a href="#" class="wordmark" id="wordmark"><span class="underscore">_</span>modo<span class="underscore">_</span>bim</a>
+        <span class="header-meta" id="headerMeta">2026</span>
+    </header>
+
+    <!-- Progress bar (hidden on cover and success) -->
+    <div class="progress" id="progress" style="display:none;">
+        <div class="progress-segment" data-step="1"></div>
+        <div class="progress-segment" data-step="2"></div>
+        <div class="progress-segment" data-step="3"></div>
+        <div class="progress-segment" data-step="4"></div>
     </div>
 
-    <!-- Profile Info -->
-    <h1 class="profile-name">Jhony Dias</h1>
-    <p class="profile-bio">Desenvolvedor & criador de conteúdo tech.<br/>Transformando código em oportunidade. 🚀</p>
+    <!-- ============================================
+         STAGE 0: COVER
+         ============================================ -->
+    <section class="stage active" id="stage-cover">
+        <div class="eyebrow">Cadastro de cliente · 2026</div>
+        <h1 class="headline">Ative seu <em>modo BIM.</em></h1>
+        <p class="subhead">Preencha os dados a seguir para que possamos elaborar seu contrato de prestação de serviço. Leva cerca de quatro minutos.</p>
+        <a href="#" class="cover-cta" id="startBtn">
+            Iniciar cadastro
+            <span class="arrow">→</span>
+        </a>
+    </section>
 
-    <!-- Social Icons -->
-    <div class="social-icons">
-        <!-- LinkedIn -->
-        <a href="https://www.linkedin.com/in/jhonydias/" target="_blank" rel="noopener" title="LinkedIn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-            </svg>
-        </a>
-        <!-- GitHub -->
-        <a href="https://github.com/jhonydias" target="_blank" rel="noopener" title="GitHub">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-            </svg>
-        </a>
-        <!-- Instagram -->
-        <a href="https://www.instagram.com/codewithjhony/" target="_blank" rel="noopener" title="Instagram">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                <circle cx="12" cy="12" r="4"/>
-                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
-            </svg>
-        </a>
-        <!-- Email -->
-        <a href="mailto:contato@jhonydias.work@gmail.com" title="Email">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-            </svg>
-        </a>
-    </div>
+    <!-- ============================================
+         STAGE 1: DADOS DA EMPRESA
+         ============================================ -->
+    <section class="stage" id="stage-1">
+        <div class="eyebrow">Etapa 01 — Empresa</div>
+        <h2 class="headline">Sobre sua <em>empresa.</em></h2>
 
-    <!-- 🔔 Em Breve -->
-    <div class="links-group">
-        <p class="section-header">🔔 Em Breve</p>
+        <div class="error-banner" id="error-1">Preencha os campos obrigatórios antes de avançar.</div>
 
-        <!-- Newsletter -->
-        <div class="link-btn coming-soon">
-            <div class="link-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
+        <div class="fields">
+            <div class="field">
+                <label>Razão Social <span class="required">*</span></label>
+                <input type="text" name="razaoSocial" data-required autocomplete="organization" />
+                <span class="field-bar"></span>
+                <span class="field-error">Campo obrigatório</span>
             </div>
-            <div class="link-text">
-                <div class="link-title">
-                    Newsletter Dev Weekly
-                    <span class="badge-soon">Em Breve</span>
-                </div>
-                <div class="link-subtitle">Conteúdo exclusivo toda semana</div>
+
+            <div class="field">
+                <label>Nome Fantasia <span class="optional">opcional</span></label>
+                <input type="text" name="nomeFantasia" autocomplete="off" />
+                <span class="field-bar"></span>
             </div>
-            <div class="link-spacer"></div>
+
+            <div class="field">
+                <label>CNPJ <span class="required">*</span></label>
+                <input type="text" name="cnpj" data-required data-mask="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00" />
+                <span class="field-bar"></span>
+                <span class="field-error">CNPJ inválido</span>
+            </div>
+
+            <div class="field">
+                <label>Inscrição Estadual <span class="optional">opcional</span></label>
+                <input type="text" name="inscricaoEstadual" autocomplete="off" />
+                <span class="field-bar"></span>
+            </div>
+
+            <div class="field">
+                <label>Ramo de Atividade <span class="required">*</span></label>
+                <select name="ramoAtividade" data-required>
+                    <option value="">Selecione</option>
+                    <option value="Arquitetura">Arquitetura</option>
+                    <option value="Paisagismo">Paisagismo</option>
+                    <option value="Restauro">Restauro</option>
+                    <option value="Urbanismo">Urbanismo</option>
+                    <option value="Engenharia">Engenharia</option>
+                    <option value="Construtora">Construtora</option>
+                    <option value="Incorporadora">Incorporadora</option>
+                    <option value="Design de Interiores">Design de Interiores</option>
+                    <option value="Consultoria">Consultoria</option>
+                    <option value="Outro">Outro</option>
+                </select>
+                <span class="field-bar"></span>
+                <span class="field-error">Selecione uma opção</span>
+            </div>
         </div>
 
-        <!-- Portfólio / Site pessoal -->
-        <div class="link-btn coming-soon">
-            <div class="link-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#68d391" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="2" y1="12" x2="22" y2="12"/>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
-            </div>
-            <div class="link-text">
-                <div class="link-title">
-                    Portfólio Pessoal
-                    <span class="badge-soon">Em Breve</span>
-                </div>
-                <div class="link-subtitle">jhonydias.dev</div>
-            </div>
-            <div class="link-spacer"></div>
-        </div>
-    </div>
+        <nav class="nav">
+            <button type="button" class="nav-btn back disabled" data-back><span class="arrow">→</span> Voltar</button>
+            <button type="button" class="nav-btn next" data-next>Avançar <span class="arrow">→</span></button>
+        </nav>
+    </section>
 
-    <!-- Footer -->
+    <!-- ============================================
+         STAGE 2: REPRESENTANTE LEGAL
+         ============================================ -->
+    <section class="stage" id="stage-2">
+        <div class="eyebrow">Etapa 02 — Representante Legal</div>
+        <h2 class="headline">Quem responde <em>pela empresa?</em></h2>
+
+        <div class="error-banner" id="error-2">Preencha os campos obrigatórios antes de avançar.</div>
+
+        <div class="fields">
+            <div class="field">
+                <label>CPF do Representante <span class="required">*</span></label>
+                <input type="text" name="cpfRepresentante" data-required data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" />
+                <span class="field-bar"></span>
+                <span class="field-error">CPF inválido</span>
+            </div>
+
+            <div class="field">
+                <label>Cargo / Função <span class="required">*</span></label>
+                <input type="text" name="cargo" data-required autocomplete="organization-title" />
+                <span class="field-bar"></span>
+                <span class="field-error">Campo obrigatório</span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
+            <button type="button" class="nav-btn next" data-next>Avançar <span class="arrow">→</span></button>
+        </nav>
+    </section>
+
+    <!-- ============================================
+         STAGE 3: CONTATO
+         ============================================ -->
+    <section class="stage" id="stage-3">
+        <div class="eyebrow">Etapa 03 — Contato</div>
+        <h2 class="headline">Como falamos <em>com você?</em></h2>
+
+        <div class="error-banner" id="error-3">Preencha os campos obrigatórios antes de avançar.</div>
+
+        <div class="fields">
+            <div class="field">
+                <label>E-mail Corporativo <span class="required">*</span></label>
+                <input type="email" name="email" data-required autocomplete="email" placeholder="contato@empresa.com.br" />
+                <span class="field-bar"></span>
+                <span class="field-error">E-mail inválido</span>
+            </div>
+
+            <div class="field">
+                <label>Telefone / WhatsApp <span class="optional">opcional</span></label>
+                <input type="tel" name="telefone" data-mask="phone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" autocomplete="tel" />
+                <span class="field-bar"></span>
+            </div>
+
+            <div class="field">
+                <label>Site <span class="optional">opcional</span></label>
+                <input type="url" name="site" autocomplete="url" placeholder="www.empresa.com.br" />
+                <span class="field-bar"></span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
+            <button type="button" class="nav-btn next" data-next>Avançar <span class="arrow">→</span></button>
+        </nav>
+    </section>
+
+    <!-- ============================================
+         STAGE 4: ENDEREÇO
+         ============================================ -->
+    <section class="stage" id="stage-4">
+        <div class="eyebrow">Etapa 04 — Endereço</div>
+        <h2 class="headline">Onde sua empresa <em>fica?</em></h2>
+
+        <div class="error-banner" id="error-4">Preencha os campos obrigatórios antes de enviar.</div>
+
+        <!-- HONEYPOT (anti-spam) -->
+        <input type="text" name="website_url" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="fields">
+            <div class="field field-full">
+                <label>CEP <span class="required">*</span></label>
+                <input type="text" name="cep" data-required data-mask="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code" />
+                <span class="field-bar"></span>
+                <span class="field-hint">Digite o CEP — preencheremos o endereço pra você.</span>
+                <span class="field-error">CEP inválido</span>
+            </div>
+
+            <div class="field field-full">
+                <label>Logradouro <span class="required">*</span></label>
+                <input type="text" name="logradouro" data-required autocomplete="address-line1" placeholder="Rua, Travessa, Avenida..." />
+                <span class="field-bar"></span>
+                <span class="field-error">Campo obrigatório</span>
+            </div>
+
+            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
+                <div class="field">
+                    <label>Número <span class="optional">opcional</span></label>
+                    <input type="text" name="numero" inputmode="numeric" autocomplete="address-line2" />
+                    <span class="field-bar"></span>
+                </div>
+                <div class="field">
+                    <label>Complemento <span class="optional">opcional</span></label>
+                    <input type="text" name="complemento" autocomplete="address-line3" />
+                    <span class="field-bar"></span>
+                </div>
+            </div>
+
+            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
+                <div class="field">
+                    <label>Bairro <span class="optional">opcional</span></label>
+                    <input type="text" name="bairro" />
+                    <span class="field-bar"></span>
+                </div>
+                <div class="field">
+                    <label>Cidade <span class="optional">opcional</span></label>
+                    <input type="text" name="cidade" autocomplete="address-level2" />
+                    <span class="field-bar"></span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Estado / UF <span class="required">*</span></label>
+                <select name="estado" data-required autocomplete="address-level1">
+                    <option value="">Selecione</option>
+                    <option value="AC">Acre</option><option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option><option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option><option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option><option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
+                    <option value="MG">Minas Gerais</option><option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option><option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option><option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option>
+                    <option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option><option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
+                </select>
+                <span class="field-bar"></span>
+                <span class="field-error">Selecione um estado</span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
+            <button type="button" class="nav-btn next submit" id="submitBtn">Enviar cadastro <span class="arrow">→</span></button>
+        </nav>
+    </section>
+
+    <!-- ============================================
+         STAGE SUCCESS
+         ============================================ -->
+    <section class="stage" id="stage-success">
+        <div class="success-seal" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>
+        </div>
+        <h2 class="success-headline">Recebido.</h2>
+        <p class="success-text">Suas informações chegaram até nós com sucesso. Em breve entraremos em contato pelo e-mail informado.</p>
+        <div class="protocol-card">
+            <div class="protocol-label">Protocolo</div>
+            <div class="protocol-number" id="protocolNumber">MB-2026-0001</div>
+        </div>
+        <div class="success-footer">_modo_bim</div>
+    </section>
+
+    <!-- ============================================
+         FOOTER (always visible)
+         ============================================ -->
     <footer class="footer">
-        <p>© 2026 Jhony Dias</p>
+        <span>_modo_bim</span>
+        <span>Belém · Pará · Brasil</span>
     </footer>
 
 </div>
+
+<script>
+    /* ============================================
+       CONFIG — substitua pelo URL do Apps Script
+       ============================================ */
+    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxPoOB2zFlaH-POS-yTUb7jerB2RKlU72HM_FLjqFEQBV0uGuiRS4LGODR71TKVVTT8Fg/exec';
+
+    /* ============================================
+       STATE
+       ============================================ */
+    let currentStep = 0; // 0 = cover, 1-4 = form steps, 5 = success
+    const totalSteps = 4;
+    const formData = {};
+
+    /* ============================================
+       DOM REFS
+       ============================================ */
+    const stages = {
+        cover: document.getElementById('stage-cover'),
+        1: document.getElementById('stage-1'),
+        2: document.getElementById('stage-2'),
+        3: document.getElementById('stage-3'),
+        4: document.getElementById('stage-4'),
+        success: document.getElementById('stage-success')
+    };
+    const progressEl = document.getElementById('progress');
+    const headerMeta = document.getElementById('headerMeta');
+    const startBtn = document.getElementById('startBtn');
+    const submitBtn = document.getElementById('submitBtn');
+
+    /* ============================================
+       NAVIGATION
+       ============================================ */
+    function showStage(step) {
+        Object.values(stages).forEach(s => s.classList.remove('active'));
+
+        if (step === 0) {
+            stages.cover.classList.add('active');
+            progressEl.style.display = 'none';
+            headerMeta.textContent = '2026';
+        } else if (step >= 1 && step <= 4) {
+            stages[step].classList.add('active');
+            progressEl.style.display = 'flex';
+            headerMeta.textContent = `0${step} / 0${totalSteps}`;
+            updateProgress(step);
+            // focus first field after transition
+            setTimeout(() => {
+                const firstInput = stages[step].querySelector('input, select');
+                if (firstInput) firstInput.focus();
+            }, 400);
+        } else if (step === 5) {
+            stages.success.classList.add('active');
+            progressEl.style.display = 'none';
+            headerMeta.textContent = 'Concluído';
+        }
+        currentStep = step;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateProgress(step) {
+        document.querySelectorAll('.progress-segment').forEach(seg => {
+            const segStep = parseInt(seg.dataset.step);
+            seg.classList.remove('active', 'completed');
+            if (segStep < step) seg.classList.add('completed');
+            else if (segStep === step) seg.classList.add('active');
+        });
+    }
+
+    document.getElementById('wordmark').addEventListener('click', (e) => {
+        e.preventDefault();
+        showStage(0);
+    });
+
+    startBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showStage(1);
+    });
+
+    document.querySelectorAll('[data-back]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (currentStep > 1) showStage(currentStep - 1);
+        });
+    });
+
+    document.querySelectorAll('[data-next]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (validateStep(currentStep)) {
+                saveStepData(currentStep);
+                showStage(currentStep + 1);
+            }
+        });
+    });
+
+    /* ============================================
+       MASKS
+       ============================================ */
+    function maskCNPJ(v) {
+        return v.replace(/\D/g, '')
+            .replace(/^(\d{2})(\d)/, '$1.$2')
+            .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+            .replace(/\.(\d{3})(\d)/, '.$1/$2')
+            .replace(/(\d{4})(\d)/, '$1-$2')
+            .substring(0, 18);
+    }
+    function maskCPF(v) {
+        return v.replace(/\D/g, '')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+            .substring(0, 14);
+    }
+    function maskCEP(v) {
+        return v.replace(/\D/g, '')
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .substring(0, 9);
+    }
+    function maskPhone(v) {
+        v = v.replace(/\D/g, '');
+        if (v.length <= 10) {
+            return v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2').substring(0, 14);
+        }
+        return v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15);
+    }
+
+    document.querySelectorAll('[data-mask]').forEach(input => {
+        input.addEventListener('input', (e) => {
+            const type = e.target.dataset.mask;
+            const fn = { cnpj: maskCNPJ, cpf: maskCPF, cep: maskCEP, phone: maskPhone }[type];
+            if (fn) e.target.value = fn(e.target.value);
+        });
+    });
+
+    /* ============================================
+       VALIDATORS
+       ============================================ */
+    function validarCNPJ(cnpj) {
+        cnpj = cnpj.replace(/\D/g, '');
+        if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) return false;
+        let t = cnpj.length - 2, d = cnpj.substring(t), n = cnpj.substring(0, t), s = 0, p = t - 7;
+        for (let i = t; i >= 1; i--) { s += n.charAt(t - i) * p--; if (p < 2) p = 9; }
+        let r = s % 11 < 2 ? 0 : 11 - s % 11;
+        if (r !== parseInt(d.charAt(0))) return false;
+        t += 1; n = cnpj.substring(0, t); s = 0; p = t - 7;
+        for (let i = t; i >= 1; i--) { s += n.charAt(t - i) * p--; if (p < 2) p = 9; }
+        r = s % 11 < 2 ? 0 : 11 - s % 11;
+        return r === parseInt(d.charAt(1));
+    }
+
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, '');
+        if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+        let s = 0;
+        for (let i = 0; i < 9; i++) s += parseInt(cpf.charAt(i)) * (10 - i);
+        let r = 11 - (s % 11); if (r >= 10) r = 0;
+        if (r !== parseInt(cpf.charAt(9))) return false;
+        s = 0;
+        for (let i = 0; i < 10; i++) s += parseInt(cpf.charAt(i)) * (11 - i);
+        r = 11 - (s % 11); if (r >= 10) r = 0;
+        return r === parseInt(cpf.charAt(10));
+    }
+
+    function validarEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validarCEP(cep) {
+        return cep.replace(/\D/g, '').length === 8;
+    }
+
+    /* ============================================
+       STEP VALIDATION
+       ============================================ */
+    function validateStep(step) {
+        const stage = stages[step];
+        if (!stage) return true;
+
+        let isValid = true;
+        const banner = document.getElementById('error-' + step);
+
+        stage.querySelectorAll('.field').forEach(f => f.classList.remove('error'));
+
+        stage.querySelectorAll('[data-required]').forEach(input => {
+            const field = input.closest('.field');
+            const value = input.value.trim();
+            if (!value) {
+                field.classList.add('error');
+                field.querySelector('.field-error').textContent = 'Campo obrigatório';
+                isValid = false;
+                return;
+            }
+            // Specific validations
+            if (input.name === 'cnpj' && !validarCNPJ(value)) {
+                field.classList.add('error');
+                field.querySelector('.field-error').textContent = 'CNPJ inválido';
+                isValid = false;
+            }
+            if (input.name === 'cpfRepresentante' && !validarCPF(value)) {
+                field.classList.add('error');
+                field.querySelector('.field-error').textContent = 'CPF inválido';
+                isValid = false;
+            }
+            if (input.name === 'email' && !validarEmail(value)) {
+                field.classList.add('error');
+                field.querySelector('.field-error').textContent = 'E-mail inválido';
+                isValid = false;
+            }
+            if (input.name === 'cep' && !validarCEP(value)) {
+                field.classList.add('error');
+                field.querySelector('.field-error').textContent = 'CEP inválido';
+                isValid = false;
+            }
+        });
+
+        if (banner) banner.classList.toggle('visible', !isValid);
+        return isValid;
+    }
+
+    function saveStepData(step) {
+        const stage = stages[step];
+        if (!stage) return;
+        stage.querySelectorAll('input, select').forEach(input => {
+            if (input.name && input.name !== 'website_url') {
+                formData[input.name] = input.value.trim();
+            }
+        });
+    }
+
+    /* ============================================
+       VIACEP — auto-fill address
+       ============================================ */
+    const cepInput = document.querySelector('[name="cep"]');
+    if (cepInput) {
+        cepInput.addEventListener('blur', async () => {
+            const cep = cepInput.value.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+            const field = cepInput.closest('.field');
+            field.classList.add('loading');
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await res.json();
+                if (!data.erro) {
+                    const set = (name, val) => {
+                        const el = document.querySelector(`[name="${name}"]`);
+                        if (el && !el.value) el.value = val || '';
+                    };
+                    set('logradouro', data.logradouro);
+                    set('bairro', data.bairro);
+                    set('cidade', data.localidade);
+                    const estadoSelect = document.querySelector('[name="estado"]');
+                    if (estadoSelect && data.uf && !estadoSelect.value) estadoSelect.value = data.uf;
+                }
+            } catch (err) {
+                console.warn('ViaCEP indisponível', err);
+            } finally {
+                field.classList.remove('loading');
+            }
+        });
+    }
+
+    /* ============================================
+       SUBMIT
+       ============================================ */
+    submitBtn.addEventListener('click', async () => {
+        if (!validateStep(4)) return;
+        saveStepData(4);
+
+        // Honeypot check
+        const honeypot = document.querySelector('[name="website_url"]');
+        if (honeypot && honeypot.value) {
+            console.warn('Honeypot triggered');
+            return;
+        }
+
+        const app = document.querySelector('.app');
+        app.classList.add('submitting');
+
+        try {
+            const payload = {
+                ...formData,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+
+            if (ENDPOINT_URL && ENDPOINT_URL !== 'COLE_AQUI_A_URL_DO_APPS_SCRIPT_WEB_APP') {
+                const res = await fetch(ENDPOINT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    document.getElementById('protocolNumber').textContent = result.protocolo || 'MB-2026-0001';
+                }
+            } else {
+                // DEV mode — sem endpoint
+                console.log('📤 Payload (modo dev):', payload);
+                await new Promise(r => setTimeout(r, 800));
+                document.getElementById('protocolNumber').textContent = 'MB-2026-DEV';
+            }
+
+            showStage(5);
+        } catch (err) {
+            console.error('Erro ao enviar:', err);
+            const banner = document.getElementById('error-4');
+            banner.textContent = 'Erro ao enviar. Tente novamente em instantes.';
+            banner.classList.add('visible');
+        } finally {
+            app.classList.remove('submitting');
+        }
+    });
+
+    /* ============================================
+       REAL-TIME VALIDATION FEEDBACK (visual ✓)
+       ============================================ */
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('blur', () => {
+            const field = input.closest('.field');
+            if (!field || !input.dataset.required) return;
+            const value = input.value.trim();
+            field.classList.remove('valid', 'error');
+            if (!value) return;
+
+            let valid = true;
+            if (input.name === 'cnpj') valid = validarCNPJ(value);
+            else if (input.name === 'cpfRepresentante') valid = validarCPF(value);
+            else if (input.name === 'email') valid = validarEmail(value);
+            else if (input.name === 'cep') valid = validarCEP(value);
+
+            if (valid) field.classList.add('valid');
+            else field.classList.add('error');
+        });
+    });
+
+    /* ============================================
+       ENTER key navigation
+       ============================================ */
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && currentStep >= 1 && currentStep <= 4) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                e.preventDefault();
+                if (currentStep === 4) submitBtn.click();
+                else {
+                    const nextBtn = stages[currentStep].querySelector('[data-next]');
+                    if (nextBtn) nextBtn.click();
+                }
+            }
+        } else if (e.key === 'Enter' && currentStep === 0) {
+            e.preventDefault();
+            startBtn.click();
+        }
+    });
+</script>
 
 </body>
 </html>
