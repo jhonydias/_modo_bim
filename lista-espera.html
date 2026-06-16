@@ -60,18 +60,6 @@
         /* ============================================
            BACKGROUND TEXTURE
            ============================================ */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                    linear-gradient(var(--cloud-faint) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--cloud-faint) 1px, transparent 1px);
-            background-size: 80px 80px;
-            opacity: 0.25;
-            pointer-events: none;
-            z-index: 0;
-        }
         body::after {
             content: '';
             position: fixed;
@@ -114,6 +102,29 @@
             text-decoration: none;
         }
         .wordmark .underscore { color: var(--cloud-muted); }
+
+        /* Brand logo (logo.png is a square with the wordmark centered on
+           the same cereja background — we crop to the wordmark by scaling
+           the image as a centered, non-repeating background). */
+        .brand-logo {
+            display: block;
+            background-image: url("img/logo.png");
+            background-repeat: no-repeat;
+            background-position: center;
+            text-indent: -9999px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .brand-logo.header-logo {
+            width: 132px;
+            height: 32px;
+            background-size: 320px auto;
+        }
+        .brand-logo.footer-logo {
+            width: 84px;
+            height: 21px;
+            background-size: 205px auto;
+        }
         .header-meta {
             font-size: 11px;
             letter-spacing: 0.18em;
@@ -653,7 +664,6 @@
             .cover-cta { font-size: 22px; }
             .protocol-card { padding: 20px 32px; }
             .protocol-number { font-size: 24px; }
-            body::before { background-size: 50px 50px; }
             .pill { font-size: 14px; padding: 10px 18px; }
         }
 
@@ -670,7 +680,7 @@
 
     <!-- HEADER -->
     <header class="header">
-        <a href="#" class="wordmark" id="wordmark"><span class="underscore">_</span>modo<span class="underscore">_</span>bim</a>
+        <a href="#" class="brand-logo header-logo" id="wordmark" aria-label="_modo_bim — início">_modo_bim</a>
         <span class="header-meta" id="headerMeta">2026</span>
     </header>
 
@@ -886,7 +896,7 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-        <span>_modo_bim</span>
+        <span class="brand-logo footer-logo" aria-label="_modo_bim">_modo_bim</span>
         <span>belém · pará · brasil</span>
     </footer>
 
