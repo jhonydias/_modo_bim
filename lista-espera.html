@@ -10,10 +10,18 @@
     <title>_modo_bim — lista de espera</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
-    <!-- Fonts: Montserrat -->
+    <!-- Fonts -->
+    <!-- Sentient (títulos / fonte principal) — Fontshare -->
+    <link href="https://api.fontshare.com/v2/css?f[]=sentient@300,400,500,700,301,401,501,701&display=swap" rel="stylesheet" />
+    <!-- Inter (textos / fonte secundária) — Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet" />
+    <!-- Neue Haas Grotesk (detalhe) — fonte licenciada, sem CDN gratuito.
+         Para usá-la de verdade, hospede os arquivos com um @font-face próprio
+         ou inclua aqui o kit do Adobe Fonts, por exemplo:
+         <link rel="stylesheet" href="https://use.typekit.net/SEU_KIT.css" />
+         Sem isso, o fallback Helvetica Neue / Arial é aplicado (visualmente próximo). -->
 
     <style>
         /* ============================================
@@ -30,8 +38,9 @@
             --sage: #C7BDB5;
             --militar: #3D3232;
 
-            --serif: 'Montserrat', sans-serif;
-            --sans: 'Montserrat', sans-serif;
+            --serif: 'Sentient', Georgia, 'Times New Roman', serif;   /* títulos / impacto */
+            --sans: 'Inter', system-ui, -apple-system, sans-serif;     /* textos / corpo */
+            --detail: 'Neue Haas Grotesk', 'Helvetica Neue', Arial, sans-serif; /* detalhe / labels */
 
             --ease: cubic-bezier(0.65, 0.05, 0.36, 1);
             --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -126,6 +135,7 @@
             background-size: 205px auto;
         }
         .header-meta {
+            font-family: var(--detail);
             font-size: 11px;
             letter-spacing: 0.18em;
             text-transform: uppercase;
@@ -187,6 +197,7 @@
         }
 
         .eyebrow {
+            font-family: var(--detail);
             font-size: 11px;
             letter-spacing: 0.22em;
             text-transform: uppercase;
@@ -273,6 +284,7 @@
             flex-direction: column;
         }
         .field label {
+            font-family: var(--detail);
             font-size: 10px;
             letter-spacing: 0.22em;
             text-transform: uppercase;
@@ -554,6 +566,7 @@
             margin-bottom: 48px;
         }
         .protocol-label {
+            font-family: var(--detail);
             font-size: 10px;
             letter-spacing: 0.25em;
             text-transform: uppercase;
@@ -570,6 +583,7 @@
         }
 
         .success-footer {
+            font-family: var(--detail);
             font-size: 11px;
             letter-spacing: 0.18em;
             text-transform: uppercase;
@@ -586,6 +600,7 @@
             align-items: center;
             padding-top: 32px;
             border-top: 1px solid var(--cloud-line);
+            font-family: var(--detail);
             font-size: 11px;
             letter-spacing: 0.18em;
             color: var(--cloud-muted);
@@ -694,7 +709,7 @@
     <!-- STAGE 0: COVER -->
     <section class="stage active" id="stage-cover">
         <div class="eyebrow">Lista de espera · 2026</div>
-        <h1 class="headline">Garanta sua <em>vaga.</em></h1>
+        <h1 class="headline">Garanta sua vaga.</h1>
         <p class="subhead">Entre na lista de espera da próxima turma do treinamento Modo BIM. Avisamos você assim que abrirem as inscrições — leva cerca de três minutos pra se inscrever.</p>
         <a href="#" class="cover-cta" id="startBtn">
             Entrar na lista
