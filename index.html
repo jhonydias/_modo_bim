@@ -3,1260 +3,735 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Cadastro Modo BIM. Ative seu modo BIM." />
+    <meta name="description" content="_modo_bim — consultoria de implementação BIM. Estruturamos processo, equipe e cultura até seu escritório operar com autonomia real. Um novo modo de projetar." />
+    <meta property="og:title" content="_modo_bim — um novo modo de projetar" />
+    <meta property="og:description" content="Consultoria de implementação BIM. Do diagnóstico à autonomia, com acompanhamento real." />
     <meta property="og:url" content="https://jhonydias.github.io/_modo_bim/" />
     <meta property="og:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
     <meta name="twitter:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
-    <title>_modo_bim — cadastro</title>
+    <title>_modo_bim — um novo modo de projetar</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
-    <!-- Fonts: Montserrat -->
+    <!-- Fonts -->
+    <!-- Sentient (títulos / fonte principal) — Fontshare -->
+    <link href="https://api.fontshare.com/v2/css?f[]=sentient@300,400,500,700,301,401,501,701&display=swap" rel="stylesheet" />
+    <!-- Inter (textos / fonte secundária) — Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet" />
+    <!-- Neue Haas Grotesk (detalhe) — fonte licenciada, sem CDN gratuito.
+         Para usá-la de verdade, hospede os arquivos com um @font-face próprio
+         ou inclua aqui o kit do Adobe Fonts:
+         <link rel="stylesheet" href="https://use.typekit.net/SEU_KIT.css" />
+         Sem isso, o fallback Helvetica Neue / Arial é aplicado (visualmente próximo). -->
 
     <style>
         /* ============================================
            DESIGN TOKENS
            ============================================ */
         :root {
-            --cereja: #8B1D1D;
-            --cereja-deep: #6F1515;
-            --cloud: #EFEEE9;
-            --cloud-soft: rgba(239, 238, 233, 0.7);
-            --cloud-muted: rgba(239, 238, 233, 0.45);
-            --cloud-faint: rgba(239, 238, 233, 0.18);
-            --cloud-line: rgba(239, 238, 233, 0.35);
-            --sage: #C7BDB5;
-            --militar: #3D3232;
+            --cereja: #81161E;        /* vermelho principal (paleta oficial) */
+            --cereja-deep: #470000;   /* cereja escuro (paleta oficial) */
+            --cream: #EFEEE9;
+            --cream-2: #E6E3DB;
+            --olive: #5F6245;
+            --olive-deep: #4C4F37;
 
-            --serif: 'Montserrat', sans-serif;
-            --sans: 'Montserrat', sans-serif;
+            --ink: #470000;                      /* texto: cereja escuro (paleta) — sem preto */
+            --ink-soft: rgba(71, 0, 0, 0.74);    /* texto secundário */
+            --ink-muted: rgba(71, 0, 0, 0.5);    /* texto de apoio */
+            --line: rgba(71, 0, 0, 0.16);        /* linhas/divisores */
+
+            --cloud: #EFEEE9;
+            --cloud-soft: rgba(239, 238, 233, 0.72);
+            --cloud-muted: rgba(239, 238, 233, 0.5);
+            --cloud-line: rgba(239, 238, 233, 0.28);
+
+            --serif: 'Sentient', Georgia, 'Times New Roman', serif;   /* títulos / impacto */
+            --sans: 'Inter', system-ui, -apple-system, sans-serif;     /* textos / corpo */
+            --detail: 'Neue Haas Grotesk', 'Helvetica Neue', Arial, sans-serif; /* detalhe / labels */
 
             --ease: cubic-bezier(0.65, 0.05, 0.36, 1);
             --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+            --maxw: 1180px;
+            --gutter: clamp(22px, 5vw, 72px);
         }
 
         /* ============================================
-           RESET
+           RESET / BASE
            ============================================ */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body {
             font-family: var(--sans);
             font-weight: 400;
-            background: var(--cereja);
-            color: var(--cloud);
-            min-height: 100vh;
+            background: var(--cream);
+            color: var(--ink);
+            line-height: 1.6;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            line-height: 1.5;
         }
-
+        img { display: block; max-width: 100%; }
+        a { color: inherit; text-decoration: none; }
         button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-        input, select, textarea { font-family: inherit; }
 
         /* ============================================
-           BACKGROUND TEXTURE — subtle blueprint grid
+           SHARED PRIMITIVES
            ============================================ */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                    linear-gradient(var(--cloud-faint) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--cloud-faint) 1px, transparent 1px);
-            background-size: 80px 80px;
-            opacity: 0.25;
-            pointer-events: none;
-            z-index: 0;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at center top, transparent 0%, rgba(0,0,0,0.15) 100%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ============================================
-           APP CONTAINER
-           ============================================ */
-        .app {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            max-width: 1100px;
+        .wrap {
+            width: 100%;
+            max-width: var(--maxw);
             margin: 0 auto;
-            padding: 40px 60px 60px;
-            display: flex;
-            flex-direction: column;
+            padding-left: var(--gutter);
+            padding-right: var(--gutter);
+        }
+        .section { padding: clamp(72px, 11vw, 150px) 0; }
+
+        .label {
+            font-family: var(--detail);
+            font-size: 11px;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--cereja);
+        }
+        .label.muted { color: var(--ink-muted); }
+
+        h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.015em; line-height: 1.04; }
+        .display { font-size: clamp(40px, 6.4vw, 84px); }
+        .h-sec { font-size: clamp(30px, 4.4vw, 56px); line-height: 1.08; }
+        em.it { font-style: italic; font-weight: 300; }
+        .us { color: var(--ink-muted); }    /* underscore tint */
+
+        .lead {
+            font-size: clamp(16px, 1.7vw, 19px);
+            color: var(--ink-soft);
+            font-weight: 300;
+            max-width: 56ch;
         }
 
-        /* ============================================
-           HEADER
-           ============================================ */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 32px;
-            border-bottom: 1px solid var(--cloud-line);
-        }
+        /* Wordmark */
         .wordmark {
-            font-family: var(--sans);
-            font-weight: 500;
-            font-size: 18px;
-            letter-spacing: 0.02em;
-            color: var(--cloud);
-            text-decoration: none;
-        }
-        .wordmark .underscore { color: var(--cloud-muted); }
-        .header-meta {
-            font-size: 11px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--cloud-soft);
-            font-weight: 500;
-        }
-
-        /* ============================================
-           PROGRESS BAR
-           ============================================ */
-        .progress {
-            margin-top: 32px;
-            display: flex;
-            gap: 8px;
-        }
-        .progress-segment {
-            flex: 1;
-            height: 1px;
-            background: var(--cloud-faint);
-            position: relative;
-            overflow: hidden;
-            transition: background 0.5s var(--ease);
-        }
-        .progress-segment.active {
-            height: 2px;
-            background: var(--cloud-faint);
-        }
-        .progress-segment.active::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--cloud);
-            transform-origin: left;
-            animation: fillSegment 0.7s var(--ease-out) forwards;
-        }
-        .progress-segment.completed {
-            height: 2px;
-            background: var(--cloud);
-        }
-        @keyframes fillSegment {
-            from { transform: scaleX(0); }
-            to { transform: scaleX(1); }
-        }
-
-        /* ============================================
-           MAIN CONTENT — STAGES
-           ============================================ */
-        .stage {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            padding: 80px 0 40px;
-            animation: stageIn 0.6s var(--ease-out);
-        }
-        .stage.active { display: flex; }
-        @keyframes stageIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .eyebrow {
-            font-size: 11px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--cloud-soft);
-            font-weight: 500;
-            margin-bottom: 24px;
-        }
-
-        .headline {
             font-family: var(--serif);
-            font-weight: 400;
-            font-size: clamp(48px, 7vw, 88px);
-            line-height: 0.98;
-            letter-spacing: -0.02em;
-            color: var(--cloud);
-            max-width: 14ch;
-            margin-bottom: 28px;
-        }
-        .headline em {
-            font-style: italic;
-            font-weight: 300;
-        }
-
-        .subhead {
-            font-size: 16px;
-            line-height: 1.6;
-            color: var(--cloud-soft);
-            max-width: 52ch;
-            margin-bottom: 56px;
-            font-weight: 300;
-        }
-
-        /* ============================================
-           COVER (FRAME 1) SPECIFIC
-           ============================================ */
-        #stage-cover {
-            justify-content: center;
-        }
-        .cover-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 14px;
-            font-family: var(--serif);
-            font-style: italic;
-            font-size: 28px;
-            font-weight: 400;
-            color: var(--cloud);
-            padding-bottom: 4px;
-            border-bottom: 1px solid var(--cloud);
-            align-self: flex-start;
-            transition: gap 0.4s var(--ease-out), letter-spacing 0.4s var(--ease-out);
-        }
-        .cover-cta:hover {
-            gap: 22px;
+            font-size: 20px;
+            font-weight: 500;
             letter-spacing: 0.01em;
+            color: var(--cereja);
+            white-space: nowrap;
         }
-        .cover-cta .arrow {
-            font-family: var(--sans);
-            font-style: normal;
-            font-weight: 300;
-            font-size: 24px;
-            transition: transform 0.4s var(--ease-out);
-        }
-        .cover-cta:hover .arrow { transform: translateX(4px); }
+        .wordmark .b { font-style: italic; font-weight: 400; }
+        .wordmark .us { color: rgba(129, 22, 30, 0.45); }
 
-        /* ============================================
-           FORM FIELDS — minimal underline style
-           ============================================ */
-        .fields {
-            display: grid;
-            gap: 36px;
-            max-width: 720px;
-            margin-bottom: 64px;
-        }
-        .fields.two-col {
-            grid-template-columns: 1fr 1fr;
-            gap: 36px 48px;
-        }
-        .field-full { grid-column: 1 / -1; }
-
-        .field {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-        .field label {
-            font-size: 10px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--cloud-soft);
-            font-weight: 500;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .field label .required { color: var(--cloud); font-weight: 400; }
-        .field label .optional {
-            text-transform: lowercase;
-            letter-spacing: 0.05em;
-            font-size: 10px;
-            font-style: italic;
-            color: var(--cloud-muted);
-            font-weight: 300;
-            margin-left: 4px;
-        }
-
-        .field input,
-        .field select {
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--cloud-line);
-            color: var(--cloud);
-            font-family: var(--serif);
-            font-size: 22px;
-            font-weight: 400;
-            padding: 8px 0 12px;
-            transition: border-color 0.3s var(--ease), padding 0.3s var(--ease);
-            outline: none;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        .field input::placeholder {
-            color: var(--cloud-muted);
-            font-style: italic;
-            font-weight: 300;
-            font-size: 18px;
-        }
-
-        .field input:focus,
-        .field select:focus {
-            border-bottom-color: var(--cloud);
-            border-bottom-width: 1px;
-        }
-
-        .field input:focus + .field-bar,
-        .field select:focus + .field-bar {
-            transform: scaleX(1);
-        }
-        .field-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: var(--cloud);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.5s var(--ease-out);
-            pointer-events: none;
-        }
-
-        /* Select dropdown */
-        .field select {
-            cursor: pointer;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EFEEE9' stroke-width='1' stroke-opacity='0.7'><path d='M6 9l6 6 6-6'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 0 center;
-            background-size: 22px;
-            padding-right: 30px;
-        }
-        .field select option {
-            background: var(--cereja-deep);
-            color: var(--cloud);
-            font-family: var(--sans);
-            font-size: 14px;
-        }
-
-        /* Hint text */
-        .field-hint {
-            font-family: var(--serif);
-            font-style: italic;
-            font-size: 14px;
-            color: var(--cloud-soft);
-            margin-top: 8px;
-            font-weight: 300;
-        }
-
-        /* Validation states */
-        .field.error input,
-        .field.error select { border-bottom-color: #FFB4B4; }
-        .field.error label { color: #FFB4B4; }
-        .field-error {
-            font-size: 11px;
-            letter-spacing: 0.05em;
-            color: #FFB4B4;
-            margin-top: 8px;
-            font-weight: 400;
-            font-style: italic;
-            display: none;
-        }
-        .field.error .field-error { display: block; }
-
-        .field.valid::after {
-            content: '✓';
-            position: absolute;
-            right: 0;
-            top: 36px;
-            color: var(--sage);
-            font-size: 18px;
-            font-weight: 300;
-            animation: checkIn 0.4s var(--ease-out);
-        }
-        @keyframes checkIn {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* CEP loading */
-        .field.loading::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 38px;
-            width: 14px;
-            height: 14px;
-            border: 1px solid var(--cloud-faint);
-            border-top-color: var(--cloud);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ============================================
-           NAVIGATION (back / next)
-           ============================================ */
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-            padding-top: 32px;
-            border-top: 1px solid var(--cloud-line);
-        }
-        .nav-btn {
-            font-family: var(--serif);
-            font-style: italic;
-            font-size: 22px;
-            font-weight: 400;
-            color: var(--cloud);
+        /* Buttons */
+        .btn {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            padding: 4px 0;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.3s var(--ease), gap 0.3s var(--ease-out), opacity 0.3s var(--ease);
+            font-family: var(--detail);
+            font-size: 13px;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+            padding: 15px 28px;
+            border-radius: 999px;
+            transition: transform 0.35s var(--ease-out), background 0.35s var(--ease), color 0.35s var(--ease), gap 0.35s var(--ease-out);
         }
-        .nav-btn:hover {
-            border-bottom-color: var(--cloud);
+        .btn .arr { transition: transform 0.35s var(--ease-out); }
+        .btn:hover .arr { transform: translateX(4px); }
+        .btn-olive { background: var(--olive); color: var(--cloud); }
+        .btn-olive:hover { background: var(--olive-deep); transform: translateY(-2px); gap: 16px; }
+        .btn-cream { background: var(--cream); color: var(--ink); }
+        .btn-cream:hover { transform: translateY(-2px); gap: 16px; }
+        .btn-ghost-light {
+            background: rgba(239, 238, 233, 0.08);
+            color: var(--cloud);
+            border: 1px solid var(--cloud-line);
         }
-        .nav-btn.next:hover { gap: 18px; }
-        .nav-btn.back:hover { gap: 18px; }
-        .nav-btn.back .arrow { transform: scaleX(-1); }
-        .nav-btn.disabled {
-            opacity: 0.35;
-            pointer-events: none;
-        }
-        .nav-btn .arrow {
-            font-family: var(--sans);
-            font-style: normal;
-            font-weight: 300;
-            font-size: 20px;
-            transition: transform 0.3s var(--ease-out);
-        }
-        .nav-btn.submit {
-            font-size: 26px;
-        }
+        .btn-ghost-light:hover { background: rgba(239, 238, 233, 0.16); transform: translateY(-2px); }
 
-        /* ============================================
-           SUCCESS SCREEN
-           ============================================ */
-        #stage-success {
+        /* Text link with arrow */
+        .tlink {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px 0;
-        }
-
-        .success-seal {
-            width: 96px;
-            height: 96px;
-            border: 1px solid var(--cloud);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 48px;
-            animation: sealIn 1s var(--ease-out);
-            position: relative;
-        }
-        .success-seal svg {
-            width: 36px;
-            height: 36px;
-            stroke: var(--cloud);
-            fill: none;
-            stroke-width: 1;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            stroke-dasharray: 60;
-            stroke-dashoffset: 60;
-            animation: drawCheck 0.8s 0.4s var(--ease-out) forwards;
-        }
-        @keyframes sealIn {
-            from { opacity: 0; transform: scale(0.8) rotate(-12deg); }
-            to { opacity: 1; transform: scale(1) rotate(0); }
-        }
-        @keyframes drawCheck {
-            to { stroke-dashoffset: 0; }
-        }
-
-        .success-headline {
+            gap: 10px;
             font-family: var(--serif);
             font-style: italic;
-            font-size: clamp(56px, 8vw, 96px);
-            font-weight: 300;
-            line-height: 1;
-            margin-bottom: 24px;
+            font-size: clamp(17px, 1.9vw, 21px);
+            color: var(--ink);
+            padding-bottom: 3px;
+            border-bottom: 1px solid var(--ink);
+            transition: gap 0.35s var(--ease-out), opacity 0.3s var(--ease);
         }
-        .success-text {
-            font-size: 16px;
-            font-weight: 300;
-            color: var(--cloud-soft);
-            max-width: 44ch;
-            margin: 0 auto 56px;
-            line-height: 1.6;
-        }
+        .tlink .arr { font-style: normal; transition: transform 0.35s var(--ease-out); }
+        .tlink:hover { gap: 16px; }
+        .tlink:hover .arr { transform: translateX(4px); }
+        .tlink.light { color: var(--cloud); border-bottom-color: var(--cloud-line); }
 
-        .protocol-card {
-            border-top: 1px solid var(--cloud-line);
-            border-bottom: 1px solid var(--cloud-line);
-            padding: 28px 64px;
-            display: inline-block;
-            margin-bottom: 48px;
+        /* ============================================
+           NAV
+           ============================================ */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(239, 238, 233, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
         }
-        .protocol-label {
-            font-size: 10px;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--cloud-soft);
-            margin-bottom: 8px;
-            font-weight: 500;
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
         }
-        .protocol-number {
-            font-family: var(--serif);
-            font-size: 32px;
-            font-weight: 400;
+        .nav-links { display: flex; align-items: center; gap: 36px; }
+        .nav-links a {
+            font-family: var(--detail);
+            font-size: 13px;
             letter-spacing: 0.04em;
-            color: var(--cloud);
-        }
-
-        .success-footer {
-            font-size: 11px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--cloud-muted);
             font-weight: 500;
+            color: var(--ink-soft);
+            transition: color 0.3s var(--ease);
+            position: relative;
         }
+        .nav-links a:not(.nav-cta)::after {
+            content: '';
+            position: absolute;
+            left: 0; bottom: -5px;
+            width: 100%; height: 1px;
+            background: var(--cereja);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s var(--ease-out);
+        }
+        .nav-links a:not(.nav-cta):hover { color: var(--cereja); }
+        .nav-links a:not(.nav-cta):hover::after { transform: scaleX(1); }
+        .nav-cta {
+            color: var(--cloud) !important;
+            background: var(--cereja);
+            padding: 9px 18px;
+            border-radius: 999px;
+            transition: background 0.3s var(--ease), transform 0.3s var(--ease-out) !important;
+        }
+        .nav-cta:hover { background: var(--cereja-deep); transform: translateY(-1px); }
+        .nav-toggle { display: none; flex-direction: column; gap: 5px; padding: 8px; }
+        .nav-toggle span { width: 24px; height: 1.5px; background: var(--ink); transition: transform 0.3s var(--ease), opacity 0.3s var(--ease); }
+
+        /* ============================================
+           HERO
+           ============================================ */
+        .hero { border-bottom: 1px solid var(--line); }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 1fr;
+            gap: clamp(32px, 5vw, 72px);
+            align-items: center;
+            min-height: calc(100vh - 70px);
+            padding: clamp(40px, 6vw, 80px) 0;
+        }
+        .hero-copy .display { margin: 22px 0 26px; max-width: 11ch; }
+        .hero-copy .lead { margin-bottom: 40px; }
+        .hero-actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+
+        .hero-media {
+            position: relative;
+            background: var(--cereja);
+            border-radius: 4px;
+            overflow: hidden;
+            aspect-ratio: 4 / 3.7;
+            box-shadow: 0 30px 80px -40px rgba(71, 0, 0, 0.5);
+        }
+        .hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+        /* ============================================
+           STATEMENT
+           ============================================ */
+        .statement .intro {
+            font-size: clamp(17px, 2vw, 22px);
+            font-weight: 300;
+            color: var(--ink-soft);
+            max-width: 30ch;
+            margin-bottom: 36px;
+        }
+        .statement .big {
+            font-size: clamp(32px, 5.2vw, 66px);
+            line-height: 1.05;
+            margin-bottom: 40px;
+            max-width: 16ch;
+        }
+        .statement .big .soft { color: var(--ink-muted); }
+        .statement .para {
+            font-size: clamp(15px, 1.6vw, 18px);
+            color: var(--ink-soft);
+            font-weight: 300;
+            max-width: 60ch;
+            margin-bottom: 40px;
+        }
+        .statement .para strong { color: var(--ink); font-weight: 600; }
+
+        /* ============================================
+           PROCESS
+           ============================================ */
+        .process { background: var(--cream-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+        .process-head { max-width: 60ch; margin-bottom: clamp(48px, 7vw, 80px); }
+        .process-head .h-sec { margin: 18px 0 22px; }
+        .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 3vw, 40px); }
+        .step { border-top: 1px solid var(--ink); padding-top: 22px; }
+        .step-bars { display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-bottom: 26px; }
+        .step-bars i { width: 9px; background: var(--olive); display: block; border-radius: 1px; }
+        .step:nth-child(1) .step-bars i:nth-child(n+2) { display: none; }
+        .step:nth-child(2) .step-bars i:nth-child(n+3) { display: none; }
+        .step:nth-child(3) .step-bars i:nth-child(n+4) { display: none; }
+        .step-num { font-family: var(--serif); font-size: clamp(34px, 4vw, 48px); color: var(--ink); line-height: 1; margin-bottom: 10px; }
+        .step-name { font-family: var(--detail); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); }
+        .process-foot { margin-top: clamp(40px, 6vw, 64px); }
+        .process-foot .cap { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink-muted); margin-bottom: 32px; }
+        .process-actions { display: flex; align-items: center; gap: 28px 36px; flex-wrap: wrap; }
+
+        /* ============================================
+           TREINAMENTOS
+           ============================================ */
+        .training-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(32px, 6vw, 88px); align-items: start; }
+        .training-sticky { position: sticky; top: 100px; }
+        .training-sticky .h-sec { margin: 18px 0 24px; }
+        .training-body p { margin-bottom: 22px; color: var(--ink-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 17.5px); }
+        .training-body p strong { color: var(--ink); font-weight: 600; }
+        .training-body .closing {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: clamp(18px, 2.2vw, 24px);
+            color: var(--ink);
+            line-height: 1.35;
+            margin: 36px 0;
+            font-weight: 300;
+        }
+        .training-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; margin-top: 8px; }
+
+        /* ============================================
+           ABOUT + BIOS
+           ============================================ */
+        .about { background: var(--cereja); color: var(--cloud); }
+        .about .label { color: var(--cloud-muted); }
+        .about-intro {
+            display: grid;
+            grid-template-columns: 0.92fr 1fr;
+            gap: clamp(32px, 5vw, 72px);
+            align-items: center;
+            margin-bottom: clamp(56px, 8vw, 96px);
+        }
+        .about-photo { border-radius: 4px; overflow: hidden; aspect-ratio: 3 / 3.4; background: var(--cereja-deep); }
+        .about-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .about-text .h-sec { color: var(--cloud); margin: 16px 0 24px; font-size: clamp(26px, 3.4vw, 42px); }
+        .about-text p { color: var(--cloud-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 18px); max-width: 52ch; }
+        .about-text .names { margin-top: 28px; font-family: var(--detail); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cloud); font-weight: 600; }
+        .about-text .names span { color: var(--cloud-muted); }
+
+        .bios { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 56px); }
+        .bio { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(20px, 2.4vw, 32px); align-items: start; }
+        .bio-photo { border-radius: 4px; overflow: hidden; aspect-ratio: 3 / 3.6; background: var(--cereja-deep); }
+        .bio-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .bio-name { font-family: var(--serif); font-size: clamp(22px, 2.4vw, 30px); color: var(--cloud); margin-bottom: 6px; }
+        .bio-role { font-family: var(--detail); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cloud-muted); font-weight: 600; margin-bottom: 18px; }
+        .bio-desc { color: var(--cloud-soft); font-weight: 300; font-size: 14.5px; line-height: 1.6; }
+
+        /* ============================================
+           GALLERY
+           ============================================ */
+        .gallery-head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(36px, 5vw, 56px); }
+        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(155px, 19vw, 230px); gap: clamp(12px, 1.6vw, 20px); }
+        .gallery-grid figure { border-radius: 4px; overflow: hidden; background: var(--cream-2); }
+        .gallery-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease-out); }
+        .gallery-grid figure:hover img { transform: scale(1.04); }
+        .gallery-quote { display: flex; align-items: center; padding: 28px; background: var(--cream-2); border-radius: 4px; }
+        /* explicit placement: tall left + two small (top) + tall right, quote spans the middle bottom */
+        .gallery-grid > :nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
+        .gallery-grid > :nth-child(2) { grid-column: 2; grid-row: 1; }
+        .gallery-grid > :nth-child(3) { grid-column: 4; grid-row: 1 / span 2; }
+        .gallery-grid > :nth-child(4) { grid-column: 3; grid-row: 1; }
+        .gallery-grid > :nth-child(5) { grid-column: 2 / span 2; grid-row: 2; }
+        .gallery-quote p { font-family: var(--serif); font-style: italic; font-size: clamp(17px, 2vw, 22px); color: var(--ink-soft); line-height: 1.4; }
+
+        /* ============================================
+           FAQ
+           ============================================ */
+        .faq { background: var(--cream-2); border-top: 1px solid var(--line); }
+        .faq-grid { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
+        .faq-list { border-top: 1px solid var(--line); }
+        .faq-item { border-bottom: 1px solid var(--line); }
+        .faq-q {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            text-align: left;
+            padding: 26px 0;
+            font-family: var(--serif);
+            font-size: clamp(18px, 2.1vw, 24px);
+            color: var(--ink);
+            transition: color 0.3s var(--ease);
+        }
+        .faq-q:hover { color: var(--cereja); }
+        .faq-icon { position: relative; width: 18px; height: 18px; flex-shrink: 0; }
+        .faq-icon::before, .faq-icon::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            background: var(--cereja);
+            transition: transform 0.4s var(--ease-out);
+        }
+        .faq-icon::before { width: 16px; height: 1.5px; transform: translate(-50%, -50%); }
+        .faq-icon::after { width: 1.5px; height: 16px; transform: translate(-50%, -50%); }
+        .faq-item.open .faq-icon::after { transform: translate(-50%, -50%) scaleY(0); }
+        .faq-a { overflow: hidden; height: 0; transition: height 0.45s var(--ease-out); }
+        .faq-a-inner { padding: 0 0 28px; max-width: 60ch; color: var(--ink-soft); font-weight: 300; font-size: 16px; }
+
+        /* ============================================
+           FINAL CTA
+           ============================================ */
+        .cta-final { background: var(--cereja); color: var(--cloud); text-align: center; padding: clamp(90px, 14vw, 180px) 0; }
+        .cta-final h2 { font-size: clamp(34px, 6vw, 76px); color: var(--cloud); max-width: 16ch; margin: 0 auto 44px; }
+        .cta-final .cur { color: var(--cloud-muted); }
+        .cta-buttons { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
 
         /* ============================================
            FOOTER
            ============================================ */
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 32px;
-            border-top: 1px solid var(--cloud-line);
-            font-size: 11px;
-            letter-spacing: 0.18em;
-            /*text-transform: uppercase;*/
-            color: var(--cloud-muted);
-            font-weight: 500;
-            margin-top: auto;
-        }
+        .footer { background: var(--cream); color: var(--ink-soft); padding: 56px 0 40px; }
+        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; padding-bottom: 36px; border-bottom: 1px solid var(--line); }
+        .footer .wordmark { color: var(--cereja); }
+        .footer .wordmark .us { color: rgba(129, 22, 30, 0.45); }
+        .footer-nav { display: flex; gap: 28px; flex-wrap: wrap; }
+        .footer-nav a { font-family: var(--detail); font-size: 13px; letter-spacing: 0.04em; color: var(--ink-soft); font-weight: 500; transition: color 0.3s var(--ease); }
+        .footer-nav a:hover { color: var(--cereja); }
+        .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 28px; }
+        .footer-bottom span { font-family: var(--detail); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted); }
 
         /* ============================================
-           LOADING / SUBMITTING STATE
+           SCROLL REVEAL
            ============================================ */
-        .submitting {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        .submitting .nav-btn.submit::after {
-            content: '';
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            margin-left: 12px;
-            border: 1px solid var(--cloud-faint);
-            border-top-color: var(--cloud);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-        }
-
-        /* ============================================
-           ERROR BANNER
-           ============================================ */
-        .error-banner {
-            display: none;
-            padding: 16px 20px;
-            border: 1px solid #FFB4B4;
-            color: #FFB4B4;
-            font-size: 13px;
-            margin-bottom: 32px;
-            font-style: italic;
-            font-family: var(--serif);
-            font-size: 16px;
-        }
-        .error-banner.visible { display: block; animation: stageIn 0.4s var(--ease-out); }
-
-        /* ============================================
-           HONEYPOT
-           ============================================ */
-        .honeypot {
-            position: absolute;
-            left: -9999px;
-            width: 1px;
-            height: 1px;
-            opacity: 0;
-            pointer-events: none;
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
+        .reveal.in { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            html { scroll-behavior: auto; }
         }
 
         /* ============================================
            RESPONSIVE
            ============================================ */
-        @media (max-width: 768px) {
-            .app { padding: 24px 24px 32px; }
-            .header { padding-bottom: 20px; }
-            .header-meta { font-size: 9px; }
-            .stage { padding: 40px 0 24px; }
-            .headline { font-size: 44px; }
-            .subhead { font-size: 14px; margin-bottom: 40px; }
-            .fields { gap: 28px; margin-bottom: 40px; }
-            .fields.two-col {
-                grid-template-columns: 1fr;
-                gap: 28px;
-            }
-            .field input, .field select { font-size: 18px; }
-            .nav-btn { font-size: 18px; }
-            .nav-btn.submit { font-size: 20px; }
-            .cover-cta { font-size: 22px; }
-            .protocol-card { padding: 20px 32px; }
-            .protocol-number { font-size: 24px; }
-            body::before { background-size: 50px 50px; }
-        }
+        @media (max-width: 900px) {
+            .nav-links { position: fixed; inset: 70px 0 auto 0; flex-direction: column; align-items: flex-start; gap: 4px; background: var(--cream); padding: 16px var(--gutter) 28px; border-bottom: 1px solid var(--line); transform: translateY(-130%); transition: transform 0.45s var(--ease-out); }
+            .nav-links.open { transform: translateY(0); }
+            .nav-links a { padding: 12px 0; font-size: 16px; width: 100%; }
+            .nav-cta { width: max-content; }
+            .nav-toggle { display: flex; }
+            .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+            .nav-toggle.open span:nth-child(2) { opacity: 0; }
+            .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
-        @media (max-width: 480px) {
-            .app { padding: 20px 20px 28px; }
-            .headline { font-size: 36px; }
-            .field input, .field select { font-size: 16px; }
+            .hero-grid { grid-template-columns: 1fr; min-height: 0; gap: 40px; }
+            .hero-media { order: -1; aspect-ratio: 4/3.4; }
+            .statement .big, .statement .intro { max-width: none; }
+            .steps { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .training-grid { grid-template-columns: 1fr; gap: 40px; }
+            .training-sticky { position: static; }
+            .about-intro { grid-template-columns: 1fr; }
+            .about-photo { aspect-ratio: 4/3.2; max-height: 440px; }
+            .bios { grid-template-columns: 1fr; gap: 44px; }
+            .faq-grid { grid-template-columns: 1fr; gap: 24px; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: clamp(180px, 32vw, 280px); }
+            .gallery-grid > :nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
+            .gallery-grid > :nth-child(2) { grid-column: 2; grid-row: 1; }
+            .gallery-grid > :nth-child(3) { grid-column: 2; grid-row: 2; }
+            .gallery-grid > :nth-child(4) { grid-column: 1; grid-row: 3; }
+            .gallery-grid > :nth-child(5) { grid-column: 2; grid-row: 3; }
+        }
+        @media (max-width: 520px) {
+            .steps { grid-template-columns: 1fr; }
+            .bio { grid-template-columns: 1fr; }
+            .bio-photo { max-height: 360px; aspect-ratio: 4/3.4; }
+            .gallery-grid { grid-template-columns: 1fr 1fr; }
+            .hero-actions { gap: 18px; }
         }
     </style>
 </head>
 <body>
 
-<div class="app">
-
-    <!-- ============================================
-         HEADER (always visible)
-         ============================================ -->
-    <header class="header">
-        <a href="#" class="wordmark" id="wordmark"><span class="underscore">_</span>modo<span class="underscore">_</span>bim</a>
-        <span class="header-meta" id="headerMeta">2026</span>
-    </header>
-
-    <!-- Progress bar (hidden on cover and success) -->
-    <div class="progress" id="progress" style="display:none;">
-        <div class="progress-segment" data-step="1"></div>
-        <div class="progress-segment" data-step="2"></div>
-        <div class="progress-segment" data-step="3"></div>
-        <div class="progress-segment" data-step="4"></div>
+<!-- ============================================ NAV ============================================ -->
+<header class="nav">
+    <div class="wrap nav-inner">
+        <a href="#top" class="wordmark" aria-label="_modo_bim — início">_modo_<span class="b">b</span>im</a>
+        <nav class="nav-links" id="navLinks">
+            <a href="#implementacoes">implementações</a>
+            <a href="#treinamentos">treinamentos</a>
+            <a href="#equipe">quem somos</a>
+            <a href="#faq">dúvidas</a>
+            <a href="cadastro.html" class="nav-cta">faça um diagnóstico</a>
+        </nav>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
     </div>
+</header>
 
-    <!-- ============================================
-         STAGE 0: COVER
-         ============================================ -->
-    <section class="stage active" id="stage-cover">
-        <div class="eyebrow">Cadastro de cliente · 2026</div>
-        <h1 class="headline">Ative seu <em>modo BIM.</em></h1>
-        <p class="subhead">Preencha os dados a seguir para que possamos elaborar seu contrato de prestação de serviço. Leva cerca de quatro minutos.</p>
-        <a href="#" class="cover-cta" id="startBtn">
-            Iniciar cadastro
-            <span class="arrow">→</span>
-        </a>
-    </section>
+<main id="top">
 
-    <!-- ============================================
-         STAGE 1: DADOS DA EMPRESA
-         ============================================ -->
-    <section class="stage" id="stage-1">
-        <div class="eyebrow">Etapa 01 — Empresa</div>
-        <h2 class="headline">Sobre sua <em>empresa.</em></h2>
-
-        <div class="error-banner" id="error-1">Preencha os campos obrigatórios antes de avançar.</div>
-
-        <div class="fields">
-            <div class="field">
-                <label>Razão Social <span class="required">*</span></label>
-                <input type="text" name="razaoSocial" data-required autocomplete="organization" />
-                <span class="field-bar"></span>
-                <span class="field-error">Campo obrigatório</span>
-            </div>
-
-            <div class="field">
-                <label>Nome Fantasia <span class="optional">opcional</span></label>
-                <input type="text" name="nomeFantasia" autocomplete="off" />
-                <span class="field-bar"></span>
-            </div>
-
-            <div class="field">
-                <label>CNPJ <span class="required">*</span></label>
-                <input type="text" name="cnpj" data-required data-mask="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00" />
-                <span class="field-bar"></span>
-                <span class="field-error">CNPJ inválido</span>
-            </div>
-
-            <div class="field">
-                <label>Inscrição Estadual <span class="optional">opcional</span></label>
-                <input type="text" name="inscricaoEstadual" autocomplete="off" />
-                <span class="field-bar"></span>
-            </div>
-
-            <div class="field">
-                <label>Ramo de Atividade <span class="required">*</span></label>
-                <select name="ramoAtividade" data-required>
-                    <option value="">Selecione</option>
-                    <option value="Arquitetura">Arquitetura</option>
-                    <option value="Paisagismo">Paisagismo</option>
-                    <option value="Restauro">Restauro</option>
-                    <option value="Urbanismo">Urbanismo</option>
-                    <option value="Engenharia">Engenharia</option>
-                    <option value="Construtora">Construtora</option>
-                    <option value="Incorporadora">Incorporadora</option>
-                    <option value="Design de Interiores">Design de Interiores</option>
-                    <option value="Consultoria">Consultoria</option>
-                    <option value="Outro">Outro</option>
-                </select>
-                <span class="field-bar"></span>
-                <span class="field-error">Selecione uma opção</span>
-            </div>
-        </div>
-
-        <nav class="nav">
-            <button type="button" class="nav-btn back disabled" data-back><span class="arrow">→</span> Voltar</button>
-            <button type="button" class="nav-btn next" data-next>Avançar <span class="arrow">→</span></button>
-        </nav>
-    </section>
-
-    <!-- ============================================
-         STAGE 2: REPRESENTANTE LEGAL
-         ============================================ -->
-    <section class="stage" id="stage-2">
-        <div class="eyebrow">Etapa 02 — Representante Legal</div>
-        <h2 class="headline">Quem responde <em>pela empresa?</em></h2>
-
-        <div class="error-banner" id="error-2">Preencha os campos obrigatórios antes de avançar.</div>
-
-        <div class="fields">
-            <div class="field">
-                <label>CPF do Representante <span class="required">*</span></label>
-                <input type="text" name="cpfRepresentante" data-required data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" />
-                <span class="field-bar"></span>
-                <span class="field-error">CPF inválido</span>
-            </div>
-
-            <div class="field">
-                <label>Cargo / Função <span class="required">*</span></label>
-                <input type="text" name="cargo" data-required autocomplete="organization-title" />
-                <span class="field-bar"></span>
-                <span class="field-error">Campo obrigatório</span>
-            </div>
-        </div>
-
-        <nav class="nav">
-            <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
-            <button type="button" class="nav-btn next" data-next>Avançar <span class="arrow">→</span></button>
-        </nav>
-    </section>
-
-    <!-- ============================================
-         STAGE 3: CONTATO
-         ============================================ -->
-    <section class="stage" id="stage-3">
-        <div class="eyebrow">Etapa 03 — Contato</div>
-        <h2 class="headline">Como falamos <em>com você?</em></h2>
-
-        <div class="error-banner" id="error-3">Preencha os campos obrigatórios antes de avançar.</div>
-
-        <div class="fields">
-            <div class="field">
-                <label>E-mail Corporativo <span class="required">*</span></label>
-                <input type="email" name="email" data-required autocomplete="email" placeholder="contato@empresa.com.br" />
-                <span class="field-bar"></span>
-                <span class="field-error">E-mail inválido</span>
-            </div>
-
-            <div class="field">
-                <label>Telefone / WhatsApp <span class="optional">opcional</span></label>
-                <input type="tel" name="telefone" data-mask="phone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" autocomplete="tel" />
-                <span class="field-bar"></span>
-            </div>
-
-            <div class="field">
-                <label>Site <span class="optional">opcional</span></label>
-                <input type="url" name="site" autocomplete="url" placeholder="www.empresa.com.br" />
-                <span class="field-bar"></span>
-            </div>
-        </div>
-
-        <nav class="nav">
-            <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
-            <button type="button" class="nav-btn next" data-next>Avançar <span class="arrow">→</span></button>
-        </nav>
-    </section>
-
-    <!-- ============================================
-         STAGE 4: ENDEREÇO
-         ============================================ -->
-    <section class="stage" id="stage-4">
-        <div class="eyebrow">Etapa 04 — Endereço</div>
-        <h2 class="headline">Onde sua empresa <em>fica?</em></h2>
-
-        <div class="error-banner" id="error-4">Preencha os campos obrigatórios antes de enviar.</div>
-
-        <!-- HONEYPOT (anti-spam) -->
-        <input type="text" name="website_url" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
-        <div class="fields">
-            <div class="field field-full">
-                <label>CEP <span class="required">*</span></label>
-                <input type="text" name="cep" data-required data-mask="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code" />
-                <span class="field-bar"></span>
-                <span class="field-hint">Digite o CEP — preencheremos o endereço pra você.</span>
-                <span class="field-error">CEP inválido</span>
-            </div>
-
-            <div class="field field-full">
-                <label>Logradouro <span class="required">*</span></label>
-                <input type="text" name="logradouro" data-required autocomplete="address-line1" placeholder="Rua, Travessa, Avenida..." />
-                <span class="field-bar"></span>
-                <span class="field-error">Campo obrigatório</span>
-            </div>
-
-            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
-                <div class="field">
-                    <label>Número <span class="optional">opcional</span></label>
-                    <input type="text" name="numero" inputmode="numeric" autocomplete="address-line2" />
-                    <span class="field-bar"></span>
+    <!-- ============================================ HERO ============================================ -->
+    <section class="hero">
+        <div class="wrap hero-grid">
+            <div class="hero-copy">
+                <span class="label">Consultoria de implementação BIM</span>
+                <h1 class="display">Um novo <span class="us">modo_</span><br /><em class="it">de projetar.</em></h1>
+                <p class="lead">Somos uma consultoria de implementação BIM que estrutura processo, equipe e cultura — até seu escritório operar com autonomia real.</p>
+                <div class="hero-actions">
+                    <a href="cadastro.html" class="btn btn-olive">faça um diagnóstico <span class="arr">→</span></a>
+                    <a href="#implementacoes" class="tlink">Veja como funciona <span class="arr">→</span></a>
                 </div>
-                <div class="field">
-                    <label>Complemento <span class="optional">opcional</span></label>
-                    <input type="text" name="complemento" autocomplete="address-line3" />
-                    <span class="field-bar"></span>
+            </div>
+            <div class="hero-media reveal">
+                <img src="img/hero.jpg" alt="Equipe da _modo_bim instalando uma cultura BIM" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ STATEMENT ============================================ -->
+    <section class="section statement">
+        <div class="wrap">
+            <p class="intro reveal">Seu escritório cresceu, mas os processos não acompanharam. Retrabalho, equipe sem clareza de função e uma rotina que depende demais de você.</p>
+            <h2 class="big reveal">Não entregamos software. <span class="soft">Entregamos um modo de trabalhar.</span></h2>
+            <p class="para reveal">É aí que entramos. <strong>Estruturamos o processo que faltou</strong>, damos clareza de função para cada pessoa da equipe e <strong>implementamos o BIM na ordem certa</strong>, até o escritório <strong>operar com método</strong> e parar de depender só de você. Do diagnóstico à autonomia, com acompanhamento real.</p>
+            <a href="#implementacoes" class="tlink reveal">Veja como funciona <span class="arr">→</span></a>
+        </div>
+    </section>
+
+    <!-- ============================================ PROCESS / IMPLEMENTAÇÃO ============================================ -->
+    <section class="section process" id="implementacoes">
+        <div class="wrap">
+            <div class="process-head reveal">
+                <span class="label">Implementação</span>
+                <h2 class="h-sec">Da bagunça à autonomia, em 6 meses de parceria real.</h2>
+                <p class="lead">A jornada completa de quem tem (ou está montando) um escritório e precisa que a equipe inteira opere em BIM, com método, não no improviso.</p>
+            </div>
+
+            <div class="steps">
+                <div class="step reveal">
+                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <div class="step-num">01</div>
+                    <div class="step-name">Diagnóstico</div>
+                </div>
+                <div class="step reveal">
+                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <div class="step-num">02</div>
+                    <div class="step-name">Estruturação</div>
+                </div>
+                <div class="step reveal">
+                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <div class="step-num">03</div>
+                    <div class="step-name">Treinamento da equipe</div>
+                </div>
+                <div class="step reveal">
+                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <div class="step-num">04</div>
+                    <div class="step-name">Validação</div>
                 </div>
             </div>
 
-            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
-                <div class="field">
-                    <label>Bairro <span class="optional">opcional</span></label>
-                    <input type="text" name="bairro" />
-                    <span class="field-bar"></span>
+            <div class="process-foot reveal">
+                <p class="cap">*diagrama do processo + recortes anonimizados de manuais — a prova que ninguém mostra.*</p>
+                <div class="process-actions">
+                    <a href="cadastro.html" class="btn btn-olive">Solicite seu orçamento <span class="arr">→</span></a>
+                    <a href="#treinamentos" class="tlink">Ainda trabalha sozinho(a)? Comece pelos Treinamentos <span class="arr">→</span></a>
                 </div>
-                <div class="field">
-                    <label>Cidade <span class="optional">opcional</span></label>
-                    <input type="text" name="cidade" autocomplete="address-level2" />
-                    <span class="field-bar"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ TREINAMENTOS ============================================ -->
+    <section class="section" id="treinamentos">
+        <div class="wrap training-grid">
+            <div class="training-sticky reveal">
+                <span class="label">Treinamentos</span>
+                <h2 class="h-sec">Para quem está <em class="it">começando</em> certo.</h2>
+                <p class="lead">Para autônomos e recém-formados que querem dominar o método desde o início — no seu ritmo e no seu orçamento.</p>
+            </div>
+            <div class="training-body reveal">
+                <p><strong>Aqui não é consultoria.</strong> São aulas e materiais diretos para você aprender a organizar seu trabalho desde já e não precisar reconstruir tudo quando o escritório crescer.</p>
+                <p>Ao final, você não "sabe usar" mais uma ferramenta. Você opera em BIM com autonomia real: produz mais rápido, com padrão profissional e com dados que saem direto do modelo. E sai preparado para o BIM que o mercado já está exigindo, nas licitações públicas e, cada vez mais, no setor privado.</p>
+                <p class="closing">Porque BIM não é software. É operação, cultura e método. E é assim que a gente entrega.</p>
+                <div class="training-actions">
+                    <a href="lista-espera.html" class="btn btn-olive">Entre na lista de espera <span class="arr">→</span></a>
+                    <a href="#implementacoes" class="tlink">Já tem escritório e equipe? Conheça a Implementação <span class="arr">→</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ ABOUT + BIOS ============================================ -->
+    <section class="section about" id="equipe">
+        <div class="wrap">
+            <div class="about-intro">
+                <div class="about-photo reveal">
+                    <img src="img/founders.jpg" alt="Joene Louchard e Dayana Ramos, fundadoras da _modo_bim" />
+                </div>
+                <div class="about-text reveal">
+                    <span class="label">Quem está por trás da _modo_bim</span>
+                    <h2 class="h-sec">Profundidade acadêmica <em class="it">+</em> vivência real de mercado.</h2>
+                    <p>Duas arquitetas de Belém, atuantes no Brasil, que se especializaram na metodologia BIM, viveram a dor do mercado por dentro e decidiram ser a resposta. A _modo_bim nasceu de uma convicção: BIM não é uma ferramenta a ser aprendida, é um modo de operar. Por isso começamos no diagnóstico e só terminamos quando o seu escritório anda sozinho.</p>
+                    <div class="names">Joene Louchard <span>·</span> Dayana Ramos</div>
                 </div>
             </div>
 
-            <div class="field">
-                <label>Estado / UF <span class="required">*</span></label>
-                <select name="estado" data-required autocomplete="address-level1">
-                    <option value="">Selecione</option>
-                    <option value="AC">Acre</option><option value="AL">Alagoas</option>
-                    <option value="AP">Amapá</option><option value="AM">Amazonas</option>
-                    <option value="BA">Bahia</option><option value="CE">Ceará</option>
-                    <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option>
-                    <option value="GO">Goiás</option><option value="MA">Maranhão</option>
-                    <option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
-                    <option value="MG">Minas Gerais</option><option value="PA">Pará</option>
-                    <option value="PB">Paraíba</option><option value="PR">Paraná</option>
-                    <option value="PE">Pernambuco</option><option value="PI">Piauí</option>
-                    <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option>
-                    <option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option>
-                    <option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
-                    <option value="SP">São Paulo</option><option value="SE">Sergipe</option>
-                    <option value="TO">Tocantins</option>
-                </select>
-                <span class="field-bar"></span>
-                <span class="field-error">Selecione um estado</span>
+            <div class="bios">
+                <article class="bio reveal">
+                    <div class="bio-photo"><img src="img/joene.jpg" alt="Joene Louchard" /></div>
+                    <div>
+                        <h3 class="bio-name">Joene Louchard</h3>
+                        <div class="bio-role">Co-fundadora · Arquiteta e Designer</div>
+                        <p class="bio-desc">A vivência de mercado da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro — porque já esteve lá.</p>
+                    </div>
+                </article>
+                <article class="bio reveal">
+                    <div class="bio-photo"><img src="img/dayana.jpg" alt="Dayana Ramos" /></div>
+                    <div>
+                        <h3 class="bio-name">Dayana Ramos</h3>
+                        <div class="bio-role">Co-fundadora · Arquiteta, especialista em BIM</div>
+                        <p class="bio-desc">A base metodológica da _modo_bim. Dedicada a traduzir o BIM em processo aplicável. É quem garante que cada implementação tenha método, não improviso.</p>
+                    </div>
+                </article>
             </div>
         </div>
-
-        <nav class="nav">
-            <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
-            <button type="button" class="nav-btn next submit" id="submitBtn">Enviar cadastro <span class="arrow">→</span></button>
-        </nav>
     </section>
 
-    <!-- ============================================
-         STAGE SUCCESS
-         ============================================ -->
-    <section class="stage" id="stage-success">
-        <div class="success-seal" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>
+    <!-- ============================================ GALLERY ============================================ -->
+    <section class="section gallery">
+        <div class="wrap">
+            <div class="gallery-head reveal">
+                <span class="label">A _modo_bim acontecendo</span>
+            </div>
+            <div class="gallery-grid">
+                <figure class="tall reveal"><img src="img/proj3.jpg" alt="Modelagem BIM em andamento" /></figure>
+                <figure class="reveal"><img src="img/proj1.jpg" alt="Modelo BIM de uma edificação" /></figure>
+                <figure class="tall reveal"><img src="img/proj4.jpg" alt="Apresentação de projeto BIM" /></figure>
+                <figure class="reveal"><img src="img/proj2.jpg" alt="Equipe em treinamento BIM" /></figure>
+                <div class="gallery-quote reveal">
+                    <p>“Depoimentos passando aqui” — espaço reservado para os relatos de quem já passou pela _modo_bim.</p>
+                </div>
+            </div>
         </div>
-        <h2 class="success-headline">Recebido.</h2>
-        <p class="success-text">Suas informações chegaram até nós com sucesso. Em breve entraremos em contato pelo e-mail informado.</p>
-        <div class="protocol-card">
-            <div class="protocol-label">Protocolo</div>
-            <div class="protocol-number" id="protocolNumber">MB-2026-0001</div>
-        </div>
-        <div class="success-footer">_modo_bim</div>
     </section>
 
-    <!-- ============================================
-         FOOTER (always visible)
-         ============================================ -->
-    <footer class="footer">
-        <span>_modo_bim</span>
-        <span>belém · pará · brasil</span>
-    </footer>
+    <!-- ============================================ FAQ ============================================ -->
+    <section class="section faq" id="faq">
+        <div class="wrap faq-grid">
+            <div class="reveal">
+                <span class="label">FAQ</span>
+                <h2 class="h-sec" style="margin-top:16px;">Perguntas <em class="it">frequentes.</em></h2>
+            </div>
+            <div class="faq-list reveal">
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Preciso já ter equipe montada? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Não. A implementação atende escritórios que já têm equipe e também quem está montando agora — estruturamos a função de cada pessoa desde o começo. Se você ainda trabalha sozinho(a), o caminho ideal são os Treinamentos.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Qual software vocês implementam? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Trabalhamos principalmente com Revit e Archicad. Mais importante que a ferramenta é o método: implementamos o BIM na ordem certa para o seu fluxo, não o contrário.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Quanto tempo dura a implementação? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">A jornada completa, do diagnóstico à autonomia, leva em média 6 meses de parceria real, com acompanhamento durante todo o processo.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Onde vocês atendem? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Somos de Belém, Pará, e atendemos escritórios em todo o Brasil de forma remota, com encontros e acompanhamento à distância.</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-</div>
+    <!-- ============================================ FINAL CTA ============================================ -->
+    <section class="cta-final">
+        <div class="wrap">
+            <h2 class="reveal">Seu escritório está pronto para implementar BIM?<span class="cur">_</span></h2>
+            <div class="cta-buttons reveal">
+                <a href="cadastro.html" class="btn btn-cream">solicite um orçamento <span class="arr">→</span></a>
+                <a href="lista-espera.html" class="btn btn-ghost-light">faça parte do BIM Club <span class="arr">→</span></a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- ============================================ FOOTER ============================================ -->
+<footer class="footer">
+    <div class="wrap">
+        <div class="footer-top">
+            <a href="#top" class="wordmark">_modo_<span class="b">b</span>im</a>
+            <nav class="footer-nav">
+                <a href="#implementacoes">implementações</a>
+                <a href="#treinamentos">treinamentos</a>
+                <a href="#equipe">quem somos</a>
+                <a href="cadastro.html">orçamento</a>
+                <a href="lista-espera.html">lista de espera</a>
+            </nav>
+        </div>
+        <div class="footer-bottom">
+            <span>belém · pará · brasil</span>
+            <span>© <span id="year"></span> _modo_bim</span>
+        </div>
+    </div>
+</footer>
 
 <script>
-    /* ============================================
-       CONFIG — substitua pelo URL do Apps Script
-       ============================================ */
-    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbwCEpVWnpv9gyUK6k-b10lJ9O45RXbstsviNQwdrGKDzzgpsqR2587g-UttwCQsemk/exec';
-
-    /* ============================================
-       STATE
-       ============================================ */
-    let currentStep = 0; // 0 = cover, 1-4 = form steps, 5 = success
-    const totalSteps = 4;
-    const formData = {};
-
-    /* ============================================
-       DOM REFS
-       ============================================ */
-    const stages = {
-        cover: document.getElementById('stage-cover'),
-        1: document.getElementById('stage-1'),
-        2: document.getElementById('stage-2'),
-        3: document.getElementById('stage-3'),
-        4: document.getElementById('stage-4'),
-        success: document.getElementById('stage-success')
-    };
-    const progressEl = document.getElementById('progress');
-    const headerMeta = document.getElementById('headerMeta');
-    const startBtn = document.getElementById('startBtn');
-    const submitBtn = document.getElementById('submitBtn');
-
-    /* ============================================
-       NAVIGATION
-       ============================================ */
-    function showStage(step) {
-        Object.values(stages).forEach(s => s.classList.remove('active'));
-
-        if (step === 0) {
-            stages.cover.classList.add('active');
-            progressEl.style.display = 'none';
-            headerMeta.textContent = '2026';
-        } else if (step >= 1 && step <= 4) {
-            stages[step].classList.add('active');
-            progressEl.style.display = 'flex';
-            headerMeta.textContent = `0${step} / 0${totalSteps}`;
-            updateProgress(step);
-            // focus first field after transition
-            setTimeout(() => {
-                const firstInput = stages[step].querySelector('input, select');
-                if (firstInput) firstInput.focus();
-            }, 400);
-        } else if (step === 5) {
-            stages.success.classList.add('active');
-            progressEl.style.display = 'none';
-            headerMeta.textContent = 'Concluído';
-        }
-        currentStep = step;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function updateProgress(step) {
-        document.querySelectorAll('.progress-segment').forEach(seg => {
-            const segStep = parseInt(seg.dataset.step);
-            seg.classList.remove('active', 'completed');
-            if (segStep < step) seg.classList.add('completed');
-            else if (segStep === step) seg.classList.add('active');
-        });
-    }
-
-    document.getElementById('wordmark').addEventListener('click', (e) => {
-        e.preventDefault();
-        showStage(0);
+    /* ============================================ MOBILE NAV ============================================ */
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    navToggle.addEventListener('click', () => {
+        const open = navLinks.classList.toggle('open');
+        navToggle.classList.toggle('open', open);
+        navToggle.setAttribute('aria-expanded', open);
     });
+    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+    }));
 
-    startBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        showStage(1);
-    });
-
-    document.querySelectorAll('[data-back]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (currentStep > 1) showStage(currentStep - 1);
-        });
-    });
-
-    document.querySelectorAll('[data-next]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (validateStep(currentStep)) {
-                saveStepData(currentStep);
-                showStage(currentStep + 1);
-            }
-        });
-    });
-
-    /* ============================================
-       MASKS
-       ============================================ */
-    function maskCNPJ(v) {
-        return v.replace(/\D/g, '')
-            .replace(/^(\d{2})(\d)/, '$1.$2')
-            .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-            .replace(/\.(\d{3})(\d)/, '.$1/$2')
-            .replace(/(\d{4})(\d)/, '$1-$2')
-            .substring(0, 18);
-    }
-    function maskCPF(v) {
-        return v.replace(/\D/g, '')
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-            .substring(0, 14);
-    }
-    function maskCEP(v) {
-        return v.replace(/\D/g, '')
-            .replace(/(\d{5})(\d)/, '$1-$2')
-            .substring(0, 9);
-    }
-    function maskPhone(v) {
-        v = v.replace(/\D/g, '');
-        if (v.length <= 10) {
-            return v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2').substring(0, 14);
-        }
-        return v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').substring(0, 15);
-    }
-
-    document.querySelectorAll('[data-mask]').forEach(input => {
-        input.addEventListener('input', (e) => {
-            const type = e.target.dataset.mask;
-            const fn = { cnpj: maskCNPJ, cpf: maskCPF, cep: maskCEP, phone: maskPhone }[type];
-            if (fn) e.target.value = fn(e.target.value);
-        });
-    });
-
-    /* ============================================
-       VALIDATORS
-       ============================================ */
-    function validarCNPJ(cnpj) {
-        cnpj = cnpj.replace(/\D/g, '');
-        if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) return false;
-        let t = cnpj.length - 2, d = cnpj.substring(t), n = cnpj.substring(0, t), s = 0, p = t - 7;
-        for (let i = t; i >= 1; i--) { s += n.charAt(t - i) * p--; if (p < 2) p = 9; }
-        let r = s % 11 < 2 ? 0 : 11 - s % 11;
-        if (r !== parseInt(d.charAt(0))) return false;
-        t += 1; n = cnpj.substring(0, t); s = 0; p = t - 7;
-        for (let i = t; i >= 1; i--) { s += n.charAt(t - i) * p--; if (p < 2) p = 9; }
-        r = s % 11 < 2 ? 0 : 11 - s % 11;
-        return r === parseInt(d.charAt(1));
-    }
-
-    function validarCPF(cpf) {
-        cpf = cpf.replace(/\D/g, '');
-        if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-        let s = 0;
-        for (let i = 0; i < 9; i++) s += parseInt(cpf.charAt(i)) * (10 - i);
-        let r = 11 - (s % 11); if (r >= 10) r = 0;
-        if (r !== parseInt(cpf.charAt(9))) return false;
-        s = 0;
-        for (let i = 0; i < 10; i++) s += parseInt(cpf.charAt(i)) * (11 - i);
-        r = 11 - (s % 11); if (r >= 10) r = 0;
-        return r === parseInt(cpf.charAt(10));
-    }
-
-    function validarEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function validarCEP(cep) {
-        return cep.replace(/\D/g, '').length === 8;
-    }
-
-    /* ============================================
-       STEP VALIDATION
-       ============================================ */
-    function validateStep(step) {
-        const stage = stages[step];
-        if (!stage) return true;
-
-        let isValid = true;
-        const banner = document.getElementById('error-' + step);
-
-        stage.querySelectorAll('.field').forEach(f => f.classList.remove('error'));
-
-        stage.querySelectorAll('[data-required]').forEach(input => {
-            const field = input.closest('.field');
-            const value = input.value.trim();
-            if (!value) {
-                field.classList.add('error');
-                field.querySelector('.field-error').textContent = 'Campo obrigatório';
-                isValid = false;
-                return;
-            }
-            // Specific validations
-            if (input.name === 'cnpj' && !validarCNPJ(value)) {
-                field.classList.add('error');
-                field.querySelector('.field-error').textContent = 'CNPJ inválido';
-                isValid = false;
-            }
-            if (input.name === 'cpfRepresentante' && !validarCPF(value)) {
-                field.classList.add('error');
-                field.querySelector('.field-error').textContent = 'CPF inválido';
-                isValid = false;
-            }
-            if (input.name === 'email' && !validarEmail(value)) {
-                field.classList.add('error');
-                field.querySelector('.field-error').textContent = 'E-mail inválido';
-                isValid = false;
-            }
-            if (input.name === 'cep' && !validarCEP(value)) {
-                field.classList.add('error');
-                field.querySelector('.field-error').textContent = 'CEP inválido';
-                isValid = false;
-            }
-        });
-
-        if (banner) banner.classList.toggle('visible', !isValid);
-        return isValid;
-    }
-
-    function saveStepData(step) {
-        const stage = stages[step];
-        if (!stage) return;
-        stage.querySelectorAll('input, select').forEach(input => {
-            if (input.name && input.name !== 'website_url') {
-                formData[input.name] = input.value.trim();
-            }
-        });
-    }
-
-    /* ============================================
-       VIACEP — auto-fill address
-       ============================================ */
-    const cepInput = document.querySelector('[name="cep"]');
-    if (cepInput) {
-        cepInput.addEventListener('blur', async () => {
-            const cep = cepInput.value.replace(/\D/g, '');
-            if (cep.length !== 8) return;
-            const field = cepInput.closest('.field');
-            field.classList.add('loading');
-            try {
-                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                const data = await res.json();
-                if (!data.erro) {
-                    const set = (name, val) => {
-                        const el = document.querySelector(`[name="${name}"]`);
-                        if (el && !el.value) el.value = val || '';
-                    };
-                    set('logradouro', data.logradouro);
-                    set('bairro', data.bairro);
-                    set('cidade', data.localidade);
-                    const estadoSelect = document.querySelector('[name="estado"]');
-                    if (estadoSelect && data.uf && !estadoSelect.value) estadoSelect.value = data.uf;
+    /* ============================================ FAQ ACCORDION ============================================ */
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const q = item.querySelector('.faq-q');
+        const a = item.querySelector('.faq-a');
+        q.addEventListener('click', () => {
+            const isOpen = item.classList.contains('open');
+            document.querySelectorAll('.faq-item.open').forEach(other => {
+                if (other !== item) {
+                    other.classList.remove('open');
+                    other.querySelector('.faq-a').style.height = '0px';
+                    other.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
                 }
-            } catch (err) {
-                console.warn('ViaCEP indisponível', err);
-            } finally {
-                field.classList.remove('loading');
-            }
-        });
-    }
-
-    /* ============================================
-       SUBMIT
-       ============================================ */
-    submitBtn.addEventListener('click', async () => {
-        if (!validateStep(4)) return;
-        saveStepData(4);
-
-        // Honeypot check
-        const honeypot = document.querySelector('[name="website_url"]');
-        if (honeypot && honeypot.value) {
-            console.warn('Honeypot triggered');
-            return;
-        }
-
-        const app = document.querySelector('.app');
-        app.classList.add('submitting');
-
-        try {
-            const payload = {
-                ...formData,
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
-            };
-
-            if (ENDPOINT_URL && ENDPOINT_URL !== 'COLE_AQUI_A_URL_DO_APPS_SCRIPT_WEB_APP') {
-                const res = await fetch(ENDPOINT_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if (result.success) {
-                    document.getElementById('protocolNumber').textContent = result.protocolo || 'MB-2026-0001';
-                }
+            });
+            if (isOpen) {
+                item.classList.remove('open');
+                a.style.height = '0px';
+                q.setAttribute('aria-expanded', 'false');
             } else {
-                // DEV mode — sem endpoint
-                console.log('📤 Payload (modo dev):', payload);
-                await new Promise(r => setTimeout(r, 800));
-                document.getElementById('protocolNumber').textContent = 'MB-2026-DEV';
+                item.classList.add('open');
+                a.style.height = a.firstElementChild.offsetHeight + 'px';
+                q.setAttribute('aria-expanded', 'true');
             }
-
-            showStage(5);
-        } catch (err) {
-            console.error('Erro ao enviar:', err);
-            const banner = document.getElementById('error-4');
-            banner.textContent = 'Erro ao enviar. Tente novamente em instantes.';
-            banner.classList.add('visible');
-        } finally {
-            app.classList.remove('submitting');
-        }
-    });
-
-    /* ============================================
-       REAL-TIME VALIDATION FEEDBACK (visual ✓)
-       ============================================ */
-    document.querySelectorAll('input, select').forEach(input => {
-        input.addEventListener('blur', () => {
-            const field = input.closest('.field');
-            if (!field || !input.dataset.required) return;
-            const value = input.value.trim();
-            field.classList.remove('valid', 'error');
-            if (!value) return;
-
-            let valid = true;
-            if (input.name === 'cnpj') valid = validarCNPJ(value);
-            else if (input.name === 'cpfRepresentante') valid = validarCPF(value);
-            else if (input.name === 'email') valid = validarEmail(value);
-            else if (input.name === 'cep') valid = validarCEP(value);
-
-            if (valid) field.classList.add('valid');
-            else field.classList.add('error');
         });
     });
 
-    /* ============================================
-       ENTER key navigation
-       ============================================ */
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && currentStep >= 1 && currentStep <= 4) {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
-                e.preventDefault();
-                if (currentStep === 4) submitBtn.click();
-                else {
-                    const nextBtn = stages[currentStep].querySelector('[data-next]');
-                    if (nextBtn) nextBtn.click();
-                }
-            }
-        } else if (e.key === 'Enter' && currentStep === 0) {
-            e.preventDefault();
-            startBtn.click();
-        }
-    });
+    /* ============================================ SCROLL REVEAL ============================================ */
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    /* ============================================ MISC ============================================ */
+    document.getElementById('year').textContent = new Date().getFullYear();
 </script>
 
 </body>

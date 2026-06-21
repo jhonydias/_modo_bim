@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Lista de espera Modo BIM. Garanta sua vaga na próxima turma." />
-    <meta property="og:url" content="https://jhonydias.github.io/_modo_bim/lista-espera.html" />
+    <meta name="description" content="Cadastro Modo BIM. Ative seu modo BIM." />
+    <meta property="og:url" content="https://jhonydias.github.io/_modo_bim/" />
     <meta property="og:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
     <meta name="twitter:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
-    <title>_modo_bim — lista de espera</title>
+    <title>_modo_bim — cadastro</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
     <!-- Fonts -->
@@ -19,7 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet" />
     <!-- Neue Haas Grotesk (detalhe) — fonte licenciada, sem CDN gratuito.
          Para usá-la de verdade, hospede os arquivos com um @font-face próprio
-         ou inclua aqui o kit do Adobe Fonts, por exemplo:
+         ou inclua aqui o kit do Adobe Fonts:
          <link rel="stylesheet" href="https://use.typekit.net/SEU_KIT.css" />
          Sem isso, o fallback Helvetica Neue / Arial é aplicado (visualmente próximo). -->
 
@@ -112,9 +112,9 @@
         }
         .wordmark .underscore { color: var(--cloud-muted); }
 
-        /* Brand logo (logo.png is a square with the wordmark centered on
-           the same cereja background — we crop to the wordmark by scaling
-           the image as a centered, non-repeating background). */
+        /* Brand logo (logo.png é um quadrado com o wordmark centralizado no
+           mesmo fundo cereja — recortamos o wordmark escalando a imagem como
+           background centralizado e sem repetição). */
         .brand-logo {
             display: block;
             background-image: url("img/logo.png");
@@ -181,7 +181,7 @@
         }
 
         /* ============================================
-           STAGES
+           MAIN CONTENT — STAGES
            ============================================ */
         .stage {
             flex: 1;
@@ -231,7 +231,7 @@
         }
 
         /* ============================================
-           COVER
+           COVER (FRAME 1) SPECIFIC
            ============================================ */
         #stage-cover {
             justify-content: center;
@@ -264,7 +264,7 @@
         .cover-cta:hover .arrow { transform: translateX(4px); }
 
         /* ============================================
-           FORM FIELDS
+           FORM FIELDS — minimal underline style
            ============================================ */
         .fields {
             display: grid;
@@ -307,8 +307,7 @@
         }
 
         .field input,
-        .field select,
-        .field textarea {
+        .field select {
             width: 100%;
             background: transparent;
             border: none;
@@ -324,15 +323,7 @@
             -webkit-appearance: none;
         }
 
-        .field textarea {
-            font-size: 18px;
-            line-height: 1.5;
-            min-height: 84px;
-            resize: vertical;
-        }
-
-        .field input::placeholder,
-        .field textarea::placeholder {
+        .field input::placeholder {
             color: var(--cloud-muted);
             font-style: italic;
             font-weight: 300;
@@ -340,12 +331,15 @@
         }
 
         .field input:focus,
-        .field select:focus,
-        .field textarea:focus {
+        .field select:focus {
             border-bottom-color: var(--cloud);
             border-bottom-width: 1px;
         }
 
+        .field input:focus + .field-bar,
+        .field select:focus + .field-bar {
+            transform: scaleX(1);
+        }
         .field-bar {
             position: absolute;
             bottom: 0;
@@ -357,11 +351,6 @@
             transform-origin: left;
             transition: transform 0.5s var(--ease-out);
             pointer-events: none;
-        }
-        .field input:focus + .field-bar,
-        .field select:focus + .field-bar,
-        .field textarea:focus + .field-bar {
-            transform: scaleX(1);
         }
 
         /* Select dropdown */
@@ -392,9 +381,7 @@
 
         /* Validation states */
         .field.error input,
-        .field.error select,
-        .field.error textarea { border-bottom-color: #FFB4B4; }
-        .field.error .pills { border-bottom-color: #FFB4B4; }
+        .field.error select { border-bottom-color: #FFB4B4; }
         .field.error label { color: #FFB4B4; }
         .field-error {
             font-size: 11px;
@@ -407,7 +394,7 @@
         }
         .field.error .field-error { display: block; }
 
-        .field.valid:not(.pill-group)::after {
+        .field.valid::after {
             content: '✓';
             position: absolute;
             right: 0;
@@ -422,40 +409,25 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ============================================
-           PILLS (toggle group)
-           ============================================ */
-        .pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: 4px 0 6px;
+        /* CEP loading */
+        .field.loading::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 38px;
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--cloud-faint);
+            border-top-color: var(--cloud);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
-        .pill {
-            padding: 12px 24px;
-            border: 1px solid var(--cloud-line);
-            border-radius: 999px;
-            font-family: var(--serif);
-            font-size: 16px;
-            font-weight: 400;
-            color: var(--cloud);
-            background: transparent;
-            cursor: pointer;
-            transition: border-color 0.3s var(--ease), background 0.3s var(--ease), color 0.3s var(--ease), transform 0.2s var(--ease-out);
-            letter-spacing: 0.01em;
-        }
-        .pill:hover {
-            border-color: var(--cloud);
-            transform: translateY(-1px);
-        }
-        .pill.selected {
-            background: var(--cloud);
-            color: var(--cereja);
-            border-color: var(--cloud);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* ============================================
-           NAVIGATION
+           NAVIGATION (back / next)
            ============================================ */
         .nav {
             display: flex;
@@ -500,7 +472,7 @@
         }
 
         /* ============================================
-           SUCCESS
+           SUCCESS SCREEN
            ============================================ */
         #stage-success {
             align-items: center;
@@ -603,13 +575,14 @@
             font-family: var(--detail);
             font-size: 11px;
             letter-spacing: 0.18em;
+            /*text-transform: uppercase;*/
             color: var(--cloud-muted);
             font-weight: 500;
             margin-top: auto;
         }
 
         /* ============================================
-           LOADING
+           LOADING / SUBMITTING STATE
            ============================================ */
         .submitting {
             pointer-events: none;
@@ -627,9 +600,6 @@
             animation: spin 0.8s linear infinite;
             vertical-align: middle;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
 
         /* ============================================
            ERROR BANNER
@@ -639,6 +609,7 @@
             padding: 16px 20px;
             border: 1px solid #FFB4B4;
             color: #FFB4B4;
+            font-size: 13px;
             margin-bottom: 32px;
             font-style: italic;
             font-family: var(--serif);
@@ -673,19 +644,18 @@
                 grid-template-columns: 1fr;
                 gap: 28px;
             }
-            .field input, .field select, .field textarea { font-size: 18px; }
+            .field input, .field select { font-size: 18px; }
             .nav-btn { font-size: 18px; }
             .nav-btn.submit { font-size: 20px; }
             .cover-cta { font-size: 22px; }
             .protocol-card { padding: 20px 32px; }
             .protocol-number { font-size: 24px; }
-            .pill { font-size: 14px; padding: 10px 18px; }
         }
 
         @media (max-width: 480px) {
             .app { padding: 20px 20px 28px; }
             .headline { font-size: 36px; }
-            .field input, .field select, .field textarea { font-size: 16px; }
+            .field input, .field select { font-size: 16px; }
         }
     </style>
 </head>
@@ -693,88 +663,88 @@
 
 <div class="app">
 
-    <!-- HEADER -->
+    <!-- ============================================
+         HEADER (always visible)
+         ============================================ -->
     <header class="header">
         <a href="#" class="brand-logo header-logo" id="wordmark" aria-label="_modo_bim — início">_modo_bim</a>
         <span class="header-meta" id="headerMeta">2026</span>
     </header>
 
-    <!-- PROGRESS -->
+    <!-- Progress bar (hidden on cover and success) -->
     <div class="progress" id="progress" style="display:none;">
         <div class="progress-segment" data-step="1"></div>
         <div class="progress-segment" data-step="2"></div>
         <div class="progress-segment" data-step="3"></div>
+        <div class="progress-segment" data-step="4"></div>
     </div>
 
-    <!-- STAGE 0: COVER -->
+    <!-- ============================================
+         STAGE 0: COVER
+         ============================================ -->
     <section class="stage active" id="stage-cover">
-        <div class="eyebrow">Lista de espera · 2026</div>
-        <h1 class="headline">Garanta sua vaga.</h1>
-        <p class="subhead">Entre na lista de espera da próxima turma do treinamento Modo BIM. Avisamos você assim que abrirem as inscrições — leva cerca de três minutos pra se inscrever.</p>
+        <div class="eyebrow">Cadastro de cliente · 2026</div>
+        <h1 class="headline">Ative seu <em>modo BIM.</em></h1>
+        <p class="subhead">Preencha os dados a seguir para que possamos elaborar seu contrato de prestação de serviço. Leva cerca de quatro minutos.</p>
         <a href="#" class="cover-cta" id="startBtn">
-            Entrar na lista
+            Iniciar cadastro
             <span class="arrow">→</span>
         </a>
     </section>
 
-    <!-- STAGE 1: SOBRE VOCÊ -->
+    <!-- ============================================
+         STAGE 1: DADOS DA EMPRESA
+         ============================================ -->
     <section class="stage" id="stage-1">
-        <div class="eyebrow">Etapa 01 — Sobre você</div>
-        <h2 class="headline">Quem é <em>você?</em></h2>
+        <div class="eyebrow">Etapa 01 — Empresa</div>
+        <h2 class="headline">Sobre sua <em>empresa.</em></h2>
 
         <div class="error-banner" id="error-1">Preencha os campos obrigatórios antes de avançar.</div>
 
         <div class="fields">
             <div class="field">
-                <label>Nome completo <span class="required">*</span></label>
-                <input type="text" name="nomeCompleto" data-required autocomplete="name" />
+                <label>Razão Social <span class="required">*</span></label>
+                <input type="text" name="razaoSocial" data-required autocomplete="organization" />
                 <span class="field-bar"></span>
                 <span class="field-error">Campo obrigatório</span>
             </div>
 
             <div class="field">
-                <label>E-mail <span class="required">*</span></label>
-                <input type="email" name="email" data-required autocomplete="email" placeholder="seu@email.com" />
+                <label>Nome Fantasia <span class="optional">opcional</span></label>
+                <input type="text" name="nomeFantasia" autocomplete="off" />
                 <span class="field-bar"></span>
-                <span class="field-error">E-mail inválido</span>
             </div>
 
             <div class="field">
-                <label>Telefone / WhatsApp <span class="required">*</span></label>
-                <input type="tel" name="telefone" data-required data-mask="phone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" autocomplete="tel" />
+                <label>CNPJ <span class="required">*</span></label>
+                <input type="text" name="cnpj" data-required data-mask="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00" />
                 <span class="field-bar"></span>
-                <span class="field-error">Telefone inválido</span>
+                <span class="field-error">CNPJ inválido</span>
             </div>
 
-            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
-                <div class="field">
-                    <label>Cidade <span class="required">*</span></label>
-                    <input type="text" name="cidade" data-required autocomplete="address-level2" />
-                    <span class="field-bar"></span>
-                    <span class="field-error">Campo obrigatório</span>
-                </div>
-                <div class="field">
-                    <label>Estado / UF <span class="required">*</span></label>
-                    <select name="estado" data-required autocomplete="address-level1">
-                        <option value="">Selecione</option>
-                        <option value="AC">Acre</option><option value="AL">Alagoas</option>
-                        <option value="AP">Amapá</option><option value="AM">Amazonas</option>
-                        <option value="BA">Bahia</option><option value="CE">Ceará</option>
-                        <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option>
-                        <option value="GO">Goiás</option><option value="MA">Maranhão</option>
-                        <option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
-                        <option value="MG">Minas Gerais</option><option value="PA">Pará</option>
-                        <option value="PB">Paraíba</option><option value="PR">Paraná</option>
-                        <option value="PE">Pernambuco</option><option value="PI">Piauí</option>
-                        <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option>
-                        <option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option>
-                        <option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
-                        <option value="SP">São Paulo</option><option value="SE">Sergipe</option>
-                        <option value="TO">Tocantins</option>
-                    </select>
-                    <span class="field-bar"></span>
-                    <span class="field-error">Selecione um estado</span>
-                </div>
+            <div class="field">
+                <label>Inscrição Estadual <span class="optional">opcional</span></label>
+                <input type="text" name="inscricaoEstadual" autocomplete="off" />
+                <span class="field-bar"></span>
+            </div>
+
+            <div class="field">
+                <label>Ramo de Atividade <span class="required">*</span></label>
+                <select name="ramoAtividade" data-required>
+                    <option value="">Selecione</option>
+                    <option value="Arquitetura">Arquitetura</option>
+                    <option value="Paisagismo">Paisagismo</option>
+                    <option value="Restauro">Restauro</option>
+                    <option value="Urbanismo">Urbanismo</option>
+                    <option value="Engenharia">Engenharia</option>
+                    <option value="Construtora">Construtora</option>
+                    <option value="Incorporadora">Incorporadora</option>
+                    <option value="Design de Interiores">Design de Interiores</option>
+                    <option value="Consultoria">Consultoria</option>
+                    <option value="Outro">Outro</option>
+                </select>
+                <span class="field-bar"></span>
+                <span class="field-error">Selecione uma opção</span>
             </div>
         </div>
 
@@ -784,51 +754,28 @@
         </nav>
     </section>
 
-    <!-- STAGE 2: PROFISSIONAL -->
+    <!-- ============================================
+         STAGE 2: REPRESENTANTE LEGAL
+         ============================================ -->
     <section class="stage" id="stage-2">
-        <div class="eyebrow">Etapa 02 — Profissional</div>
-        <h2 class="headline">Sua atuação <em>profissional.</em></h2>
+        <div class="eyebrow">Etapa 02 — Representante Legal</div>
+        <h2 class="headline">Quem responde <em>pela empresa?</em></h2>
 
         <div class="error-banner" id="error-2">Preencha os campos obrigatórios antes de avançar.</div>
 
         <div class="fields">
             <div class="field">
-                <label>Empresa / Escritório <span class="optional">opcional</span></label>
-                <input type="text" name="empresa" autocomplete="organization" />
+                <label>CPF do Representante <span class="required">*</span></label>
+                <input type="text" name="cpfRepresentante" data-required data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" />
                 <span class="field-bar"></span>
+                <span class="field-error">CPF inválido</span>
             </div>
 
             <div class="field">
                 <label>Cargo / Função <span class="required">*</span></label>
-                <input type="text" name="cargo" data-required autocomplete="organization-title" placeholder="Ex: arquiteto, BIM manager, estagiário, sócio" />
+                <input type="text" name="cargo" data-required autocomplete="organization-title" />
                 <span class="field-bar"></span>
                 <span class="field-error">Campo obrigatório</span>
-            </div>
-
-            <div class="field">
-                <label>Qual software você utiliza atualmente? <span class="required">*</span></label>
-                <select name="softwareAtual" data-required>
-                    <option value="">Selecione</option>
-                    <option value="Revit">Revit</option>
-                    <option value="Archicad">Archicad</option>
-                    <option value="SketchUp">SketchUp</option>
-                    <option value="AutoCAD">AutoCAD</option>
-                    <option value="Outro">Outro</option>
-                </select>
-                <span class="field-bar"></span>
-                <span class="field-error">Selecione uma opção</span>
-            </div>
-
-            <div class="field">
-                <label>Seu nível de experiência com BIM <span class="required">*</span></label>
-                <select name="nivelBIM" data-required>
-                    <option value="">Selecione</option>
-                    <option value="Iniciante">Iniciante</option>
-                    <option value="Intermediário">Intermediário</option>
-                    <option value="Avançado">Avançado</option>
-                </select>
-                <span class="field-bar"></span>
-                <span class="field-error">Selecione uma opção</span>
             </div>
         </div>
 
@@ -838,78 +785,145 @@
         </nav>
     </section>
 
-    <!-- STAGE 3: TREINAMENTO -->
+    <!-- ============================================
+         STAGE 3: CONTATO
+         ============================================ -->
     <section class="stage" id="stage-3">
-        <div class="eyebrow">Etapa 03 — Treinamento</div>
-        <h2 class="headline">Sobre o <em>treinamento.</em></h2>
+        <div class="eyebrow">Etapa 03 — Contato</div>
+        <h2 class="headline">Como falamos <em>com você?</em></h2>
 
-        <div class="error-banner" id="error-3">Preencha os campos obrigatórios antes de enviar.</div>
-
-        <!-- HONEYPOT -->
-        <input type="text" name="website_url" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <div class="error-banner" id="error-3">Preencha os campos obrigatórios antes de avançar.</div>
 
         <div class="fields">
-            <div class="field pill-group" data-pill-group="softwareInteresse">
-                <label>Qual software é do seu interesse? <span class="required">*</span></label>
-                <div class="pills">
-                    <button type="button" class="pill" data-value="Archicad">Archicad</button>
-                    <button type="button" class="pill" data-value="Revit">Revit</button>
-                </div>
-                <input type="hidden" name="softwareInteresse" data-required />
-                <span class="field-error">Selecione uma opção</span>
+            <div class="field">
+                <label>E-mail Corporativo <span class="required">*</span></label>
+                <input type="email" name="email" data-required autocomplete="email" placeholder="contato@empresa.com.br" />
+                <span class="field-bar"></span>
+                <span class="field-error">E-mail inválido</span>
             </div>
 
             <div class="field">
-                <label>Qual sua principal dificuldade ou objetivo com esse treinamento? <span class="required">*</span></label>
-                <textarea name="objetivo" data-required rows="3" placeholder="Conte pra gente o que você espera alcançar..."></textarea>
+                <label>Telefone / WhatsApp <span class="optional">opcional</span></label>
+                <input type="tel" name="telefone" data-mask="phone" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" autocomplete="tel" />
                 <span class="field-bar"></span>
-                <span class="field-error">Campo obrigatório</span>
             </div>
 
             <div class="field">
-                <label>Como conheceu a Modo BIM? <span class="optional">opcional</span></label>
-                <select name="comoConheceu">
-                    <option value="">Selecione</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="Indicação">Indicação</option>
-                    <option value="Google">Google</option>
-                    <option value="Outro">Outro</option>
-                </select>
+                <label>Site <span class="optional">opcional</span></label>
+                <input type="url" name="site" autocomplete="url" placeholder="www.empresa.com.br" />
                 <span class="field-bar"></span>
-            </div>
-
-            <div class="field pill-group" data-pill-group="bimclub">
-                <label>Aceita entrar na nossa comunidade do BIMClub? <span class="required">*</span></label>
-                <div class="pills">
-                    <button type="button" class="pill" data-value="Sim">Sim, quero entrar</button>
-                    <button type="button" class="pill" data-value="Não">Agora não</button>
-                </div>
-                <input type="hidden" name="bimclub" data-required />
-                <span class="field-error">Selecione uma opção</span>
             </div>
         </div>
 
         <nav class="nav">
             <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
-            <button type="button" class="nav-btn next submit" id="submitBtn">Entrar na lista <span class="arrow">→</span></button>
+            <button type="button" class="nav-btn next" data-next>Avançar <span class="arrow">→</span></button>
         </nav>
     </section>
 
-    <!-- SUCCESS -->
+    <!-- ============================================
+         STAGE 4: ENDEREÇO
+         ============================================ -->
+    <section class="stage" id="stage-4">
+        <div class="eyebrow">Etapa 04 — Endereço</div>
+        <h2 class="headline">Onde sua empresa <em>fica?</em></h2>
+
+        <div class="error-banner" id="error-4">Preencha os campos obrigatórios antes de enviar.</div>
+
+        <!-- HONEYPOT (anti-spam) -->
+        <input type="text" name="website_url" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="fields">
+            <div class="field field-full">
+                <label>CEP <span class="required">*</span></label>
+                <input type="text" name="cep" data-required data-mask="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code" />
+                <span class="field-bar"></span>
+                <span class="field-hint">Digite o CEP — preencheremos o endereço pra você.</span>
+                <span class="field-error">CEP inválido</span>
+            </div>
+
+            <div class="field field-full">
+                <label>Logradouro <span class="required">*</span></label>
+                <input type="text" name="logradouro" data-required autocomplete="address-line1" placeholder="Rua, Travessa, Avenida..." />
+                <span class="field-bar"></span>
+                <span class="field-error">Campo obrigatório</span>
+            </div>
+
+            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
+                <div class="field">
+                    <label>Número <span class="optional">opcional</span></label>
+                    <input type="text" name="numero" inputmode="numeric" autocomplete="address-line2" />
+                    <span class="field-bar"></span>
+                </div>
+                <div class="field">
+                    <label>Complemento <span class="optional">opcional</span></label>
+                    <input type="text" name="complemento" autocomplete="address-line3" />
+                    <span class="field-bar"></span>
+                </div>
+            </div>
+
+            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
+                <div class="field">
+                    <label>Bairro <span class="optional">opcional</span></label>
+                    <input type="text" name="bairro" />
+                    <span class="field-bar"></span>
+                </div>
+                <div class="field">
+                    <label>Cidade <span class="optional">opcional</span></label>
+                    <input type="text" name="cidade" autocomplete="address-level2" />
+                    <span class="field-bar"></span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Estado / UF <span class="required">*</span></label>
+                <select name="estado" data-required autocomplete="address-level1">
+                    <option value="">Selecione</option>
+                    <option value="AC">Acre</option><option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option><option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option><option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option><option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
+                    <option value="MG">Minas Gerais</option><option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option><option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option><option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option>
+                    <option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option><option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
+                </select>
+                <span class="field-bar"></span>
+                <span class="field-error">Selecione um estado</span>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <button type="button" class="nav-btn back" data-back><span class="arrow">→</span> Voltar</button>
+            <button type="button" class="nav-btn next submit" id="submitBtn">Enviar cadastro <span class="arrow">→</span></button>
+        </nav>
+    </section>
+
+    <!-- ============================================
+         STAGE SUCCESS
+         ============================================ -->
     <section class="stage" id="stage-success">
         <div class="success-seal" aria-hidden="true">
             <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>
         </div>
-        <h2 class="success-headline">Você está dentro.</h2>
-        <p class="success-text">Sua vaga na lista de espera está garantida. Avisaremos pelo e-mail e WhatsApp informados assim que abrirmos as inscrições da próxima turma.</p>
+        <h2 class="success-headline">Recebido.</h2>
+        <p class="success-text">Suas informações chegaram até nós com sucesso. Em breve entraremos em contato pelo e-mail informado.</p>
         <div class="protocol-card">
             <div class="protocol-label">Protocolo</div>
-            <div class="protocol-number" id="protocolNumber">LE-2026-0001</div>
+            <div class="protocol-number" id="protocolNumber">MB-2026-0001</div>
         </div>
         <div class="success-footer">_modo_bim</div>
     </section>
 
-    <!-- FOOTER -->
+    <!-- ============================================
+         FOOTER (always visible)
+         ============================================ -->
     <footer class="footer">
         <span class="brand-logo footer-logo" aria-label="_modo_bim">_modo_bim</span>
         <span>belém · pará · brasil</span>
@@ -919,16 +933,15 @@
 
 <script>
     /* ============================================
-       CONFIG
+       CONFIG — substitua pelo URL do Apps Script
        ============================================ */
     const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbwCEpVWnpv9gyUK6k-b10lJ9O45RXbstsviNQwdrGKDzzgpsqR2587g-UttwCQsemk/exec';
-    const FORM_TYPE = 'lista-espera';
 
     /* ============================================
        STATE
        ============================================ */
-    let currentStep = 0;
-    const totalSteps = 3;
+    let currentStep = 0; // 0 = cover, 1-4 = form steps, 5 = success
+    const totalSteps = 4;
     const formData = {};
 
     /* ============================================
@@ -939,6 +952,7 @@
         1: document.getElementById('stage-1'),
         2: document.getElementById('stage-2'),
         3: document.getElementById('stage-3'),
+        4: document.getElementById('stage-4'),
         success: document.getElementById('stage-success')
     };
     const progressEl = document.getElementById('progress');
@@ -956,16 +970,17 @@
             stages.cover.classList.add('active');
             progressEl.style.display = 'none';
             headerMeta.textContent = '2026';
-        } else if (step >= 1 && step <= totalSteps) {
+        } else if (step >= 1 && step <= 4) {
             stages[step].classList.add('active');
             progressEl.style.display = 'flex';
             headerMeta.textContent = `0${step} / 0${totalSteps}`;
             updateProgress(step);
+            // focus first field after transition
             setTimeout(() => {
-                const firstInput = stages[step].querySelector('input:not([type="hidden"]):not(.honeypot), select, textarea');
+                const firstInput = stages[step].querySelector('input, select');
                 if (firstInput) firstInput.focus();
             }, 400);
-        } else if (step === totalSteps + 1) {
+        } else if (step === 5) {
             stages.success.classList.add('active');
             progressEl.style.display = 'none';
             headerMeta.textContent = 'Concluído';
@@ -1011,6 +1026,26 @@
     /* ============================================
        MASKS
        ============================================ */
+    function maskCNPJ(v) {
+        return v.replace(/\D/g, '')
+            .replace(/^(\d{2})(\d)/, '$1.$2')
+            .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+            .replace(/\.(\d{3})(\d)/, '.$1/$2')
+            .replace(/(\d{4})(\d)/, '$1-$2')
+            .substring(0, 18);
+    }
+    function maskCPF(v) {
+        return v.replace(/\D/g, '')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+            .substring(0, 14);
+    }
+    function maskCEP(v) {
+        return v.replace(/\D/g, '')
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .substring(0, 9);
+    }
     function maskPhone(v) {
         v = v.replace(/\D/g, '');
         if (v.length <= 10) {
@@ -1022,35 +1057,46 @@
     document.querySelectorAll('[data-mask]').forEach(input => {
         input.addEventListener('input', (e) => {
             const type = e.target.dataset.mask;
-            const fn = { phone: maskPhone }[type];
+            const fn = { cnpj: maskCNPJ, cpf: maskCPF, cep: maskCEP, phone: maskPhone }[type];
             if (fn) e.target.value = fn(e.target.value);
-        });
-    });
-
-    /* ============================================
-       PILLS (toggle group)
-       ============================================ */
-    document.querySelectorAll('[data-pill-group]').forEach(group => {
-        const hiddenInput = group.querySelector('input[type="hidden"]');
-        group.querySelectorAll('.pill').forEach(pill => {
-            pill.addEventListener('click', () => {
-                group.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
-                pill.classList.add('selected');
-                if (hiddenInput) hiddenInput.value = pill.dataset.value;
-                group.classList.remove('error');
-            });
         });
     });
 
     /* ============================================
        VALIDATORS
        ============================================ */
+    function validarCNPJ(cnpj) {
+        cnpj = cnpj.replace(/\D/g, '');
+        if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) return false;
+        let t = cnpj.length - 2, d = cnpj.substring(t), n = cnpj.substring(0, t), s = 0, p = t - 7;
+        for (let i = t; i >= 1; i--) { s += n.charAt(t - i) * p--; if (p < 2) p = 9; }
+        let r = s % 11 < 2 ? 0 : 11 - s % 11;
+        if (r !== parseInt(d.charAt(0))) return false;
+        t += 1; n = cnpj.substring(0, t); s = 0; p = t - 7;
+        for (let i = t; i >= 1; i--) { s += n.charAt(t - i) * p--; if (p < 2) p = 9; }
+        r = s % 11 < 2 ? 0 : 11 - s % 11;
+        return r === parseInt(d.charAt(1));
+    }
+
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, '');
+        if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+        let s = 0;
+        for (let i = 0; i < 9; i++) s += parseInt(cpf.charAt(i)) * (10 - i);
+        let r = 11 - (s % 11); if (r >= 10) r = 0;
+        if (r !== parseInt(cpf.charAt(9))) return false;
+        s = 0;
+        for (let i = 0; i < 10; i++) s += parseInt(cpf.charAt(i)) * (11 - i);
+        r = 11 - (s % 11); if (r >= 10) r = 0;
+        return r === parseInt(cpf.charAt(10));
+    }
+
     function validarEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
-    function validarTelefone(tel) {
-        const digits = tel.replace(/\D/g, '');
-        return digits.length === 10 || digits.length === 11;
+
+    function validarCEP(cep) {
+        return cep.replace(/\D/g, '').length === 8;
     }
 
     /* ============================================
@@ -1067,22 +1113,32 @@
 
         stage.querySelectorAll('[data-required]').forEach(input => {
             const field = input.closest('.field');
-            const value = (input.value || '').trim();
+            const value = input.value.trim();
             if (!value) {
                 field.classList.add('error');
-                const errEl = field.querySelector('.field-error');
-                if (errEl) errEl.textContent = field.classList.contains('pill-group') ? 'Selecione uma opção' : 'Campo obrigatório';
+                field.querySelector('.field-error').textContent = 'Campo obrigatório';
                 isValid = false;
                 return;
+            }
+            // Specific validations
+            if (input.name === 'cnpj' && !validarCNPJ(value)) {
+                field.classList.add('error');
+                field.querySelector('.field-error').textContent = 'CNPJ inválido';
+                isValid = false;
+            }
+            if (input.name === 'cpfRepresentante' && !validarCPF(value)) {
+                field.classList.add('error');
+                field.querySelector('.field-error').textContent = 'CPF inválido';
+                isValid = false;
             }
             if (input.name === 'email' && !validarEmail(value)) {
                 field.classList.add('error');
                 field.querySelector('.field-error').textContent = 'E-mail inválido';
                 isValid = false;
             }
-            if (input.name === 'telefone' && !validarTelefone(value)) {
+            if (input.name === 'cep' && !validarCEP(value)) {
                 field.classList.add('error');
-                field.querySelector('.field-error').textContent = 'Telefone inválido';
+                field.querySelector('.field-error').textContent = 'CEP inválido';
                 isValid = false;
             }
         });
@@ -1094,9 +1150,41 @@
     function saveStepData(step) {
         const stage = stages[step];
         if (!stage) return;
-        stage.querySelectorAll('input, select, textarea').forEach(input => {
+        stage.querySelectorAll('input, select').forEach(input => {
             if (input.name && input.name !== 'website_url') {
-                formData[input.name] = (input.value || '').trim();
+                formData[input.name] = input.value.trim();
+            }
+        });
+    }
+
+    /* ============================================
+       VIACEP — auto-fill address
+       ============================================ */
+    const cepInput = document.querySelector('[name="cep"]');
+    if (cepInput) {
+        cepInput.addEventListener('blur', async () => {
+            const cep = cepInput.value.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+            const field = cepInput.closest('.field');
+            field.classList.add('loading');
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await res.json();
+                if (!data.erro) {
+                    const set = (name, val) => {
+                        const el = document.querySelector(`[name="${name}"]`);
+                        if (el && !el.value) el.value = val || '';
+                    };
+                    set('logradouro', data.logradouro);
+                    set('bairro', data.bairro);
+                    set('cidade', data.localidade);
+                    const estadoSelect = document.querySelector('[name="estado"]');
+                    if (estadoSelect && data.uf && !estadoSelect.value) estadoSelect.value = data.uf;
+                }
+            } catch (err) {
+                console.warn('ViaCEP indisponível', err);
+            } finally {
+                field.classList.remove('loading');
             }
         });
     }
@@ -1105,9 +1193,10 @@
        SUBMIT
        ============================================ */
     submitBtn.addEventListener('click', async () => {
-        if (!validateStep(totalSteps)) return;
-        saveStepData(totalSteps);
+        if (!validateStep(4)) return;
+        saveStepData(4);
 
+        // Honeypot check
         const honeypot = document.querySelector('[name="website_url"]');
         if (honeypot && honeypot.value) {
             console.warn('Honeypot triggered');
@@ -1120,7 +1209,6 @@
         try {
             const payload = {
                 ...formData,
-                tipo: FORM_TYPE,
                 timestamp: new Date().toISOString(),
                 userAgent: navigator.userAgent
             };
@@ -1134,18 +1222,19 @@
                 });
                 const result = await res.json();
                 if (result.success) {
-                    document.getElementById('protocolNumber').textContent = result.protocolo || 'LE-2026-0001';
+                    document.getElementById('protocolNumber').textContent = result.protocolo || 'MB-2026-0001';
                 }
             } else {
+                // DEV mode — sem endpoint
                 console.log('📤 Payload (modo dev):', payload);
                 await new Promise(r => setTimeout(r, 800));
-                document.getElementById('protocolNumber').textContent = 'LE-2026-DEV';
+                document.getElementById('protocolNumber').textContent = 'MB-2026-DEV';
             }
 
-            showStage(totalSteps + 1);
+            showStage(5);
         } catch (err) {
             console.error('Erro ao enviar:', err);
-            const banner = document.getElementById('error-' + totalSteps);
+            const banner = document.getElementById('error-4');
             banner.textContent = 'Erro ao enviar. Tente novamente em instantes.';
             banner.classList.add('visible');
         } finally {
@@ -1154,20 +1243,21 @@
     });
 
     /* ============================================
-       REAL-TIME VALIDATION (visual ✓)
+       REAL-TIME VALIDATION FEEDBACK (visual ✓)
        ============================================ */
-    document.querySelectorAll('input, select, textarea').forEach(input => {
-        if (input.type === 'hidden') return;
+    document.querySelectorAll('input, select').forEach(input => {
         input.addEventListener('blur', () => {
             const field = input.closest('.field');
             if (!field || !input.dataset.required) return;
-            const value = (input.value || '').trim();
+            const value = input.value.trim();
             field.classList.remove('valid', 'error');
             if (!value) return;
 
             let valid = true;
-            if (input.name === 'email') valid = validarEmail(value);
-            else if (input.name === 'telefone') valid = validarTelefone(value);
+            if (input.name === 'cnpj') valid = validarCNPJ(value);
+            else if (input.name === 'cpfRepresentante') valid = validarCPF(value);
+            else if (input.name === 'email') valid = validarEmail(value);
+            else if (input.name === 'cep') valid = validarCEP(value);
 
             if (valid) field.classList.add('valid');
             else field.classList.add('error');
@@ -1178,11 +1268,10 @@
        ENTER key navigation
        ============================================ */
     document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'TEXTAREA') return;
-        if (e.key === 'Enter' && currentStep >= 1 && currentStep <= totalSteps) {
+        if (e.key === 'Enter' && currentStep >= 1 && currentStep <= 4) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
                 e.preventDefault();
-                if (currentStep === totalSteps) submitBtn.click();
+                if (currentStep === 4) submitBtn.click();
                 else {
                     const nextBtn = stages[currentStep].querySelector('[data-next]');
                     if (nextBtn) nextBtn.click();
