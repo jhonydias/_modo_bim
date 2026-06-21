@@ -9,7 +9,8 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ### Correções de responsividade no mobile — `index.html`
 - **Menu mobile / botão "faça um diagnóstico":** corrigido bug de especificidade CSS — `.nav-links a` (`width:100%; padding:12px 0`) sobrescrevia o `.nav-cta` e zerava o padding horizontal, cortando o texto. Agora usa `.nav-links a.nav-cta` com `width:max-content` e padding adequado.
-- **Headline do hero ("Um novo modo_ de projetar"):** estava colada na borda esquerda. Aumentado o gutter mínimo (`--gutter` de 22px → 26px) e reduzida a fonte do título no mobile (≤520px).
+- **Headline do hero ("Um novo modo_ de projetar"):** aumentado o gutter mínimo (`--gutter` de 22px → 26px) e reduzida a fonte do título no mobile (≤520px).
+- **Hero colado na borda esquerda (mobile):** a regra `.hero-grid` usava o shorthand `padding: clamp(...) 0`, que zerava o padding horizontal e sobrescrevia o gutter lateral do `.wrap`. Trocado por `padding-top`/`padding-bottom` (só vertical), preservando o espaçamento lateral como nas demais seções.
 - **Galeria "a _modo_bim acontecendo":** o posicionamento explícito do grid com alturas fixas fazia o depoimento estourar a célula e sobrepor as fotos, além de cortar imagens. Reescrito o layout mobile: grade simples de 2 colunas de fotos (proporção 3/4) + bloco de depoimento em largura total abaixo, com altura automática.
 
 ### Rodapé da landing — `index.html`

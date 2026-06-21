@@ -229,7 +229,9 @@
             gap: clamp(32px, 5vw, 72px);
             align-items: center;
             min-height: calc(100vh - 70px);
-            padding: clamp(40px, 6vw, 80px) 0;
+            /* só vertical — NÃO usar shorthand aqui, senão zera o gutter lateral do .wrap */
+            padding-top: clamp(40px, 6vw, 80px);
+            padding-bottom: clamp(40px, 6vw, 80px);
         }
         .hero-copy .display { margin: 22px 0 26px; max-width: 11ch; }
         .hero-copy .lead { margin-bottom: 40px; }
