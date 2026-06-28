@@ -7,19 +7,25 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-06-28
 
+### Pattern da marca como espinha visual da jornada (task 04) — `index.html`
+- **Pattern oficial recriado como ativo vetorial leve** (SVG inline, sem `.png` pesado nem libs): um `<symbol id="modoPattern">` com blocos de linhas horizontais que **sobem em degraus diagonais** — esparsas embaixo/à esquerda (bagunça), densas e alinhadas em cima/à direita (autonomia). A cor vem de `currentColor`, então o mesmo vetor serve em **creme sobre cereja** e **oliva sobre creme** (2+ variantes).
+- **Uso primário (textura de fundo, ~10%):** `.about` (#equipe) e `.cta-final` agora têm o Pattern em creme, bem sutil, **atrás do conteúdo** (`z-index`, `.wrap` acima) e sangrando para fora das bordas — faixa lateral à direita no #equipe; cantos opostos (topo-esq. espelhado + base-dir.) na CTA final. Não passa atrás do wordmark e não prejudica a leitura de nenhum texto.
+- **Uso secundário (passos 01–04):** as antigas `.step-bars` (barrinhas verticais improvisadas) foram **substituídas pela linguagem do Pattern**: cada passo mostra um swatch que cresce em altura/densidade do 01 ao 04 (01 = dois traços soltos; 04 = degrau completo e denso), reforçando "da bagunça à autonomia". Números (01–04) e nomes preservados; cabe no `.hpanel` horizontal sem cortar.
+- **Restrições respeitadas:** nenhum novo efeito de scroll (a ideia do "divisor que se constrói no scroll" foi descartada para não concorrer com o scroll horizontal); só cores da paleta (creme/oliva), sem preto; vetor leve, sem requisições extras. **Mobile (`< 520px`):** densidade simplificada (oculta a banda mais esparsa e os traços `.den`, reduz o tamanho da textura). Sem overflow horizontal em nenhuma largura.
+
 ### Seções "nosso modo / implementações / treinamentos" com scroll horizontal — `index.html`
 - As três seções agora **deslizam lateralmente** conforme o scroll vertical: rolar para baixo avança para a direita, rolar para cima volta para a esquerda. Ficam **pinadas** (sticky) enquanto o track horizontal é dirigido pelo scroll, com deslize suavizado (lerp) para uma transição gradual e bonita.
 - O **selecionador** acompanha automaticamente o painel ativo e, ao clicar num item (ou em qualquer link interno para essas seções), a página rola suavemente até o painel correspondente.
 - **Fallback:** em telas `< 768px` e com *prefers-reduced-motion*, as três seções voltam a empilhar verticalmente (sem pin), preservando acessibilidade. Estrutura via `display:contents` para não afetar o layout no fallback.
 - Os passos 01–04 dentro de "implementações" voltaram ao **grid normal** (a versão anterior, que rolava só os 4 passos, foi descartada conforme o esclarecimento).
 
-### Auditoria UX/UI + tasks de evolução — `tasks/03`–`tasks/07`
-- **`tasks/03/analise_ux_ui.md`:** documento de análise profunda (estética × performance/lead) das imagens de branding em `contexts/` e do site atual. Inclui: leitura do Termômetro de Atributos Visuais com nota por eixo e **alinhamento geral ≈ 73%** (furos em Ousada, Criativa e Orgânica/Artesanal); recomendação de onde aplicar o **Pattern** (espinha da jornada + textura nas seções cereja + divisor que se constrói no scroll); e leitura dos mockups de marca (prova de identidade tátil/humana, fotos reais, naming "teambim_"/"Escale com bim_", cores Bege/Marrom sub-usadas).
-- **Tasks detalhadas criadas a partir das melhores ideias** (padrão do projeto, porém com mais detalhe de implementação e definição de pronto):
-  - `tasks/04` — Pattern da marca como espinha visual da jornada (processo, seções cereja, divisor com scroll).
-  - `tasks/05` — "Termômetro de Maturidade BIM": quiz interativo client-side que qualifica e roteia o lead (cadastro vs lista-espera).
-  - `tasks/06` — Prova real: fim dos placeholders de galeria/depoimento, fotos reais das fundadoras, acento Bege/Marrom.
-  - `tasks/07` — Momento "Ousada": seção full-bleed cereja com manifesto gigante + Pattern antes de um CTA.
+### Auditoria UX/UI v2 (revisada pós scroll horizontal) — `tasks/03`–`tasks/07`
+- **`tasks/03/analise_ux_ui.md` atualizado para v2:** reanálise após a entrada do scroll horizontal pinado. O **alinhamento ao Termômetro subiu de ~73% para ≈ 78%** (o scroll horizontal cobriu boa parte dos furos Ousada/Criativa); furos restantes concentrados em **Humana** e **Artesanal/Orgânica** (placeholders de prova + ausência do Pattern/textura). Inclui §1 sobre o impacto (e o risco de scroll-jacking) da nova interação e §6 com o veredito por task.
+- **Tasks ajustadas ao estado atual do site:**
+  - `tasks/04` (Pattern) — **mantida, revisada:** cortado o "divisor que se constrói no scroll" (concorreria com o scroll horizontal); foco em textura nas seções cereja + linguagem dos passos 01–04, adaptada ao painel horizontal de altura limitada.
+  - `tasks/05` (Termômetro de Maturidade — quiz) — **mantida, recolocada:** sai de dentro de `#nosso-modo`/painéis horizontais (scroll sequestrado) para fora do bloco `.hsections`.
+  - `tasks/06` (Prova real) — **mantida, prioridade nº1:** ficou mais urgente (forma sofisticada × prova vazia).
+  - `tasks/07` — **repaginada:** o "momento Ousada" full-bleed virou redundante (o scroll horizontal já é o pico ousado); novo foco em **converter** o scroll horizontal (affordance anti scroll-jacking + CTA de fechamento) e no calor **Bege/Marrom**.
 
 ### Selecionador de seção aparece só ao rolar — `index.html`
 - O selecionador (nosso modo / implementações / treinamentos) **não aparece mais ao abrir o site**: agora surge gradualmente (fade + slide) depois de rolar para baixo (~60% da viewport) e some ao voltar ao topo.

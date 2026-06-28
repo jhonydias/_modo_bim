@@ -399,11 +399,9 @@
         .process-head .h-sec { margin: 18px 0 22px; }
         .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 3vw, 40px); }
         .step { border-top: 1px solid var(--ink); padding-top: 22px; }
-        .step-bars { display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-bottom: 26px; }
-        .step-bars i { width: 9px; background: var(--olive); display: block; border-radius: 1px; }
-        .step:nth-child(1) .step-bars i:nth-child(n+2) { display: none; }
-        .step:nth-child(2) .step-bars i:nth-child(n+3) { display: none; }
-        .step:nth-child(3) .step-bars i:nth-child(n+4) { display: none; }
+        /* swatch do Pattern: densidade/altura crescem do step 01 ao 04 (da bagunça à autonomia) */
+        .step-pat { display: block; width: 100%; max-width: 150px; height: 46px; margin-bottom: 26px; color: var(--olive); }
+        .step-pat line { stroke: currentColor; stroke-width: 2.2px; stroke-linecap: square; }
         .step-num { font-family: var(--serif); font-size: clamp(34px, 4vw, 48px); color: var(--ink); line-height: 1; margin-bottom: 10px; }
         .step-name { font-family: var(--detail); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); }
         .process-foot { margin-top: clamp(40px, 6vw, 64px); }
@@ -432,7 +430,8 @@
         /* ============================================
            QUEM SOMOS (apresentação interativa)
            ============================================ */
-        .about { background: var(--cereja); color: var(--cloud); }
+        .about { position: relative; overflow: hidden; background: var(--cereja); color: var(--cloud); }
+        .about > .wrap { position: relative; z-index: 1; }
         .about .label { color: var(--cloud-muted); }
         .about > .wrap > .label { display: block; margin-bottom: clamp(28px, 4vw, 44px); }
 
@@ -538,10 +537,29 @@
         /* ============================================
            FINAL CTA
            ============================================ */
-        .cta-final { background: var(--cereja); color: var(--cloud); text-align: center; padding: clamp(90px, 14vw, 180px) 0; }
+        .cta-final { position: relative; overflow: hidden; background: var(--cereja); color: var(--cloud); text-align: center; padding: clamp(90px, 14vw, 180px) 0; }
+        .cta-final .wrap { position: relative; z-index: 1; }
         .cta-final h2 { font-size: clamp(34px, 6vw, 76px); color: var(--cloud); max-width: 16ch; margin: 0 auto 44px; }
         .cta-final .cur { color: var(--cloud-muted); }
         .cta-buttons { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+
+        /* ============================================
+           PATTERN — textura de fundo sutil (sobre cereja)
+           ============================================ */
+        .modo-tex {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            height: auto;
+            color: var(--cream);
+            opacity: 0.1;
+        }
+        /* #equipe: faixa lateral à direita, sangrando para fora da borda */
+        .about .modo-tex { width: clamp(280px, 40vw, 520px); right: -6%; top: 50%; transform: translateY(-50%); }
+        /* cta-final: emoldura os dois cantos opostos */
+        .cta-final .modo-tex { width: clamp(220px, 26vw, 420px); }
+        .cta-final .modo-tex--tl { top: -6%; left: -5%; transform: scale(-1, 1); }
+        .cta-final .modo-tex--br { bottom: -6%; right: -5%; }
 
         /* ============================================
            FOOTER
@@ -594,10 +612,52 @@
             .steps { grid-template-columns: 1fr; }
             .gallery-grid { grid-template-columns: 1fr 1fr; }
             .hero-actions { gap: 18px; }
+            /* Pattern degrada: simplifica densidade e reduz tamanho da textura */
+            .modo-tex .mb-1 { display: none; }
+            .about .modo-tex { width: clamp(220px, 66vw, 320px); }
+            .cta-final .modo-tex { width: clamp(180px, 50vw, 260px); }
+            .step-pat .den { display: none; }
         }
     </style>
 </head>
 <body>
+
+<!-- ============================================ PATTERN (ativo vetorial reutilizável) ============================================
+     O Pattern oficial: blocos de linhas horizontais que sobem em degraus diagonais —
+     da bagunça (esparso, embaixo/à esquerda) à autonomia (denso e alinhado, em cima/à direita).
+     Vetor leve, sem imagem. A cor vem de currentColor (creme sobre cereja, oliva sobre creme). -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <symbol id="modoPattern" viewBox="0 0 220 200">
+        <g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square">
+            <g class="mb mb-1">
+                <line x1="10" y1="184" x2="30" y2="184"/><line x1="36" y1="184" x2="46" y2="184"/>
+                <line x1="10" y1="176" x2="24" y2="176"/><line x1="30" y1="176" x2="42" y2="176"/>
+                <line x1="14" y1="168" x2="34" y2="168"/>
+            </g>
+            <g class="mb mb-2">
+                <line x1="48" y1="148" x2="92" y2="148"/>
+                <line x1="48" y1="140" x2="80" y2="140"/><line x1="86" y1="140" x2="100" y2="140"/>
+                <line x1="52" y1="132" x2="96" y2="132"/>
+                <line x1="48" y1="124" x2="88" y2="124"/>
+            </g>
+            <g class="mb mb-3">
+                <line x1="96" y1="108" x2="150" y2="108"/>
+                <line x1="96" y1="100" x2="158" y2="100"/>
+                <line x1="100" y1="92" x2="150" y2="92"/>
+                <line x1="96" y1="84" x2="160" y2="84"/>
+                <line x1="104" y1="76" x2="148" y2="76"/>
+            </g>
+            <g class="mb mb-4">
+                <line x1="150" y1="64" x2="212" y2="64"/>
+                <line x1="150" y1="56" x2="208" y2="56"/>
+                <line x1="146" y1="48" x2="212" y2="48"/>
+                <line x1="152" y1="40" x2="206" y2="40"/>
+                <line x1="150" y1="32" x2="210" y2="32"/>
+                <line x1="156" y1="24" x2="200" y2="24"/>
+            </g>
+        </g>
+    </symbol>
+</svg>
 
 <!-- ============================================ NAV ============================================ -->
 <header class="nav">
@@ -672,22 +732,47 @@
 
             <div class="steps">
                 <div class="step reveal">
-                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
+                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
+                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
+                    </svg>
                     <div class="step-num">01</div>
                     <div class="step-name">Diagnóstico</div>
                 </div>
                 <div class="step reveal">
-                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
+                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
+                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
+                        <line x1="30" y1="32" x2="50" y2="32"/><line class="den" x1="54" y1="32" x2="60" y2="32"/>
+                        <line x1="30" y1="28" x2="47" y2="28"/><line class="den" x1="51" y1="28" x2="59" y2="28"/>
+                    </svg>
                     <div class="step-num">02</div>
                     <div class="step-name">Estruturação</div>
                 </div>
                 <div class="step reveal">
-                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
+                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
+                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
+                        <line x1="30" y1="32" x2="50" y2="32"/><line class="den" x1="54" y1="32" x2="60" y2="32"/>
+                        <line x1="30" y1="28" x2="47" y2="28"/><line class="den" x1="51" y1="28" x2="59" y2="28"/>
+                        <line x1="56" y1="22" x2="82" y2="22"/>
+                        <line x1="56" y1="18" x2="78" y2="18"/><line class="den" x1="82" y1="18" x2="88" y2="18"/>
+                    </svg>
                     <div class="step-num">03</div>
                     <div class="step-name">Treinamento da equipe</div>
                 </div>
                 <div class="step reveal">
-                    <div class="step-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:100%"></i></div>
+                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
+                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
+                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
+                        <line x1="30" y1="32" x2="50" y2="32"/><line class="den" x1="54" y1="32" x2="60" y2="32"/>
+                        <line x1="30" y1="28" x2="47" y2="28"/><line class="den" x1="51" y1="28" x2="59" y2="28"/>
+                        <line x1="56" y1="22" x2="82" y2="22"/>
+                        <line x1="56" y1="18" x2="78" y2="18"/><line class="den" x1="82" y1="18" x2="88" y2="18"/>
+                        <line x1="86" y1="12" x2="116" y2="12"/>
+                        <line x1="86" y1="8" x2="114" y2="8"/>
+                        <line x1="90" y1="4" x2="116" y2="4"/>
+                    </svg>
                     <div class="step-num">04</div>
                     <div class="step-name">Validação</div>
                 </div>
@@ -729,6 +814,7 @@
 
     <!-- ============================================ QUEM SOMOS (apresentação interativa) ============================================ -->
     <section class="section about" id="equipe">
+        <svg class="modo-tex" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
         <div class="wrap">
             <span class="label reveal">Quem está por trás da _modo_bim</span>
             <div class="team reveal" id="team" data-state="default">
@@ -802,6 +888,8 @@
 
     <!-- ============================================ FINAL CTA ============================================ -->
     <section class="cta-final">
+        <svg class="modo-tex modo-tex--tl" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
+        <svg class="modo-tex modo-tex--br" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
         <div class="wrap">
             <h2 class="reveal">Seu escritório está pronto para implementar BIM?<span class="cur">_</span></h2>
             <div class="cta-buttons reveal">
