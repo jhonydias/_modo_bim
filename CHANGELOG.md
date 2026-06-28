@@ -5,6 +5,14 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ---
 
+## 2026-06-28
+
+### Navegação por seção + menu hambúrguer universal — `index.html`
+- **Hambúrguer sempre visível** no canto superior direito, em qualquer viewport (desktop/tablet/mobile). Os links de navegação (implementações, treinamentos, quem somos, dúvidas, faça um diagnóstico) ficam escondidos atrás dele e aparecem como um *dropdown card* ao clicar. Fecha ao clicar fora, ao escolher um link ou com `Esc`.
+- **Selecionador de seção personalizado:** nova barra abaixo do header com "nosso modo / implementações / treinamentos" e uma marca olive deslizante no estilo da marca (`‾‾ _ ‾‾`) que indica a seção visível.
+- **Scrollspy:** ao rolar a página, a seção ativa é detectada (linha de referência a 35% da viewport) e o selecionador se move automaticamente. Clicar em um item rola suavemente até a seção correspondente.
+- Adicionado `id="nosso-modo"` à seção de posicionamento; tokens `--nav-h` (altura do header) e `scroll-padding-top` para os âncoras pararem abaixo do header fixo. Hero e coluna sticky de treinamentos passam a usar `--nav-h`.
+
 ## 2026-06-21
 
 ### Correções de responsividade no mobile — `index.html`
