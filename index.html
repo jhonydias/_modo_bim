@@ -375,31 +375,60 @@
         .training-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; margin-top: 8px; }
 
         /* ============================================
-           ABOUT + BIOS
+           QUEM SOMOS (apresentação interativa)
            ============================================ */
         .about { background: var(--cereja); color: var(--cloud); }
         .about .label { color: var(--cloud-muted); }
-        .about-intro {
+        .about > .wrap > .label { display: block; margin-bottom: clamp(28px, 4vw, 44px); }
+
+        .team {
             display: grid;
             grid-template-columns: 0.92fr 1fr;
             gap: clamp(32px, 5vw, 72px);
             align-items: center;
-            margin-bottom: clamp(56px, 8vw, 96px);
         }
-        .about-photo { border-radius: 4px; overflow: hidden; aspect-ratio: 3 / 3.4; background: var(--cereja-deep); }
-        .about-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .about-text .h-sec { color: var(--cloud); margin: 16px 0 24px; font-size: clamp(26px, 3.4vw, 42px); }
-        .about-text p { color: var(--cloud-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 18px); max-width: 52ch; }
-        .about-text .names { margin-top: 28px; font-family: var(--detail); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cloud); font-weight: 600; }
-        .about-text .names span { color: var(--cloud-muted); }
+        .team-photo { border-radius: 4px; overflow: hidden; aspect-ratio: 1 / 1; background: var(--cereja-deep); }
+        .team-photo img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s var(--ease); }
 
-        .bios { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 56px); }
-        .bio { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(20px, 2.4vw, 32px); align-items: start; }
-        .bio-photo { border-radius: 4px; overflow: hidden; aspect-ratio: 3 / 3.6; background: var(--cereja-deep); }
-        .bio-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .bio-name { font-family: var(--serif); font-size: clamp(22px, 2.4vw, 30px); color: var(--cloud); margin-bottom: 6px; }
-        .bio-role { font-family: var(--detail); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cloud-muted); font-weight: 600; margin-bottom: 18px; }
-        .bio-desc { color: var(--cloud-soft); font-weight: 300; font-size: 14.5px; line-height: 1.6; }
+        .team-info { transition: opacity 0.4s var(--ease); }
+        .team.swapping .team-photo img,
+        .team.swapping .team-info { opacity: 0; }
+
+        .team-title { color: var(--cloud); margin: 0 0 20px; font-size: clamp(26px, 3.4vw, 42px); }
+        .team-role { font-family: var(--detail); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cloud); font-weight: 600; margin-bottom: 18px; }
+        .team-body { color: var(--cloud-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 18px); max-width: 52ch; }
+
+        /* Selecionador (mesma marca da task 01) — aparece no hover dos nomes */
+        .team-picker { display: flex; flex-wrap: wrap; gap: clamp(28px, 5vw, 56px); margin-top: clamp(32px, 5vw, 48px); }
+        .pick {
+            position: relative;
+            font-family: var(--serif);
+            font-size: clamp(18px, 2.1vw, 23px);
+            line-height: 1;
+            color: var(--cloud);
+            padding-bottom: 16px;
+            opacity: 0.82;
+            transition: opacity 0.3s var(--ease);
+        }
+        .pick:hover, .pick:focus-visible { opacity: 1; outline: none; }
+        .pick-label .b { font-style: italic; }
+        .pick-mark {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: opacity 0.35s var(--ease), transform 0.4s var(--ease-out);
+        }
+        .pick:hover .pick-mark, .pick:focus-visible .pick-mark { opacity: 1; transform: translateY(0); }
+        .pick-mark i { flex: 1; height: 1.5px; background: var(--cloud); display: block; }
+        .pick-mark b { font-family: var(--serif); font-weight: 500; font-size: 15px; line-height: 0; color: var(--cloud); margin: 0 7px; transform: translateY(-3px); }
 
         /* ============================================
            GALLERY
@@ -492,9 +521,8 @@
             .steps { grid-template-columns: 1fr 1fr; gap: 32px; }
             .training-grid { grid-template-columns: 1fr; gap: 40px; }
             .training-sticky { position: static; }
-            .about-intro { grid-template-columns: 1fr; }
-            .about-photo { aspect-ratio: 4/3.2; max-height: 440px; }
-            .bios { grid-template-columns: 1fr; gap: 44px; }
+            .team { grid-template-columns: 1fr; gap: 32px; }
+            .team-photo { aspect-ratio: 4/3.4; max-height: 460px; }
             .faq-grid { grid-template-columns: 1fr; gap: 24px; }
             /* gallery: simple 2-col of photos + full-width quote below (no overlap) */
             .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; }
@@ -508,8 +536,6 @@
             .nav-links { left: var(--gutter); right: var(--gutter); min-width: 0; }
             .hero-copy .display { font-size: clamp(33px, 9vw, 42px); }
             .steps { grid-template-columns: 1fr; }
-            .bio { grid-template-columns: 1fr; }
-            .bio-photo { max-height: 360px; aspect-ratio: 4/3.4; }
             .gallery-grid { grid-template-columns: 1fr 1fr; }
             .hero-actions { gap: 18px; }
         }
@@ -634,38 +660,29 @@
         </div>
     </section>
 
-    <!-- ============================================ ABOUT + BIOS ============================================ -->
+    <!-- ============================================ QUEM SOMOS (apresentação interativa) ============================================ -->
     <section class="section about" id="equipe">
         <div class="wrap">
-            <div class="about-intro">
-                <div class="about-photo reveal">
-                    <img src="img/founders.jpg" alt="Joene Louchard e Dayana Ramos, fundadoras da _modo_bim" />
+            <span class="label reveal">Quem está por trás da _modo_bim</span>
+            <div class="team reveal" id="team" data-state="default">
+                <div class="team-photo">
+                    <img id="teamImg" src="img/founders.jpg" alt="Joene Louchard e Dayana Ramos, fundadoras da _modo_bim" />
                 </div>
-                <div class="about-text reveal">
-                    <span class="label">Quem está por trás da _modo_bim</span>
-                    <h2 class="h-sec">Profundidade acadêmica <em class="it">+</em> vivência real de mercado.</h2>
-                    <p>Duas arquitetas de Belém, atuantes no Brasil, que se especializaram na metodologia BIM, viveram a dor do mercado por dentro e decidiram ser a resposta. A _modo_bim nasceu de uma convicção: BIM não é uma ferramenta a ser aprendida, é um modo de operar. Por isso começamos no diagnóstico e só terminamos quando o seu escritório anda sozinho.</p>
-                    <div class="names">Joene Louchard <span>·</span> Dayana Ramos</div>
+                <div class="team-info" id="teamInfo">
+                    <h2 class="h-sec team-title" id="teamTitle">Profundidade acadêmica <em class="it">+</em> vivência real de mercado.</h2>
+                    <div class="team-role" id="teamRole" hidden></div>
+                    <p class="team-body" id="teamBody">Duas arquitetas de Belém, atuantes no Brasil, que se especializaram na metodologia BIM, viveram a dor do mercado por dentro e decidiram ser a resposta. A _modo_bim nasceu de uma convicção: BIM não é uma ferramenta a ser aprendida, é um modo de operar. Por isso começamos no diagnóstico e só terminamos quando o seu escritório anda sozinho.</p>
+                    <div class="team-picker" id="teamPicker" role="tablist" aria-label="Conheça as fundadoras">
+                        <button class="pick" type="button" data-slot="a">
+                            <span class="pick-label"></span>
+                            <span class="pick-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
+                        </button>
+                        <button class="pick" type="button" data-slot="b">
+                            <span class="pick-label"></span>
+                            <span class="pick-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            <div class="bios">
-                <article class="bio reveal">
-                    <div class="bio-photo"><img src="img/joene.jpg" alt="Joene Louchard" /></div>
-                    <div>
-                        <h3 class="bio-name">Joene Louchard</h3>
-                        <div class="bio-role">Co-fundadora · Arquiteta e Designer</div>
-                        <p class="bio-desc">A vivência de mercado da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro — porque já esteve lá.</p>
-                    </div>
-                </article>
-                <article class="bio reveal">
-                    <div class="bio-photo"><img src="img/dayana.jpg" alt="Dayana Ramos" /></div>
-                    <div>
-                        <h3 class="bio-name">Dayana Ramos</h3>
-                        <div class="bio-role">Co-fundadora · Arquiteta, especialista em BIM</div>
-                        <p class="bio-desc">A base metodológica da _modo_bim. Dedicada a traduzir o BIM em processo aplicável. É quem garante que cada implementação tenha método, não improviso.</p>
-                    </div>
-                </article>
             </div>
         </div>
     </section>
@@ -810,6 +827,89 @@
     window.addEventListener('load', () => { updateSpy(); repositionIndicator(); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(repositionIndicator);
     updateSpy();
+
+    /* ============================================ QUEM SOMOS — apresentação interativa ============================================ */
+    const team = document.getElementById('team');
+    if (team) {
+        const teamImg = document.getElementById('teamImg');
+        const teamTitle = document.getElementById('teamTitle');
+        const teamRole = document.getElementById('teamRole');
+        const teamBody = document.getElementById('teamBody');
+        const picks = team.querySelectorAll('.pick');
+        const BACK = '_modo_<span class="b">b</span>im';
+
+        const TEAM = {
+            default: {
+                img: 'img/founders.jpg',
+                alt: 'Joene Louchard e Dayana Ramos, fundadoras da _modo_bim',
+                title: 'Profundidade acadêmica <em class="it">+</em> vivência real de mercado.',
+                role: '',
+                body: 'Duas arquitetas de Belém, atuantes no Brasil, que se especializaram na metodologia BIM, viveram a dor do mercado por dentro e decidiram ser a resposta. A _modo_bim nasceu de uma convicção: BIM não é uma ferramenta a ser aprendida, é um modo de operar. Por isso começamos no diagnóstico e só terminamos quando o seu escritório anda sozinho.'
+            },
+            joene: {
+                img: 'img/joene.jpg',
+                alt: 'Joene Louchard',
+                title: 'Joene Louchard',
+                role: 'Co-fundadora · Arquiteta e Designer',
+                body: 'A vivência de mercado da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro — porque já esteve lá.'
+            },
+            dayana: {
+                img: 'img/dayana.jpg',
+                alt: 'Dayana Ramos',
+                title: 'Dayana Ramos',
+                role: 'Co-fundadora · Arquiteta, especialista em BIM',
+                body: 'A base metodológica da _modo_bim. Dedicada a traduzir o BIM em processo aplicável. É quem garante que cada implementação tenha método, não improviso.'
+            }
+        };
+
+        // Dois slots fixos: A alterna Joene <-> voltar(modo_bim); B alterna Dayana <-> voltar.
+        function pickerFor(state) {
+            return [
+                state === 'joene'  ? { html: BACK, target: 'default' } : { html: 'Joene Louchard', target: 'joene' },
+                state === 'dayana' ? { html: BACK, target: 'default' } : { html: 'Dayana Ramos',   target: 'dayana' }
+            ];
+        }
+
+        function paint(state) {
+            const d = TEAM[state];
+            teamImg.src = d.img;
+            teamImg.alt = d.alt;
+            teamTitle.innerHTML = d.title;
+            if (d.role) { teamRole.textContent = d.role; teamRole.hidden = false; }
+            else { teamRole.hidden = true; teamRole.textContent = ''; }
+            teamBody.textContent = d.body;
+            const opts = pickerFor(state);
+            picks.forEach((btn, i) => {
+                btn.querySelector('.pick-label').innerHTML = opts[i].html;
+                btn.dataset.target = opts[i].target;
+                const back = opts[i].target === 'default';
+                btn.setAttribute('aria-label', back ? 'Voltar para a apresentação da _modo_bim' : 'Ver apresentação de ' + opts[i].html);
+            });
+            team.dataset.state = state;
+        }
+
+        let swapTimer = null;
+        function setState(state, animate = true) {
+            if (state === team.dataset.state) return;
+            if (!animate) { paint(state); return; }
+            team.classList.add('swapping');
+            clearTimeout(swapTimer);
+            swapTimer = setTimeout(() => {
+                paint(state);
+                team.classList.remove('swapping');
+            }, 280);
+        }
+
+        picks.forEach(btn => btn.addEventListener('click', () => setState(btn.dataset.target)));
+
+        // Rolagem nunca revela sub-sessões: ao sair da viewport, volta ao default.
+        const teamIO = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (!e.isIntersecting && team.dataset.state !== 'default') setState('default', false); });
+        }, { threshold: 0 });
+        teamIO.observe(team);
+
+        paint('default');
+    }
 
     /* ============================================ FAQ ACCORDION ============================================ */
     document.querySelectorAll('.faq-item').forEach(item => {

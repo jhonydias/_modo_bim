@@ -7,6 +7,13 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-06-28
 
+### Seção "quem somos" interativa — `index.html`
+- A antiga seção **about + bios** (foto das fundadoras + dois cards fixos) virou uma **apresentação interativa de painel único** (`#equipe`).
+- **Visualização default:** foto das fundadoras, "Profundidade acadêmica + vivência real de mercado" e os nomes **Joene Louchard** / **Dayana Ramos** como itens clicáveis.
+- **Selecionador no hover:** ao passar o mouse sobre os nomes aparece a mesma marca do selecionador da task 01 (`‾‾ _ ‾‾`, em cloud para contraste no fundo cereja), sinalizando que são clicáveis.
+- **Clique:** substitui foto + título + função + bio pela apresentação da pessoa; o slot da pessoa ativa passa a exibir **_modo_bim** para voltar ao default. Transição com fade.
+- **Rolagem não troca de sessão** (ao contrário da task 01): as sub-visualizações só aparecem por clique; ao rolar para fora da seção, ela volta sozinha ao default.
+
 ### Navegação por seção + menu hambúrguer universal — `index.html`
 - **Hambúrguer sempre visível** no canto superior direito, em qualquer viewport (desktop/tablet/mobile). Os links de navegação (implementações, treinamentos, quem somos, dúvidas, faça um diagnóstico) ficam escondidos atrás dele e aparecem como um *dropdown card* ao clicar. Fecha ao clicar fora, ao escolher um link ou com `Esc`.
 - **Selecionador de seção personalizado:** nova barra abaixo do header com "nosso modo / implementações / treinamentos" e uma marca olive deslizante no estilo da marca (`‾‾ _ ‾‾`) que indica a seção visível.
