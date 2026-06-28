@@ -269,7 +269,7 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            transition: transform 0.5s var(--ease-out), width 0.5s var(--ease-out);
+            transition: transform 0.5s var(--ease-out), width 0.5s var(--ease-out), opacity 0.35s var(--ease);
         }
         .sec-indicator i { flex: 1; height: 1.5px; background: var(--olive); display: block; }
         .sec-indicator b {
@@ -531,8 +531,9 @@
             .gallery-quote { grid-column: 1 / -1 !important; }
         }
         @media (max-width: 520px) {
-            .section-nav { gap: 20px; overflow-x: auto; scrollbar-width: none; }
+            .section-nav { gap: 16px; overflow-x: auto; scrollbar-width: none; padding-right: 8px; }
             .section-nav::-webkit-scrollbar { display: none; }
+            .sec-link { font-size: clamp(13px, 3.6vw, 16px); }
             .nav-links { left: var(--gutter); right: var(--gutter); min-width: 0; }
             .hero-copy .display { font-size: clamp(33px, 9vw, 42px); }
             .steps { grid-template-columns: 1fr; }
@@ -788,14 +789,22 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
     /* ============================================ SELECIONADOR DE SEÇÃO (scrollspy) ============================================ */
+    const sectionNav = document.querySelector('.section-nav');
     const secLinks = [...document.querySelectorAll('.sec-link')];
     const secTargets = secLinks.map(l => document.getElementById(l.dataset.target));
     const indicator = document.querySelector('.sec-indicator');
     let activeIdx = -1;
 
     function moveIndicator(link) {
+        indicator.style.opacity = '1';
         indicator.style.width = link.offsetWidth + 'px';
         indicator.style.transform = `translateX(${link.offsetLeft}px)`;
+    }
+    // mantém o item ativo sempre visível quando o selecionador rola na horizontal (mobile)
+    function ensureVisible(link) {
+        const l = link.offsetLeft, r = l + link.offsetWidth, pad = 16;
+        if (l < sectionNav.scrollLeft) sectionNav.scrollLeft = l - pad;
+        else if (r > sectionNav.scrollLeft + sectionNav.clientWidth) sectionNav.scrollLeft = r - sectionNav.clientWidth + pad;
     }
     function setActive(idx) {
         if (idx === activeIdx) return;
@@ -805,10 +814,15 @@
             l.classList.toggle('active', on);
             l.setAttribute('aria-current', on ? 'true' : 'false');
         });
+        if (idx < 0) { indicator.style.opacity = '0'; indicator.style.width = '0px'; return; }
         moveIndicator(secLinks[idx]);
+        ensureVisible(secLinks[idx]);
     }
     function updateSpy() {
         const line = window.scrollY + window.innerHeight * 0.35;
+        const last = secTargets[secTargets.length - 1];
+        // já passou da última seção mapeada (treinamentos): nada selecionado
+        if (last && line >= last.offsetTop + last.offsetHeight) { setActive(-1); return; }
         let idx = 0;
         secTargets.forEach((t, i) => { if (t && t.offsetTop <= line) idx = i; });
         setActive(idx);

@@ -7,6 +7,10 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-06-28
 
+### Correções no selecionador de seção — `index.html`
+- **Mobile:** o texto "treinamentos" ficava cortado porque os três itens (384px) não cabiam na largura disponível (323px). Reduzida a fonte (`clamp(13px, 3.6vw, 16px)`) e o gap no mobile para caberem todos; o item ativo também é mantido visível via `scrollLeft` quando há rolagem horizontal.
+- **Selecionador "preso" em treinamentos:** ao rolar para além da última seção mapeada (quem somos, galeria, FAQ, CTA), o selecionador continuava marcando "treinamentos" para sempre. Agora, ao passar do fim da seção treinamentos, nenhum item fica selecionado e o indicador some (fade-out); volta a marcar ao retornar a uma das seções.
+
 ### Seção "quem somos" interativa — `index.html`
 - A antiga seção **about + bios** (foto das fundadoras + dois cards fixos) virou uma **apresentação interativa de painel único** (`#equipe`).
 - **Visualização default:** foto das fundadoras, "Profundidade acadêmica + vivência real de mercado" e os nomes **Joene Louchard** / **Dayana Ramos** como itens clicáveis.
