@@ -7,6 +7,24 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-06-28
 
+### Seções "nosso modo / implementações / treinamentos" com scroll horizontal — `index.html`
+- As três seções agora **deslizam lateralmente** conforme o scroll vertical: rolar para baixo avança para a direita, rolar para cima volta para a esquerda. Ficam **pinadas** (sticky) enquanto o track horizontal é dirigido pelo scroll, com deslize suavizado (lerp) para uma transição gradual e bonita.
+- O **selecionador** acompanha automaticamente o painel ativo e, ao clicar num item (ou em qualquer link interno para essas seções), a página rola suavemente até o painel correspondente.
+- **Fallback:** em telas `< 768px` e com *prefers-reduced-motion*, as três seções voltam a empilhar verticalmente (sem pin), preservando acessibilidade. Estrutura via `display:contents` para não afetar o layout no fallback.
+- Os passos 01–04 dentro de "implementações" voltaram ao **grid normal** (a versão anterior, que rolava só os 4 passos, foi descartada conforme o esclarecimento).
+
+### Auditoria UX/UI + tasks de evolução — `tasks/03`–`tasks/07`
+- **`tasks/03/analise_ux_ui.md`:** documento de análise profunda (estética × performance/lead) das imagens de branding em `contexts/` e do site atual. Inclui: leitura do Termômetro de Atributos Visuais com nota por eixo e **alinhamento geral ≈ 73%** (furos em Ousada, Criativa e Orgânica/Artesanal); recomendação de onde aplicar o **Pattern** (espinha da jornada + textura nas seções cereja + divisor que se constrói no scroll); e leitura dos mockups de marca (prova de identidade tátil/humana, fotos reais, naming "teambim_"/"Escale com bim_", cores Bege/Marrom sub-usadas).
+- **Tasks detalhadas criadas a partir das melhores ideias** (padrão do projeto, porém com mais detalhe de implementação e definição de pronto):
+  - `tasks/04` — Pattern da marca como espinha visual da jornada (processo, seções cereja, divisor com scroll).
+  - `tasks/05` — "Termômetro de Maturidade BIM": quiz interativo client-side que qualifica e roteia o lead (cadastro vs lista-espera).
+  - `tasks/06` — Prova real: fim dos placeholders de galeria/depoimento, fotos reais das fundadoras, acento Bege/Marrom.
+  - `tasks/07` — Momento "Ousada": seção full-bleed cereja com manifesto gigante + Pattern antes de um CTA.
+
+### Selecionador de seção aparece só ao rolar — `index.html`
+- O selecionador (nosso modo / implementações / treinamentos) **não aparece mais ao abrir o site**: agora surge gradualmente (fade + slide) depois de rolar para baixo (~60% da viewport) e some ao voltar ao topo.
+- A barra do selecionador virou um elemento **flutuante** abaixo do header (`position:absolute`, fora do fluxo), evitando qualquer pulo de layout ao aparecer/desaparecer. Token `--bar-h` (60px, só a barra do topo) separado de `--nav-h` (header completo); o hero passa a usar `--bar-h`.
+
 ### Correções no selecionador de seção — `index.html`
 - **Mobile:** o texto "treinamentos" ficava cortado porque os três itens (384px) não cabiam na largura disponível (323px). Reduzida a fonte (`clamp(13px, 3.6vw, 16px)`) e o gap no mobile para caberem todos; o item ativo também é mantido visível via `scrollLeft` quando há rolagem horizontal.
 - **Selecionador "preso" em treinamentos:** ao rolar para além da última seção mapeada (quem somos, galeria, FAQ, CTA), o selecionador continuava marcando "treinamentos" para sempre. Agora, ao passar do fim da seção treinamentos, nenhum item fica selecionado e o indicador some (fade-out); volta a marcar ao retornar a uma das seções.
