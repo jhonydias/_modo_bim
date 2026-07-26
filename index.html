@@ -36,11 +36,18 @@
             --cream-2: #E6E3DB;
             --olive: #5F6245;
             --olive-deep: #4C4F37;
+            --bege: #938776;          /* auxiliar quente (paleta oficial) */
+            --marrom: #664029;        /* auxiliar quente / calor artesanal (paleta oficial) */
 
-            --ink: #470000;                      /* texto: cereja escuro (paleta) — sem preto */
-            --ink-soft: rgba(71, 0, 0, 0.74);    /* texto secundário */
-            --ink-muted: rgba(71, 0, 0, 0.5);    /* texto de apoio */
-            --line: rgba(71, 0, 0, 0.16);        /* linhas/divisores */
+            /* REGRA DE COR (ref. Canva — proposta comercial 2026):
+               fundo claro  → texto em VERDE (militar) com destaques em VERMELHO (cereja)
+               fundo cereja → texto em BRANCO (cloud dancer)
+               Por isso os tokens de "ink" (texto sobre fundo claro) são verdes,
+               e títulos/ênfases/labels puxam var(--cereja). */
+            --ink: #4C4F37;                      /* texto sobre fundo claro: verde militar escuro */
+            --ink-soft: rgba(76, 79, 55, 0.82);  /* texto secundário */
+            --ink-muted: rgba(76, 79, 55, 0.58); /* texto de apoio */
+            --line: rgba(76, 79, 55, 0.2);       /* linhas/divisores */
 
             --cloud: #EFEEE9;
             --cloud-soft: rgba(239, 238, 233, 0.72);
@@ -101,7 +108,12 @@
         }
         .label.muted { color: var(--ink-muted); }
 
-        h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.015em; line-height: 1.04; }
+        /* Títulos: vermelho sobre fundo claro… */
+        h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.015em; line-height: 1.04; color: var(--cereja); }
+        /* …e branco sobre fundo cereja/quente. */
+        .about h1, .about h2, .about h3,
+        .cta-final h1, .cta-final h2, .cta-final h3,
+        .gallery-quote h2, .gallery-quote h3 { color: var(--cloud); }
         .display { font-size: clamp(40px, 6.4vw, 84px); }
         .h-sec { font-size: clamp(30px, 4.4vw, 56px); line-height: 1.08; }
         em.it { font-style: italic; font-weight: 300; }
@@ -303,7 +315,7 @@
         }
 
         /* ============================================
-           SEÇÕES HORIZONTAIS (nosso modo · implementações · treinamentos)
+           SEÇÕES HORIZONTAIS (nosso modo · nossos serviços · implementações · treinamentos)
            Por padrão (mobile / movimento reduzido) ficam empilhadas;
            com .is-horizontal (via JS, ≥768px) deslizam lateralmente.
            ============================================ */
@@ -333,6 +345,10 @@
         .hsections.is-horizontal .hpanel.section { padding: clamp(24px, 4vh, 56px) 0; }
         .hsections.is-horizontal .hpanel > .wrap { width: 100%; }
         .hsections.is-horizontal .process-head { margin-bottom: clamp(28px, 4vw, 52px); }
+        /* nossos serviços: compacta para os 6 itens + CTA caberem na altura do painel */
+        .hsections.is-horizontal .services-head { margin-bottom: clamp(20px, 2.8vw, 40px); }
+        .hsections.is-horizontal .svc { padding: clamp(11px, 1.4vw, 18px) 0; }
+        .hsections.is-horizontal .services-foot { margin-top: clamp(20px, 2.6vw, 36px); }
         .hsections.is-horizontal .training-sticky { position: static; top: auto; }
         /* conteúdo dentro dos painéis horizontais é sempre visível (o reveal por scroll não dispara fora da viewport horizontal) */
         .hsections.is-horizontal .reveal { opacity: 1 !important; transform: none !important; }
@@ -389,7 +405,30 @@
             max-width: 60ch;
             margin-bottom: 40px;
         }
-        .statement .para strong { color: var(--ink); font-weight: 600; }
+        .statement .para strong { color: var(--cereja); font-weight: 600; }
+
+        /* ============================================
+           NOSSOS SERVIÇOS
+           (ref. Canva "como mudamos o seu modo de projetar", pág. 5)
+           ============================================ */
+        .services-head { max-width: 60ch; margin-bottom: clamp(32px, 4.5vw, 60px); }
+        .services-head .h-sec { margin: 16px 0 20px; }
+        .services-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(28px, 5vw, 72px); }
+        .svc {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 6px 16px;
+            align-items: baseline;
+            border-top: 1px solid var(--line);
+            padding: clamp(15px, 1.9vw, 22px) 0;
+            transition: border-color 0.35s var(--ease);
+        }
+        .svc:hover { border-color: var(--cereja); }
+        .svc-num { font-family: var(--detail); font-size: 11px; letter-spacing: 0.18em; font-weight: 600; color: var(--cereja); }
+        .svc-name { font-family: var(--serif); font-size: clamp(19px, 2.1vw, 26px); line-height: 1.1; color: var(--cereja); }
+        .svc-name .us { color: rgba(129, 22, 30, 0.42); }
+        .svc-desc { grid-column: 2; font-size: clamp(14px, 1.5vw, 16px); color: var(--ink-soft); font-weight: 300; max-width: 40ch; }
+        .services-foot { margin-top: clamp(30px, 4vw, 52px); display: flex; align-items: center; gap: 22px 32px; flex-wrap: wrap; }
 
         /* ============================================
            PROCESS
@@ -415,7 +454,7 @@
         .training-sticky { position: sticky; top: calc(var(--nav-h) + 20px); }
         .training-sticky .h-sec { margin: 18px 0 24px; }
         .training-body p { margin-bottom: 22px; color: var(--ink-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 17.5px); }
-        .training-body p strong { color: var(--ink); font-weight: 600; }
+        .training-body p strong { color: var(--cereja); font-weight: 600; }
         .training-body .closing {
             font-family: var(--serif);
             font-style: italic;
@@ -490,16 +529,21 @@
         .gallery-head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(36px, 5vw, 56px); }
         .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(155px, 19vw, 230px); gap: clamp(12px, 1.6vw, 20px); }
         .gallery-grid figure { border-radius: 4px; overflow: hidden; background: var(--cream-2); }
-        .gallery-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease-out); }
-        .gallery-grid figure:hover img { transform: scale(1.04); }
-        .gallery-quote { display: flex; align-items: center; padding: 28px; background: var(--cream-2); border-radius: 4px; }
+        .gallery-grid img { width: 100%; height: 100%; object-fit: cover; }
+        /* o hover só entra depois da revelação P&B → cor (ver bloco .bw em SCROLL REVEAL) */
+        .gallery-grid figure.in:hover img { transform: scale(1.04); transition-delay: 0ms; }
+        /* bloco de prova/depoimento — card quente Marrom (calor artesanal) com texto creme (contraste AA) */
+        .gallery-quote { display: flex; align-items: center; padding: clamp(24px, 2.6vw, 38px); background: var(--marrom); color: var(--cloud); border-radius: 4px; border-left: 3px solid var(--bege); }
         /* explicit placement: tall left + two small (top) + tall right, quote spans the middle bottom */
         .gallery-grid > :nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
         .gallery-grid > :nth-child(2) { grid-column: 2; grid-row: 1; }
         .gallery-grid > :nth-child(3) { grid-column: 4; grid-row: 1 / span 2; }
         .gallery-grid > :nth-child(4) { grid-column: 3; grid-row: 1; }
         .gallery-grid > :nth-child(5) { grid-column: 2 / span 2; grid-row: 2; }
-        .gallery-quote p { font-family: var(--serif); font-style: italic; font-size: clamp(17px, 2vw, 22px); color: var(--ink-soft); line-height: 1.4; }
+        .quote-tag { font-family: var(--detail); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: var(--cloud); display: block; margin-bottom: 14px; }
+        .quote-tag b { color: var(--bege); font-family: var(--serif); }   /* underscore em Bege — acento quente */
+        .gallery-quote p { font-family: var(--serif); font-style: italic; font-size: clamp(17px, 2vw, 22px); color: var(--cloud); line-height: 1.4; margin-bottom: 20px; }
+        .gallery-quote .tlink.light { border-bottom-color: var(--bege); }
 
         /* ============================================
            FAQ
@@ -533,6 +577,68 @@
         .faq-item.open .faq-icon::after { transform: translate(-50%, -50%) scaleY(0); }
         .faq-a { overflow: hidden; height: 0; transition: height 0.45s var(--ease-out); }
         .faq-a-inner { padding: 0 0 28px; max-width: 60ch; color: var(--ink-soft); font-weight: 300; font-size: 16px; }
+
+        /* ============================================
+           QUIZ — Termômetro de Maturidade BIM
+           ============================================ */
+        .quiz { background: var(--cream); }
+        .quiz-head { max-width: 60ch; margin-bottom: clamp(36px, 5vw, 56px); }
+        .quiz-head .h-sec { margin: 16px 0 18px; }
+        .quiz-card {
+            background: var(--cream-2);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: clamp(26px, 4vw, 52px);
+            max-width: 760px;
+        }
+        .quiz-bar { height: 3px; background: var(--line); border-radius: 999px; overflow: hidden; margin-bottom: clamp(28px, 4vw, 44px); }
+        .quiz-bar span { display: block; height: 100%; width: 0; background: var(--cereja); transition: width 0.5s var(--ease-out); }
+
+        .quiz-step { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
+        .quiz-step[hidden] { display: none; }
+        .quiz-count { font-family: var(--detail); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 14px; display: block; }
+        .quiz-step legend { font-family: var(--serif); font-size: clamp(22px, 3vw, 32px); line-height: 1.12; color: var(--cereja); padding: 0; }
+        .quiz-opts { display: grid; gap: 12px; margin-top: 24px; }
+        .quiz-opt { position: relative; }
+        .quiz-opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+        .quiz-opt label {
+            display: block;
+            padding: 15px 22px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--cream);
+            font-size: clamp(15px, 1.6vw, 17px);
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: border-color 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease-out);
+        }
+        .quiz-opt label:hover { border-color: var(--cereja); color: var(--ink); transform: translateX(4px); }
+        .quiz-opt input:focus-visible + label { outline: 2px solid var(--cereja); outline-offset: 2px; }
+        .quiz-opt input:checked + label { border-color: var(--cereja); background: var(--cereja); color: var(--cloud); }
+        .quiz-nav { margin-top: 26px; min-height: 18px; }
+        .quiz-back { font-family: var(--detail); font-size: 13px; letter-spacing: 0.04em; font-weight: 600; color: var(--ink-muted); transition: color 0.25s var(--ease); }
+        .quiz-back:hover { color: var(--cereja); }
+        .quiz-back[hidden] { display: none; }
+
+        /* Resultado — termômetro no idioma da marca (linha + marcador "_") */
+        .quiz-result[hidden] { display: none; }
+        .quiz-result .label { color: var(--cereja); }
+        .quiz-result h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 3.6vw, 40px); color: var(--cereja); margin: 12px 0 10px; letter-spacing: -0.015em; }
+        .quiz-result .res-sub { color: var(--ink-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 18px); max-width: 52ch; margin-bottom: 40px; }
+        .therm { margin: 0 0 38px; }
+        .therm-track { position: relative; height: 2px; background: var(--line); }
+        .therm-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--olive); width: 0; transition: width 0.9s var(--ease-out); }
+        .therm-mark { position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); transition: left 0.9s var(--ease-out); }
+        .therm-mark b { font-family: var(--serif); font-weight: 500; font-size: 24px; line-height: 0; color: var(--cereja); }
+        .therm-stops { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+        .therm-stops span { font-family: var(--detail); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; transition: color 0.3s var(--ease); }
+        .therm-stops span:last-child { text-align: right; }
+        .therm-stops span.on { color: var(--cereja); }
+        .quiz-cta { display: flex; align-items: center; gap: 22px 28px; flex-wrap: wrap; }
+        .quiz-restart-row { margin-top: 30px; }
+        @media (prefers-reduced-motion: reduce) {
+            .quiz-bar span, .therm-fill, .therm-mark, .quiz-opt label { transition: none; }
+        }
 
         /* ============================================
            FINAL CTA
@@ -579,8 +685,53 @@
            ============================================ */
         .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
         .reveal.in { opacity: 1; transform: none; }
+
+        /* --- Texto que se monta palavra a palavra na PRIMEIRA vez que entra em cena.
+               O JS quebra o conteúdo de .rt em <span class="rt-w"><i>palavra</i></span>. --- */
+        .rt { --rt-step: 44ms; }
+        .rt .rt-w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+        .rt .rt-w > i {
+            display: inline-block;
+            font-style: inherit;
+            font-weight: inherit;
+            transform: translateY(115%);
+            opacity: 0;
+            transition: transform 0.95s var(--ease-out), opacity 0.65s var(--ease-out);
+            transition-delay: calc(var(--i, 0) * var(--rt-step));
+        }
+        .rt.in .rt-w > i { transform: none; opacity: 1; }
+
+        /* --- Imagem entra em preto e branco e ganha cor ao aparecer (cortina + leve zoom-out). --- */
+        .bw img {
+            filter: grayscale(1) contrast(1.05);
+            transform: scale(1.09);
+            clip-path: inset(0 0 100% 0);
+            transition: filter 1.4s var(--ease-out), transform 1.5s var(--ease-out), clip-path 1.2s var(--ease-out);
+            transition-delay: var(--bw-delay, 0ms);
+        }
+        .bw.in img { filter: grayscale(0) contrast(1); transform: none; clip-path: inset(0 0 0 0); }
+        .gallery-grid figure:nth-child(2) { --bw-delay: 110ms; }
+        .gallery-grid figure:nth-child(3) { --bw-delay: 220ms; }
+        .gallery-grid figure:nth-child(4) { --bw-delay: 330ms; }
+
+        /* --- Brilho que percorre o Pattern (ref. "data matters, meaning too"). --- */
+        @keyframes patShimmer {
+            from { -webkit-mask-position: 150% 0; mask-position: 150% 0; }
+            to   { -webkit-mask-position: -50% 0; mask-position: -50% 0; }
+        }
+        .modo-tex {
+            -webkit-mask-image: linear-gradient(102deg, rgba(0,0,0,0.4) 36%, #000 47%, #000 53%, rgba(0,0,0,0.4) 64%);
+            mask-image: linear-gradient(102deg, rgba(0,0,0,0.4) 36%, #000 47%, #000 53%, rgba(0,0,0,0.4) 64%);
+            -webkit-mask-size: 240% 100%;
+            mask-size: 240% 100%;
+            animation: patShimmer 7.5s linear infinite;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .reveal { opacity: 1; transform: none; transition: none; }
+            .rt .rt-w > i { transform: none; opacity: 1; transition: none; }
+            .bw img, .bw.in img { filter: none; transform: none; clip-path: none; transition: none; }
+            .modo-tex { animation: none; -webkit-mask-image: none; mask-image: none; }
             html { scroll-behavior: auto; }
         }
 
@@ -592,6 +743,7 @@
             .hero-media { order: -1; aspect-ratio: 4/3.4; }
             .statement .big, .statement .intro { max-width: none; }
             .steps { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .services-list { grid-template-columns: 1fr; }
             .training-grid { grid-template-columns: 1fr; gap: 40px; }
             .training-sticky { position: static; }
             .team { grid-template-columns: 1fr; gap: 32px; }
@@ -612,6 +764,9 @@
             .steps { grid-template-columns: 1fr; }
             .gallery-grid { grid-template-columns: 1fr 1fr; }
             .hero-actions { gap: 18px; }
+            /* quiz: termômetro com rótulos compactos para caber sem overflow em telas estreitas */
+            .therm-stops { font-size: 10px; gap: 8px; letter-spacing: 0.06em; }
+            .quiz-opt label { padding: 14px 18px; }
             /* Pattern degrada: simplifica densidade e reduz tamanho da textura */
             .modo-tex .mb-1 { display: none; }
             .about .modo-tex { width: clamp(220px, 66vw, 320px); }
@@ -667,6 +822,7 @@
             <span></span><span></span><span></span>
         </button>
         <nav class="nav-links" id="navLinks">
+            <a href="#nossos-servicos">nossos serviços</a>
             <a href="#implementacoes">implementações</a>
             <a href="#treinamentos">treinamentos</a>
             <a href="#equipe">quem somos</a>
@@ -678,6 +834,7 @@
         <div class="wrap">
             <nav class="section-nav" id="sectionNav" aria-label="Navegação por seção">
                 <a href="#nosso-modo" class="sec-link" data-target="nosso-modo">nosso modo</a>
+                <a href="#nossos-servicos" class="sec-link" data-target="nossos-servicos">nossos serviços</a>
                 <a href="#implementacoes" class="sec-link" data-target="implementacoes">implementações</a>
                 <a href="#treinamentos" class="sec-link" data-target="treinamentos">treinamentos</a>
                 <span class="sec-indicator" aria-hidden="true"><i></i><b>_</b><i></i></span>
@@ -693,20 +850,20 @@
         <div class="wrap hero-grid">
             <div class="hero-copy">
                 <span class="label">Consultoria de implementação BIM</span>
-                <h1 class="display">Um novo <span class="us">modo_</span><br /><em class="it">de projetar.</em></h1>
+                <h1 class="display rt">Um novo <span class="us">modo_</span><br /><em class="it">de projetar.</em></h1>
                 <p class="lead">Somos uma consultoria de implementação BIM que estrutura processo, equipe e cultura — até seu escritório operar com autonomia real.</p>
                 <div class="hero-actions">
                     <a href="cadastro.html" class="btn btn-olive">faça um diagnóstico <span class="arr">→</span></a>
                     <a href="#implementacoes" class="tlink">Veja como funciona <span class="arr">→</span></a>
                 </div>
             </div>
-            <div class="hero-media reveal">
+            <div class="hero-media reveal bw">
                 <img src="img/hero.jpg" alt="Equipe da _modo_bim instalando uma cultura BIM" />
             </div>
         </div>
     </section>
 
-    <!-- ============================================ SEÇÕES HORIZONTAIS (nosso modo · implementações · treinamentos) ============================================ -->
+    <!-- ============================================ SEÇÕES HORIZONTAIS (nosso modo · nossos serviços · implementações · treinamentos) ============================================ -->
     <div class="hsections" id="hsections">
     <div class="hsections-pin">
     <div class="hsections-track" id="hsectionsTrack">
@@ -715,9 +872,59 @@
     <section class="section statement hpanel" id="nosso-modo">
         <div class="wrap">
             <p class="intro reveal">Seu escritório cresceu, mas os processos não acompanharam. Retrabalho, equipe sem clareza de função e uma rotina que depende demais de você.</p>
-            <h2 class="big reveal">Não entregamos software. <span class="soft">Entregamos um modo de trabalhar.</span></h2>
+            <h2 class="big reveal rt">Não entregamos software. <span class="soft">Entregamos um modo de trabalhar.</span></h2>
             <p class="para reveal">É aí que entramos. <strong>Estruturamos o processo que faltou</strong>, damos clareza de função para cada pessoa da equipe e <strong>implementamos o BIM na ordem certa</strong>, até o escritório <strong>operar com método</strong> e parar de depender só de você. Do diagnóstico à autonomia, com acompanhamento real.</p>
             <a href="#implementacoes" class="tlink reveal">Veja como funciona <span class="arr">→</span></a>
+        </div>
+    </section>
+
+    <!-- ============================================ NOSSOS SERVIÇOS ============================================
+         Textos: Canva "como mudamos o seu modo de projetar", pág. 5 ("Para cada momento, tem um modo_"). -->
+    <section class="section services hpanel" id="nossos-servicos">
+        <div class="wrap">
+            <div class="services-head reveal">
+                <span class="label">Nossos serviços</span>
+                <h2 class="h-sec rt">Para cada momento, tem um <span class="us">modo_</span></h2>
+                <p class="lead">Da implementação ao treinamento prático, cada serviço existe para um estágio diferente da sua jornada em busca da autonomia BIM.</p>
+            </div>
+
+            <div class="services-list">
+                <div class="svc reveal">
+                    <span class="svc-num">01</span>
+                    <h3 class="svc-name">Consultoria BIM</h3>
+                    <p class="svc-desc">Diagnóstico e direção estratégica antes de qualquer decisão.</p>
+                </div>
+                <div class="svc reveal">
+                    <span class="svc-num">02</span>
+                    <h3 class="svc-name">Projetos em BIM</h3>
+                    <p class="svc-desc">Desenvolvimento com padrão e precisão técnica.</p>
+                </div>
+                <div class="svc reveal">
+                    <span class="svc-num">03</span>
+                    <h3 class="svc-name">Criação de Templates</h3>
+                    <p class="svc-desc">Arquivos-base prontos para produção real.</p>
+                </div>
+                <div class="svc reveal">
+                    <span class="svc-num">04</span>
+                    <h3 class="svc-name">Criação de Bibliotecas</h3>
+                    <p class="svc-desc">Objetos e showroom sob medida para sua empresa.</p>
+                </div>
+                <div class="svc reveal">
+                    <span class="svc-num">05</span>
+                    <h3 class="svc-name">Coordenação BIM</h3>
+                    <p class="svc-desc">Plano de execução BIM, coordenação e compatibilização de projetos.</p>
+                </div>
+                <div class="svc reveal">
+                    <span class="svc-num">06</span>
+                    <h3 class="svc-name">Treinamento BIM</h3>
+                    <p class="svc-desc">Do comando ao método: você operando BIM de verdade.</p>
+                </div>
+            </div>
+
+            <div class="services-foot reveal">
+                <a href="cadastro.html" class="btn btn-olive">Solicite seu orçamento <span class="arr">→</span></a>
+                <a href="#implementacoes" class="tlink">Nosso carro-chefe é a Implementação BIM <span class="arr">→</span></a>
+            </div>
         </div>
     </section>
 
@@ -726,7 +933,7 @@
         <div class="wrap">
             <div class="process-head reveal">
                 <span class="label">Implementação</span>
-                <h2 class="h-sec">Da bagunça à autonomia, em 6 meses de parceria real.</h2>
+                <h2 class="h-sec rt">Da bagunça à autonomia, em 6 meses de parceria real.</h2>
                 <p class="lead">A jornada completa de quem tem (ou está montando) um escritório e precisa que a equipe inteira opere em BIM, com método, não no improviso.</p>
             </div>
 
@@ -793,7 +1000,7 @@
         <div class="wrap training-grid">
             <div class="training-sticky reveal">
                 <span class="label">Treinamentos</span>
-                <h2 class="h-sec">Para quem está <em class="it">começando</em> certo.</h2>
+                <h2 class="h-sec rt">Para quem está <em class="it">começando</em> certo.</h2>
                 <p class="lead">Para autônomos e recém-formados que querem dominar o método desde o início — no seu ritmo e no seu orçamento.</p>
             </div>
             <div class="training-body reveal">
@@ -844,15 +1051,25 @@
     <section class="section gallery">
         <div class="wrap">
             <div class="gallery-head reveal">
-                <span class="label">A _modo_bim acontecendo</span>
+                <span class="label">A _modo_bim no mundo real</span>
+                <h2 class="h-sec rt" style="margin-top:14px;">Uma marca que você <em class="it">pega na mão.</em></h2>
             </div>
             <div class="gallery-grid">
-                <figure class="tall reveal"><img src="img/proj3.jpg" alt="Modelagem BIM em andamento" /></figure>
-                <figure class="reveal"><img src="img/proj1.jpg" alt="Modelo BIM de uma edificação" /></figure>
-                <figure class="tall reveal"><img src="img/proj4.jpg" alt="Apresentação de projeto BIM" /></figure>
-                <figure class="reveal"><img src="img/proj2.jpg" alt="Equipe em treinamento BIM" /></figure>
+                <figure class="tall reveal bw"><img src="img/brand-cracha.jpg" alt="Crachá da _modo_bim com a foto de Joene Louchard, arquiteta e co-fundadora" loading="lazy" /></figure>
+                <figure class="reveal bw"><img src="img/brand-cups.jpg" alt="Copos de café da _modo_bim em cereja e creme sobre uma mesa de madeira" loading="lazy" /></figure>
+                <figure class="tall reveal bw"><img src="img/brand-bag.jpg" alt="Sacola e folheto “Um novo modo de projetar” da _modo_bim" loading="lazy" /></figure>
+                <figure class="reveal bw"><img src="img/brand-notebook.jpg" alt="Site da _modo_bim apresentado em um notebook sobre uma poltrona vermelha" loading="lazy" /></figure>
+                <!-- DEPOIMENTOS: estado honesto enquanto não há relatos reais coletados (task 06).
+                     NÃO inventar nomes/relatos. Ao coletar, substitua o bloco .quote-invite por, ex.:
+                       <blockquote><p>“depoimento real do cliente…”</p>
+                         <span class="quote-tag">Nome Sobrenome — Escritório, Cidade</span></blockquote>
+                     mantendo o card e o estilo já definidos. -->
                 <div class="gallery-quote reveal">
-                    <p>“Depoimentos passando aqui” — espaço reservado para os relatos de quem já passou pela _modo_bim.</p>
+                    <div class="quote-invite">
+                        <span class="quote-tag">Prova real <b>_</b></span>
+                        <p>Os primeiros relatos de quem operou em BIM com a gente estão sendo colhidos agora. <em class="it">Quer ser um dos primeiros?</em></p>
+                        <a href="cadastro.html" class="tlink light">Trabalhe com a _modo_bim <span class="arr">→</span></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -886,12 +1103,94 @@
         </div>
     </section>
 
+    <!-- ============================================ QUIZ — Termômetro de Maturidade BIM ============================================
+         Posicionado FORA do bloco .hsections (scroll horizontal), entre o FAQ e o CTA final:
+         fecha o funil com o lead já aquecido. (Local alternativo válido: entre o hero e .hsections.)
+         TODO (task 05): textos das perguntas e dos resultados PENDENTES de validação do dono.
+         Roteamento: solo/autônomo → lista-espera.html (BIM Club); equipe/escritório → cadastro.html.
+         O nível vai na URL como ?nivel=… (sem dados pessoais). -->
+    <section class="section quiz" id="termometro">
+        <div class="wrap">
+            <div class="quiz-head reveal">
+                <span class="label">Termômetro de Maturidade BIM</span>
+                <h2 class="h-sec">Quão maduro é o BIM do <em class="it">seu escritório?</em></h2>
+                <p class="lead">3 perguntas rápidas. No fim, você vê onde está — e qual é o próximo passo certo pra você.</p>
+            </div>
+
+            <div class="quiz-card reveal">
+                <div class="quiz-bar" aria-hidden="true"><span id="quizProgress"></span></div>
+
+                <form id="quizForm" aria-label="Termômetro de Maturidade BIM">
+                    <fieldset class="quiz-step" data-step="0">
+                        <span class="quiz-count">Pergunta 1 de 3</span>
+                        <legend>Como você trabalha hoje?</legend>
+                        <div class="quiz-opts">
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1a" value="0" data-team="solo"><label for="q1a">Sozinho(a) — autônomo(a) ou recém-formado(a)</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1b" value="1" data-team="office"><label for="q1b">Com uma equipe pequena, ainda informal</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1c" value="2" data-team="office"><label for="q1c">Escritório com equipe e funções definidas</label></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="quiz-step" data-step="1" hidden>
+                        <span class="quiz-count">Pergunta 2 de 3</span>
+                        <legend>Seu processo BIM hoje é...</legend>
+                        <div class="quiz-opts">
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2a" value="0"><label for="q2a">Não existe — quero começar</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2b" value="1"><label for="q2b">No improviso: cada projeto de um jeito</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2c" value="2"><label for="q2c">Parcialmente padronizado</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2d" value="3"><label for="q2d">Com método e padrão já definidos</label></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="quiz-step" data-step="2" hidden>
+                        <span class="quiz-count">Pergunta 3 de 3</span>
+                        <legend>Qual é a sua maior dor hoje?</legend>
+                        <div class="quiz-opts">
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3a" value="0"><label for="q3a">Quero começar do jeito certo</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3b" value="1"><label for="q3b">Retrabalho — arquivos refeitos toda hora</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3c" value="2"><label for="q3c">Equipe sem clareza de função</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3d" value="2"><label for="q3d">Tudo depende de mim</label></div>
+                        </div>
+                    </fieldset>
+
+                    <div class="quiz-nav">
+                        <button type="button" class="quiz-back" id="quizBack" hidden>← voltar</button>
+                    </div>
+                </form>
+
+                <div class="quiz-result" id="quizResult" hidden role="status" aria-live="polite">
+                    <span class="label">Seu termômetro</span>
+                    <h3 id="resTitle"></h3>
+                    <p class="res-sub" id="resSub"></p>
+                    <div class="therm" aria-hidden="true">
+                        <div class="therm-track">
+                            <div class="therm-fill" id="thermFill"></div>
+                            <div class="therm-mark" id="thermMark"><b>_</b></div>
+                        </div>
+                        <div class="therm-stops">
+                            <span data-lvl="inicio">Início</span>
+                            <span data-lvl="estruturacao">Em estruturação</span>
+                            <span data-lvl="autonomo">Quase autônomo</span>
+                        </div>
+                    </div>
+                    <div class="quiz-cta">
+                        <a class="btn btn-olive" id="resPrimary" href="cadastro.html">faça um diagnóstico <span class="arr">→</span></a>
+                        <a class="tlink" id="resSecondary" href="lista-espera.html">caminho alternativo <span class="arr">→</span></a>
+                    </div>
+                    <div class="quiz-restart-row">
+                        <button type="button" class="quiz-back" id="quizRestart">↺ refazer o teste</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ============================================ FINAL CTA ============================================ -->
     <section class="cta-final">
         <svg class="modo-tex modo-tex--tl" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
         <svg class="modo-tex modo-tex--br" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
         <div class="wrap">
-            <h2 class="reveal">Seu escritório está pronto para implementar BIM?<span class="cur">_</span></h2>
+            <h2 class="reveal rt">Seu escritório está pronto para implementar BIM?<span class="cur">_</span></h2>
             <div class="cta-buttons reveal">
                 <a href="cadastro.html" class="btn btn-cream">solicite um orçamento <span class="arr">→</span></a>
                 <a href="lista-espera.html" class="btn btn-ghost-light">faça parte do BIM Club <span class="arr">→</span></a>
@@ -907,6 +1206,7 @@
         <div class="footer-top">
             <a href="#top" class="wordmark">_modo_<span class="b">b</span>im</a>
             <nav class="footer-nav">
+                <a href="#nossos-servicos">nossos serviços</a>
                 <a href="#implementacoes">implementações</a>
                 <a href="#treinamentos">treinamentos</a>
                 <a href="#equipe">quem somos</a>
@@ -964,9 +1264,20 @@
         if (l < sectionNav.scrollLeft) sectionNav.scrollLeft = l - pad;
         else if (r > sectionNav.scrollLeft + sectionNav.clientWidth) sectionNav.scrollLeft = r - sectionNav.clientWidth + pad;
     }
+    /* Painéis horizontais ficam fora da viewport (o track é transladado), então o
+       IntersectionObserver não os alcança: revelamos o conteúdo quando o painel entra em cena. */
+    let pendingPanel = -1, revealReady = false;
+    function revealPanel(idx) {
+        const t = idx >= 0 ? secTargets[idx] : null;
+        if (!t) return;
+        if (!revealReady) { pendingPanel = idx; return; }   // o bloco de reveal ainda não rodou
+        t.querySelectorAll('.reveal, .rt').forEach(el => el.classList.add('in'));
+    }
+
     function setActive(idx) {
         if (idx === activeIdx) return;
         activeIdx = idx;
+        if (horizontal) revealPanel(idx);
         secLinks.forEach((l, i) => {
             const on = i === idx;
             l.classList.toggle('active', on);
@@ -1011,7 +1322,7 @@
             hTargetX = -p * hMaxX;
             if (!hRaf) hRaf = requestAnimationFrame(hLoop);
             let idx;
-            if (window.scrollY > hStartY + hMaxX) idx = -1;          // já passou das três seções
+            if (window.scrollY > hStartY + hMaxX) idx = -1;          // já passou de todos os painéis
             else idx = Math.round(p * (secLinks.length - 1));
             setActive(idx);
         } else {
@@ -1172,13 +1483,126 @@
         });
     });
 
-    /* ============================================ SCROLL REVEAL ============================================ */
+    /* ============================================ SCROLL REVEAL + TEXTO QUE SE MONTA ============================================ */
+    /* Quebra o conteúdo de .rt em palavras animáveis, preservando <em>, <span> e <br>.
+       Cada palavra recebe --i (sua posição) para escalonar o atraso da subida. */
+    function splitWords(root) {
+        let i = 0;
+        (function walk(node) {
+            [...node.childNodes].forEach(child => {
+                if (child.nodeType === Node.TEXT_NODE) {
+                    if (!child.nodeValue.trim()) return;
+                    const frag = document.createDocumentFragment();
+                    child.nodeValue.split(/(\s+)/).forEach(part => {
+                        if (!part) return;
+                        if (!part.trim()) { frag.appendChild(document.createTextNode(part)); return; }
+                        const word = document.createElement('span');
+                        word.className = 'rt-w';
+                        word.style.setProperty('--i', i++);
+                        const inner = document.createElement('i');
+                        inner.textContent = part;
+                        word.appendChild(inner);
+                        frag.appendChild(word);
+                    });
+                    node.replaceChild(frag, child);
+                } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'BR') {
+                    walk(child);
+                }
+            });
+        })(root);
+    }
+    if (!reducedMotion) document.querySelectorAll('.rt').forEach(splitWords);
+
     const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
         });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    document.querySelectorAll('.reveal, .rt').forEach(el => io.observe(el));
+
+    // libera o reveal manual dos painéis horizontais (e aplica o que ficou pendente no setup)
+    revealReady = true;
+    if (pendingPanel >= 0) revealPanel(pendingPanel);
+
+    /* ============================================ QUIZ — Termômetro de Maturidade BIM ============================================ */
+    const quizForm = document.getElementById('quizForm');
+    if (quizForm) {
+        const steps = [...quizForm.querySelectorAll('.quiz-step')];
+        const progress = document.getElementById('quizProgress');
+        const backBtn = document.getElementById('quizBack');
+        const result = document.getElementById('quizResult');
+        let cur = 0;
+
+        // Copy dos níveis — PENDENTE de validação do dono (task 05). pos = posição do marcador no termômetro (%).
+        const LEVELS = {
+            inicio:       { pos: 12, title: 'Você está no <em class="it">Início</em>.',          sub: 'O melhor momento para construir no método certo — e não precisar refazer tudo quando o trabalho crescer.' },
+            estruturacao: { pos: 50, title: 'Você está em <em class="it">Estruturação</em>.',    sub: 'Você já roda BIM, mas no improviso. Estruturar o processo agora é o que separa crescer com método de crescer no caos.' },
+            autonomo:     { pos: 88, title: 'Você está <em class="it">Quase autônomo</em>.',     sub: 'Você já tem método. O próximo passo é consolidar a autonomia da equipe e blindar o padrão que você construiu.' }
+        };
+        // Roteamento: solo → BIM Club (lista-espera); office → diagnóstico (cadastro). O outro caminho fica como link secundário.
+        const ROUTES = {
+            solo:   { primary: { href: 'lista-espera.html', text: 'Entre no BIM Club' },     secondary: { href: 'cadastro.html',     text: 'Tenho escritório: quero um diagnóstico' } },
+            office: { primary: { href: 'cadastro.html',     text: 'Faça seu diagnóstico' },  secondary: { href: 'lista-espera.html', text: 'Sou autônomo(a): conheça o BIM Club' } }
+        };
+        const levelFor = score => score <= 2 ? 'inicio' : score <= 4 ? 'estruturacao' : 'autonomo';
+
+        function showStep(i, focus = true) {
+            steps.forEach((s, n) => { s.hidden = n !== i; });
+            cur = i;
+            progress.style.width = (i / steps.length * 100) + '%';
+            backBtn.hidden = i === 0;
+            if (focus) {
+                const first = steps[i].querySelector('input');
+                if (first) first.focus({ preventScroll: true });
+            }
+        }
+
+        function finish() {
+            const score = ['q1', 'q2', 'q3'].reduce((s, n) => {
+                const el = quizForm.querySelector(`input[name="${n}"]:checked`);
+                return s + (el ? +el.value : 0);
+            }, 0);
+            const teamEl = quizForm.querySelector('input[name="q1"]:checked');
+            const team = teamEl && teamEl.dataset.team === 'office' ? 'office' : 'solo';
+            const lvl = levelFor(score);
+            const L = LEVELS[lvl], R = ROUTES[team];
+
+            quizForm.hidden = true;
+            progress.style.width = '100%';
+            document.getElementById('resTitle').innerHTML = L.title;
+            document.getElementById('resSub').textContent = L.sub;
+
+            const fill = document.getElementById('thermFill');
+            const mark = document.getElementById('thermMark');
+            requestAnimationFrame(() => { fill.style.width = L.pos + '%'; mark.style.left = L.pos + '%'; });
+            document.querySelectorAll('.therm-stops span').forEach(s => s.classList.toggle('on', s.dataset.lvl === lvl));
+
+            const primary = document.getElementById('resPrimary');
+            const secondary = document.getElementById('resSecondary');
+            // nível na URL (sem dados pessoais)
+            primary.href = R.primary.href + '?nivel=' + lvl;
+            primary.innerHTML = R.primary.text + ' <span class="arr">→</span>';
+            secondary.href = R.secondary.href + '?nivel=' + lvl;
+            secondary.innerHTML = R.secondary.text + ' <span class="arr">→</span>';
+
+            result.hidden = false;
+        }
+
+        quizForm.addEventListener('change', (e) => {
+            if (!e.target.matches('input[type="radio"]')) return;
+            if (cur < steps.length - 1) showStep(cur + 1);
+            else finish();
+        });
+        backBtn.addEventListener('click', () => { if (cur > 0) showStep(cur - 1); });
+        document.getElementById('quizRestart').addEventListener('click', () => {
+            quizForm.reset();
+            result.hidden = true;
+            quizForm.hidden = false;
+            showStep(0);
+        });
+
+        showStep(0, false);
+    }
 
     /* ============================================ MISC ============================================ */
     document.getElementById('year').textContent = new Date().getFullYear();

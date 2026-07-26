@@ -9,6 +9,11 @@
  *
  *    tipo: 'cadastro'      → aba "Cadastros"      · MB-2026-NNNN
  *    tipo: 'lista-espera'  → aba "Lista de Espera" · LE-2026-NNNN
+ *
+ *  Cada envio também é espelhado no Notion (software oficial da
+ *  _modo_bim) via API. A planilha permanece como backup e fonte
+ *  do protocolo; o Notion é onde o time opera.
+ *  Setup: tasks/08/notion-integracao.md
  * ============================================================
  */
 
@@ -24,7 +29,30 @@ const CONFIG = {
     RATE_LIMIT_WINDOW_MIN: 5,
 
     SEND_CLIENT_EMAIL: true,
-    SEND_ADMIN_EMAIL: true
+    SEND_ADMIN_EMAIL: true,
+
+    // Espelha cada envio para o Notion (software oficial da _modo_bim).
+    // A planilha continua como registro de segurança e fonte do protocolo.
+    SEND_TO_NOTION: true
+};
+
+/* ============================================================
+ *  NOTION — configuração
+ * ============================================================
+ *  Segredos NÃO ficam no código. Cadastre em
+ *  Extensões › Apps Script › Configurações do projeto › Propriedades do script:
+ *
+ *    NOTION_TOKEN            → secret da integração interna (ntn_...)
+ *    NOTION_DB_CADASTROS     → ID do database "Cadastros"
+ *    NOTION_DB_LISTA_ESPERA  → ID do database "Lista de Espera"
+ *
+ *  Passo a passo completo em tasks/08/notion-integracao.md
+ * ============================================================ */
+const NOTION = {
+    API: 'https://api.notion.com/v1/pages',
+    VERSION: '2022-06-28',
+    RETRY_QUEUE_SHEET: 'Fila Notion',   // envios que falharam, reprocessados por gatilho
+    MAX_RETRIES: 5
 };
 
 /* ============================================================
@@ -33,6 +61,7 @@ const CONFIG = {
 const FORMS = {
     'cadastro': {
         SHEET_NAME: 'Cadastros',
+        NOTION_DB_KEY: 'NOTION_DB_CADASTROS',
         PROTOCOL_PREFIX: 'MB',
         LABEL: 'Cadastro',
         COLUMNS: [
@@ -57,6 +86,7 @@ const FORMS = {
     },
     'lista-espera': {
         SHEET_NAME: 'Lista de Espera',
+        NOTION_DB_KEY: 'NOTION_DB_LISTA_ESPERA',
         PROTOCOL_PREFIX: 'LE',
         LABEL: 'Lista de Espera',
         COLUMNS: [
@@ -138,6 +168,11 @@ function doPost(e) {
 
         // Insere linha
         appendToSheet_(data, protocolo, formConfig);
+
+        // Notion (não bloqueante: falha vai para a fila de reenvio)
+        if (CONFIG.SEND_TO_NOTION) {
+            sendToNotion_(data, protocolo, formConfig);
+        }
 
         // E-mails (não bloqueante)
         try {
@@ -243,6 +278,259 @@ function buildRow_(d, timestamp, protocolo, formConfig) {
         d.comoConheceu || '', d.bimclub || '',
         d.userAgent || ''
     ];
+}
+
+/* ============================================================
+ *  NOTION
+ * ============================================================
+ *  Estratégia: dual-write. A planilha continua sendo gravada
+ *  primeiro (é dela que sai o protocolo e é o backup em caso de
+ *  problema na API), e logo em seguida o mesmo registro vira uma
+ *  página no database correspondente do Notion.
+ *
+ *  Se a chamada falhar, o envio NÃO é perdido: vai para a aba
+ *  "Fila Notion" e é reprocessado por retryNotionQueue(), que
+ *  roda em um gatilho de tempo (ver criarGatilhoNotion).
+ * ============================================================ */
+
+/**
+ * Espelha um envio no Notion. Nunca lança — em caso de falha,
+ * enfileira para reenvio automático.
+ */
+function sendToNotion_(data, protocolo, formConfig) {
+    try {
+        const res = pushNotionPage_(data, protocolo, formConfig);
+        if (!res.ok) {
+            queueNotionRetry_(data, protocolo, formConfig, res.error);
+        }
+        return res;
+    } catch (err) {
+        queueNotionRetry_(data, protocolo, formConfig, String(err));
+        return { ok: false, error: String(err) };
+    }
+}
+
+/**
+ * Faz a chamada real à API do Notion. Retorna { ok, error?, pageId? }.
+ */
+function pushNotionPage_(data, protocolo, formConfig) {
+    const props = PropertiesService.getScriptProperties();
+    const token = props.getProperty('NOTION_TOKEN');
+    const dbId = props.getProperty(formConfig.NOTION_DB_KEY);
+
+    if (!token || !dbId) {
+        return { ok: false, error: 'NOTION_TOKEN ou ' + formConfig.NOTION_DB_KEY + ' não configurado nas Propriedades do script' };
+    }
+
+    const payload = {
+        parent: { database_id: dbId },
+        properties: buildNotionProps_(data, protocolo, formConfig)
+    };
+
+    const response = UrlFetchApp.fetch(NOTION.API, {
+        method: 'post',
+        contentType: 'application/json',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Notion-Version': NOTION.VERSION
+        },
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+    });
+
+    const code = response.getResponseCode();
+    const body = response.getContentText();
+
+    if (code >= 200 && code < 300) {
+        let pageId = '';
+        try { pageId = JSON.parse(body).id || ''; } catch (e) { /* resposta ok, id irrelevante */ }
+        return { ok: true, pageId: pageId };
+    }
+
+    return { ok: false, error: 'HTTP ' + code + ' — ' + body.substring(0, 500) };
+}
+
+/**
+ * Traduz o payload do formulário para as propriedades do database.
+ * Os NOMES aqui precisam bater exatamente com os nomes das colunas
+ * no Notion (ver tasks/08/notion-integracao.md).
+ */
+function buildNotionProps_(d, protocolo, formConfig) {
+    const recebidoEm = notionDate_(new Date());
+
+    if (formConfig.PROTOCOL_PREFIX === 'MB') {
+        return {
+            'Razão Social':        nTitle_(d.razaoSocial),
+            'Protocolo':           nText_(protocolo),
+            'Recebido em':         nDate_(recebidoEm),
+            'Nome Fantasia':       nText_(d.nomeFantasia),
+            'CNPJ':                nText_(d.cnpj),
+            'Inscrição Estadual':  nText_(d.inscricaoEstadual),
+            'Ramo de Atividade':   nSelect_(d.ramoAtividade),
+            'CPF Representante':   nText_(d.cpfRepresentante),
+            'Cargo':               nText_(d.cargo),
+            'E-mail':              nEmail_(d.email),
+            'Telefone':            nPhone_(d.telefone),
+            'Site':                nUrl_(d.site),
+            'CEP':                 nText_(d.cep),
+            'Endereço':            nText_(formatEndereco_(d)),
+            'Cidade':              nText_(d.cidade),
+            'Estado':              nSelect_(d.estado),
+            'Status':              nSelect_('Novo'),
+            'User Agent':          nText_(d.userAgent)
+        };
+    }
+
+    return {
+        'Nome Completo':          nTitle_(d.nomeCompleto),
+        'Protocolo':              nText_(protocolo),
+        'Recebido em':            nDate_(recebidoEm),
+        'E-mail':                 nEmail_(d.email),
+        'Telefone':               nPhone_(d.telefone),
+        'Cidade':                 nText_(d.cidade),
+        'Estado':                 nSelect_(d.estado),
+        'Empresa':                nText_(d.empresa),
+        'Cargo':                  nText_(d.cargo),
+        'Software Atual':         nSelect_(d.softwareAtual),
+        'Nível BIM':              nSelect_(d.nivelBIM),
+        'Software de Interesse':  nSelect_(d.softwareInteresse),
+        'Objetivo':               nText_(d.objetivo),
+        'Como Conheceu':          nSelect_(d.comoConheceu),
+        'BIMClub':                nSelect_(d.bimclub),
+        'Status':                 nSelect_('Novo'),
+        'User Agent':             nText_(d.userAgent)
+    };
+}
+
+/* --- Construtores de propriedade (formato exigido pela API do Notion) --- */
+
+function nTitle_(v) {
+    return { title: [{ text: { content: notionStr_(v) || '(sem nome)' } }] };
+}
+
+function nText_(v) {
+    const s = notionStr_(v);
+    return { rich_text: s ? [{ text: { content: s.substring(0, 2000) } }] : [] };
+}
+
+function nSelect_(v) {
+    const s = notionStr_(v);
+    // vírgula quebra o "select" do Notion; troca por barra
+    return { select: s ? { name: s.replace(/,/g, ' /').substring(0, 100) } : null };
+}
+
+function nEmail_(v) {
+    const s = notionStr_(v);
+    return { email: (s && validarEmail_(s)) ? s : null };
+}
+
+function nPhone_(v) {
+    const s = notionStr_(v);
+    return { phone_number: s || null };
+}
+
+function nUrl_(v) {
+    let s = notionStr_(v);
+    if (!s) return { url: null };
+    if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+    return { url: s };
+}
+
+function nDate_(iso) {
+    return { date: iso ? { start: iso } : null };
+}
+
+function notionStr_(v) {
+    if (v === null || v === undefined) return '';
+    return String(v).trim();
+}
+
+function notionDate_(dateObj) {
+    const tz = Session.getScriptTimeZone() || 'America/Belem';
+    return Utilities.formatDate(dateObj, tz, "yyyy-MM-dd'T'HH:mm:ssXXX");
+}
+
+/* --- Fila de reenvio ------------------------------------------------- */
+
+function queueNotionRetry_(data, protocolo, formConfig, error) {
+    try {
+        const ss = SpreadsheetApp.getActiveSpreadsheet();
+        let sheet = ss.getSheetByName(NOTION.RETRY_QUEUE_SHEET);
+        if (!sheet) {
+            sheet = ss.insertSheet(NOTION.RETRY_QUEUE_SHEET);
+            sheet.getRange(1, 1, 1, 6)
+                .setValues([['Timestamp', 'Protocolo', 'Tipo', 'Tentativas', 'Último erro', 'Payload']])
+                .setFontWeight('bold');
+            sheet.setFrozenRows(1);
+        }
+        const tz = Session.getScriptTimeZone() || 'America/Belem';
+        sheet.appendRow([
+            Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm:ss'),
+            protocolo,
+            formConfig.PROTOCOL_PREFIX === 'MB' ? 'cadastro' : 'lista-espera',
+            0,
+            String(error).substring(0, 500),
+            JSON.stringify(data).substring(0, 45000)
+        ]);
+        Logger.log('Notion falhou, enfileirado: ' + protocolo + ' — ' + error);
+    } catch (err) {
+        // último recurso: registro só no log de execução
+        Logger.log('Falha ao enfileirar reenvio Notion (' + protocolo + '): ' + err);
+    }
+}
+
+/**
+ * Reprocessa a fila. Instale um gatilho de tempo apontando para esta função
+ * (ver criarGatilhoNotion). Linhas resolvidas são removidas; após
+ * NOTION.MAX_RETRIES tentativas a linha permanece para inspeção manual.
+ */
+function retryNotionQueue() {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(NOTION.RETRY_QUEUE_SHEET);
+    if (!sheet || sheet.getLastRow() < 2) return;
+
+    const rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getValues();
+    const resolved = [];
+
+    rows.forEach((row, i) => {
+        const rowNumber = i + 2;
+        const protocolo = row[1];
+        const tipo = row[2];
+        const attempts = Number(row[3]) || 0;
+        if (attempts >= NOTION.MAX_RETRIES) return;
+
+        const formConfig = FORMS[tipo];
+        if (!formConfig) return;
+
+        let data;
+        try { data = JSON.parse(row[5]); } catch (e) { return; }
+
+        const res = pushNotionPage_(data, protocolo, formConfig);
+        if (res.ok) {
+            resolved.push(rowNumber);
+        } else {
+            sheet.getRange(rowNumber, 4).setValue(attempts + 1);
+            sheet.getRange(rowNumber, 5).setValue(String(res.error).substring(0, 500));
+        }
+    });
+
+    // remove de baixo para cima para não bagunçar os índices
+    resolved.sort((a, b) => b - a).forEach(r => sheet.deleteRow(r));
+    Logger.log('retryNotionQueue: ' + resolved.length + ' reenviado(s) com sucesso.');
+}
+
+/**
+ * Cria (uma única vez) o gatilho de reenvio a cada 15 minutos.
+ */
+function criarGatilhoNotion() {
+    const exists = ScriptApp.getProjectTriggers()
+        .some(t => t.getHandlerFunction() === 'retryNotionQueue');
+    if (exists) {
+        Logger.log('Gatilho de reenvio já existe.');
+        return;
+    }
+    ScriptApp.newTrigger('retryNotionQueue').timeBased().everyMinutes(15).create();
+    Logger.log('✅ Gatilho de reenvio criado (a cada 15 min).');
 }
 
 /* ============================================================
@@ -592,4 +880,40 @@ function testeListaEspera() {
  */
 function testeManual() {
     testeCadastro();
+}
+
+/**
+ * Valida a integração com o Notion sem gravar na planilha:
+ * cria uma página de teste em cada database configurado.
+ */
+function testeNotion() {
+    ['cadastro', 'lista-espera'].forEach(tipo => {
+        const formConfig = FORMS[tipo];
+        const dbId = PropertiesService.getScriptProperties().getProperty(formConfig.NOTION_DB_KEY);
+        if (!dbId) {
+            Logger.log('⚠️  ' + formConfig.NOTION_DB_KEY + ' não configurado — pulando ' + tipo);
+            return;
+        }
+        const fake = (tipo === 'cadastro')
+            ? {
+                razaoSocial: '[TESTE] Glimmerock Arquitetura LTDA', nomeFantasia: 'Glimmerock',
+                cnpj: '11.222.333/0001-81', ramoAtividade: 'Arquitetura',
+                cpfRepresentante: '111.444.777-35', cargo: 'Sócia-Diretora',
+                email: 'jhonymarlon@gmail.com', telefone: '(91) 99999-9999',
+                site: 'www.glimmerock.com.br', cep: '66000-000',
+                logradouro: 'Av. Presidente Vargas', numero: '100', bairro: 'Campina',
+                cidade: 'Belém', estado: 'PA', userAgent: 'testeNotion()'
+            }
+            : {
+                nomeCompleto: '[TESTE] Maria das Graças', email: 'jhonymarlon@gmail.com',
+                telefone: '(91) 98888-7777', cidade: 'Belém', estado: 'PA',
+                empresa: 'Glimmerock Arquitetura', cargo: 'Arquiteta',
+                softwareAtual: 'AutoCAD', nivelBIM: 'Iniciante', softwareInteresse: 'Archicad',
+                objetivo: 'Quero aprender BIM do zero para aplicar no escritório.',
+                comoConheceu: 'Instagram', bimclub: 'Sim', userAgent: 'testeNotion()'
+            };
+
+        const res = pushNotionPage_(fake, formConfig.PROTOCOL_PREFIX + '-TESTE-0000', formConfig);
+        Logger.log((res.ok ? '✅ ' : '❌ ') + tipo + ' → ' + (res.ok ? res.pageId : res.error));
+    });
 }

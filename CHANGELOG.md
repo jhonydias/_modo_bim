@@ -5,6 +5,32 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ---
 
+## 2026-07-26
+
+### Regra de cor da proposta comercial (task 08 · Canva ref. 1) — `index.html`
+- **Fundo claro → texto em verde, destaques em vermelho.** Os tokens `--ink`, `--ink-soft`, `--ink-muted` e `--line` deixaram de ser cereja escuro (`#470000`) e passaram a derivar do **verde militar** (`#4C4F37`). Corpo de texto, leads e divisores agora são verdes.
+- **Títulos e ênfases em cereja:** `h1/h2/h3` ganharam `color: var(--cereja)` por padrão; `strong` dentro dos parágrafos (statement e treinamentos), `legend` do quiz e o `h3` do resultado também. O resultado é a combinação "verde com vermelho" da proposta.
+- **Fundo cereja → texto branco:** overrides explícitos para `.about`, `.cta-final` e `.gallery-quote`, que continuam em Cloud Dancer. Contraste conferido (texto verde sobre creme ≈ 7,3:1).
+
+### Novo tópico "nossos serviços" (task 08 · Canva ref. 2, pág. 5) — `index.html`
+- Novo painel `#nossos-servicos` **entre "nosso modo" e "implementações"**, dentro do bloco de scroll horizontal. Título e copy vindos direto do Canva: *"Para cada momento, tem um modo_"*.
+- **Seis serviços** em duas colunas (01 Consultoria BIM · 02 Projetos em BIM · 03 Criação de Templates · 04 Criação de Bibliotecas · 05 Coordenação BIM · 06 Treinamento BIM), cada um com número, nome em cereja e descrição em verde; borda superior que acende no hover.
+- Link adicionado ao **selecionador de seção**, ao **menu hambúrguer** e ao **rodapé**. O scrollspy e o cálculo do track horizontal derivam do DOM, então passaram a lidar com 4 painéis sem alteração de lógica. Em telas `< 900px` a lista vira coluna única; no painel horizontal os espaçamentos são compactados para os 6 itens + CTA caberem na altura.
+
+### Movimento e cor no estilo Responsive Cities (task 08) — `index.html`
+- **Texto que se monta palavra a palavra** na primeira vez que entra em cena (`.rt`): o JS quebra o conteúdo em `<span class="rt-w"><i>palavra</i></span>` preservando `<em>`, `<span>` e `<br>`, e cada palavra sobe de dentro da linha com atraso escalonado (44 ms). Aplicado no H1 do hero, no statement, em nossos serviços, implementações, treinamentos, galeria e CTA final.
+- **Imagens entram em preto e branco e ganham cor** (`.bw`): `grayscale(1)` + leve zoom + cortina (`clip-path`) que abre de baixo para cima. Aplicado nas **imagens abaixo de "A _modo_bim no mundo real"** (galeria da marca, com atraso escalonado por posição) e na imagem do hero. O hover de zoom da galeria só entra depois da revelação.
+- **Brilho que percorre o Pattern:** máscara em gradiente que varre o `.modo-tex` a cada 7,5 s, no lugar do efeito "data matters, meaning too" da referência.
+- **Painéis horizontais:** como o track é transladado, o `IntersectionObserver` não os alcança — o conteúdo de cada painel passa a ser revelado quando ele entra em cena (`revealPanel`). Tudo respeita `prefers-reduced-motion` (sem split, sem grayscale, sem shimmer).
+
+### Envio automático dos formulários para o Notion (task 08) — `script/Code.gs`, `tasks/08/notion-integracao.md`
+- **Dual-write:** a planilha continua sendo gravada (é dela que sai o protocolo e ela vira o backup) e, no mesmo request, o registro é espelhado como página em um database do Notion via API (`UrlFetchApp` + `Notion-Version: 2022-06-28`).
+- **Segredos fora do código:** `NOTION_TOKEN`, `NOTION_DB_CADASTROS` e `NOTION_DB_LISTA_ESPERA` ficam nas Propriedades do script.
+- **Nada se perde:** falha na API não derruba o envio — o lead vai para a aba **"Fila Notion"** e é reprocessado por `retryNotionQueue()` num gatilho de 15 em 15 minutos (até 5 tentativas). `criarGatilhoNotion()` instala o gatilho; `testeNotion()` valida a configuração.
+- Mapeamento de campos → propriedades do Notion em `buildNotionProps_()`, com construtores tipados (title, rich_text, select, email, phone, url, date). Passo a passo de setup, tabela de colunas e erros comuns em `tasks/08/notion-integracao.md`.
+
+---
+
 ## 2026-06-28
 
 ### Pattern da marca como espinha visual da jornada (task 04) — `index.html`
