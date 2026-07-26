@@ -528,30 +528,40 @@
            ============================================ */
         .gallery-head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(30px, 4vw, 48px); }
 
-        /* Faixa em movimento contínuo (ref. responsivecities: marquee + imagens em P&B
-           que ganham cor no hover). Fica fora do .wrap para sangrar de ponta a ponta. */
-        .marquee { overflow: hidden; --mq-gap: clamp(12px, 1.6vw, 20px); --mq-dur: 60s; }
-        .marquee-track {
-            display: flex;
+        /* Faixa de prova: duas colunas de imagens em movimento contínuo (ref. responsivecities)
+           com a prova social no meio. Sangra de ponta a ponta, fora do .wrap. */
+        .proof-band {
+            --mq-gap: clamp(12px, 1.6vw, 20px);
+            display: grid;
+            grid-template-columns: 1fr minmax(300px, 440px) 1fr;
             gap: var(--mq-gap);
-            width: max-content;
-            animation: mqScroll var(--mq-dur) linear infinite;
+            align-items: center;
         }
-        /* pausa ao passar o mouse, para dar tempo de olhar (e de colorir) a peça */
-        .marquee:hover .marquee-track, .marquee:focus-within .marquee-track { animation-play-state: paused; }
-        @keyframes mqScroll { to { transform: translateX(calc(-50% - var(--mq-gap) / 2)); } }
 
-        /* aspect-ratio fixo (as seis peças são ~900×500) reserva a largura antes de a
+        .vmarquee { overflow: hidden; height: clamp(420px, 60vh, 660px); --mq-dur: 46s; }
+        .vmarquee-track {
+            display: flex;
+            flex-direction: column;
+            gap: var(--mq-gap);
+            animation: mqScrollY var(--mq-dur) linear infinite;
+        }
+        /* a segunda coluna sobe, para as duas não andarem em bloco */
+        .vmarquee--up .vmarquee-track { animation-direction: reverse; }
+        /* pausa ao passar o mouse, para dar tempo de olhar (e de colorir) a peça */
+        .vmarquee:hover .vmarquee-track, .vmarquee:focus-within .vmarquee-track { animation-play-state: paused; }
+        @keyframes mqScrollY { to { transform: translateY(calc(-50% - var(--mq-gap) / 2)); } }
+
+        /* aspect-ratio fixo (as seis peças são ~900×500) reserva a altura antes de a
            imagem carregar — sem isso a faixa nasce colapsada com lazy loading */
-        .marquee figure {
+        .vmarquee figure {
             flex: 0 0 auto;
-            height: clamp(180px, 22vw, 290px);
+            width: 100%;
             aspect-ratio: 900 / 500;
             border-radius: 4px;
             overflow: hidden;
             background: var(--cream-2);
         }
-        .marquee img {
+        .vmarquee img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -559,24 +569,23 @@
             filter: grayscale(1) contrast(1.03);
             transition: filter 0.7s var(--ease-out), transform 0.7s var(--ease-out);
         }
-        .marquee figure:hover img { filter: grayscale(0) contrast(1); transform: scale(1.04); }
+        .vmarquee figure:hover img { filter: grayscale(0) contrast(1); transform: scale(1.04); }
 
-        /* bloco de prova/depoimento — card quente Marrom (calor artesanal) com texto creme (contraste AA) */
+        /* Prova social — única mancha de cor no meio das peças em P&B.
+           Cereja com texto branco, seguindo a regra de cor da marca. */
         .gallery-quote {
             display: flex;
             align-items: center;
-            max-width: 720px;
-            margin-top: clamp(30px, 4vw, 48px);
-            padding: clamp(24px, 2.6vw, 38px);
-            background: var(--marrom);
+            align-self: stretch;
+            padding: clamp(28px, 3vw, 44px);
+            background: var(--cereja);
             color: var(--cloud);
             border-radius: 4px;
-            border-left: 3px solid var(--bege);
+            box-shadow: 0 30px 80px -50px rgba(71, 0, 0, 0.7);
         }
-        .quote-tag { font-family: var(--detail); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: var(--cloud); display: block; margin-bottom: 14px; }
-        .quote-tag b { color: var(--bege); font-family: var(--serif); }   /* underscore em Bege — acento quente */
-        .gallery-quote p { font-family: var(--serif); font-style: italic; font-size: clamp(17px, 2vw, 22px); color: var(--cloud); line-height: 1.4; margin-bottom: 20px; }
-        .gallery-quote .tlink.light { border-bottom-color: var(--bege); }
+        .quote-tag { font-family: var(--detail); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: var(--cloud); display: block; margin-bottom: 16px; }
+        .quote-tag b { color: var(--cloud-muted); font-family: var(--serif); }
+        .gallery-quote p { font-family: var(--serif); font-style: italic; font-size: clamp(18px, 2.1vw, 24px); color: var(--cloud); line-height: 1.35; margin-bottom: 24px; }
 
         /* ============================================
            FAQ
@@ -681,6 +690,19 @@
         .cta-final h2 { font-size: clamp(34px, 6vw, 76px); color: var(--cloud); max-width: 16ch; margin: 0 auto 44px; }
         .cta-final .cur { color: var(--cloud-muted); }
         .cta-buttons { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+        /* Assinatura de fechamento: o wordmark em escala grande, em que cada letra sobe
+           em sequência formando uma onda (ref. "data matters, meaning too"). */
+        .cta-mark {
+            font-family: var(--serif);
+            font-size: clamp(52px, 13vw, 168px);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+            color: var(--cloud);
+            margin-top: clamp(52px, 8vw, 104px);
+            user-select: none;
+        }
+        .cta-mark .b { font-style: italic; }
+        .cta-mark .us { color: rgba(239, 238, 233, 0.4); }
 
         /* ============================================
            PATTERN — textura de fundo sutil (sobre cereja)
@@ -724,6 +746,8 @@
         /* --- Texto que se monta palavra a palavra na PRIMEIRA vez que entra em cena.
                O JS quebra o conteúdo de .rt em <span class="rt-w"><i>palavra</i></span>. --- */
         .rt { --rt-step: 44ms; }
+        /* .rl = mesma mecânica, mas letra a letra e com passo mais curto (onda) */
+        .rt.rl { --rt-step: 26ms; }
         .rt .rt-w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.12em; margin-bottom: -0.12em; }
         .rt .rt-w > i {
             display: inline-block;
@@ -765,10 +789,10 @@
             .rt .rt-w > i { transform: none; opacity: 1; transition: none; }
             .bw img, .bw.in img { filter: none; transform: none; clip-path: none; transition: none; }
             .modo-tex { animation: none; -webkit-mask-image: none; mask-image: none; }
-            /* faixa para de rodar sozinha e vira uma tira rolável pelo próprio visitante;
-               o P&B → cor no hover continua, porque não depende de movimento */
-            .marquee { overflow-x: auto; }
-            .marquee-track { animation: none; }
+            /* as colunas param de rodar sozinhas e viram tiras roláveis pelo próprio
+               visitante; o P&B → cor no hover continua, porque não depende de movimento */
+            .vmarquee { overflow-y: auto; }
+            .vmarquee-track { animation: none; }
             html { scroll-behavior: auto; }
         }
 
@@ -786,8 +810,10 @@
             .team { grid-template-columns: 1fr; gap: 32px; }
             .team-photo { aspect-ratio: 4/3.4; max-height: 460px; }
             .faq-grid { grid-template-columns: 1fr; gap: 24px; }
-            /* a faixa roda mais rápido em tela pequena, senão parece parada */
-            .marquee { --mq-dur: 42s; }
+            /* empilha: coluna de peças · prova · coluna de peças — a prova segue no meio */
+            .proof-band { grid-template-columns: 1fr; }
+            .vmarquee { height: clamp(260px, 42vh, 380px); --mq-dur: 32s; }
+            .gallery-quote { align-self: auto; }
         }
         @media (max-width: 520px) {
             .section-nav { gap: 16px; overflow-x: auto; scrollbar-width: none; padding-right: 8px; }
@@ -1089,28 +1115,23 @@
             </div>
         </div>
 
-        <!-- Faixa contínua das peças da marca. As imagens ficam em preto e branco e
-             ganham cor quando o visitante passa o mouse; o segundo bloco é uma cópia
-             exata do primeiro, apenas para o loop não ter emenda. -->
-        <div class="marquee">
-            <div class="marquee-track">
-                <figure><img src="img/brand-cracha.jpg" alt="Crachá da _modo_bim com a foto de Joene Louchard, arquiteta e co-fundadora" loading="lazy" /></figure>
-                <figure><img src="img/brand-cups.jpg" alt="Copos de café da _modo_bim em cereja e creme sobre uma mesa de madeira" loading="lazy" /></figure>
-                <figure><img src="img/brand-bag.jpg" alt="Sacola e folheto “Um novo modo de projetar” da _modo_bim" loading="lazy" /></figure>
-                <figure><img src="img/brand-mousepad.jpg" alt="Mousepad cereja com o Pattern e o wordmark da _modo_bim" loading="lazy" /></figure>
-                <figure><img src="img/brand-notebook.jpg" alt="Site da _modo_bim apresentado em um notebook sobre uma poltrona vermelha" loading="lazy" /></figure>
-                <figure><img src="img/brand-pin.jpg" alt="Bottons da _modo_bim: “Escale com bim_” em verde e “teambim_” em cereja" loading="lazy" /></figure>
+        <!-- Duas colunas de peças da marca em movimento contínuo (uma desce, outra sobe)
+             com a prova social no meio. As imagens ficam em preto e branco e ganham cor
+             quando o visitante passa o mouse. Em cada coluna, o segundo bloco de figuras
+             é cópia exata do primeiro, só para o loop não ter emenda. -->
+        <div class="proof-band">
+            <div class="vmarquee">
+                <div class="vmarquee-track">
+                    <figure><img src="img/brand-cracha.jpg" alt="Crachá da _modo_bim com a foto de Joene Louchard, arquiteta e co-fundadora" loading="lazy" /></figure>
+                    <figure><img src="img/brand-cups.jpg" alt="Copos de café da _modo_bim em cereja e creme sobre uma mesa de madeira" loading="lazy" /></figure>
+                    <figure><img src="img/brand-bag.jpg" alt="Sacola e folheto “Um novo modo de projetar” da _modo_bim" loading="lazy" /></figure>
 
-                <figure aria-hidden="true"><img src="img/brand-cracha.jpg" alt="" loading="lazy" /></figure>
-                <figure aria-hidden="true"><img src="img/brand-cups.jpg" alt="" loading="lazy" /></figure>
-                <figure aria-hidden="true"><img src="img/brand-bag.jpg" alt="" loading="lazy" /></figure>
-                <figure aria-hidden="true"><img src="img/brand-mousepad.jpg" alt="" loading="lazy" /></figure>
-                <figure aria-hidden="true"><img src="img/brand-notebook.jpg" alt="" loading="lazy" /></figure>
-                <figure aria-hidden="true"><img src="img/brand-pin.jpg" alt="" loading="lazy" /></figure>
+                    <figure aria-hidden="true"><img src="img/brand-cracha.jpg" alt="" loading="lazy" /></figure>
+                    <figure aria-hidden="true"><img src="img/brand-cups.jpg" alt="" loading="lazy" /></figure>
+                    <figure aria-hidden="true"><img src="img/brand-bag.jpg" alt="" loading="lazy" /></figure>
+                </div>
             </div>
-        </div>
 
-        <div class="wrap">
             <!-- DEPOIMENTOS: estado honesto enquanto não há relatos reais coletados (task 06).
                  NÃO inventar nomes/relatos. Ao coletar, substitua o bloco .quote-invite por, ex.:
                    <blockquote><p>“depoimento real do cliente…”</p>
@@ -1121,6 +1142,18 @@
                     <span class="quote-tag">Prova real <b>_</b></span>
                     <p>Os primeiros relatos de quem operou em BIM com a gente estão sendo colhidos agora. <em class="it">Quer ser um dos primeiros?</em></p>
                     <a href="cadastro.html" class="tlink light">Trabalhe com a _modo_bim <span class="arr">→</span></a>
+                </div>
+            </div>
+
+            <div class="vmarquee vmarquee--up">
+                <div class="vmarquee-track">
+                    <figure><img src="img/brand-mousepad.jpg" alt="Mousepad cereja com o Pattern e o wordmark da _modo_bim" loading="lazy" /></figure>
+                    <figure><img src="img/brand-notebook.jpg" alt="Site da _modo_bim apresentado em um notebook sobre uma poltrona vermelha" loading="lazy" /></figure>
+                    <figure><img src="img/brand-pin.jpg" alt="Bottons da _modo_bim: “Escale com bim_” em verde e “teambim_” em cereja" loading="lazy" /></figure>
+
+                    <figure aria-hidden="true"><img src="img/brand-mousepad.jpg" alt="" loading="lazy" /></figure>
+                    <figure aria-hidden="true"><img src="img/brand-notebook.jpg" alt="" loading="lazy" /></figure>
+                    <figure aria-hidden="true"><img src="img/brand-pin.jpg" alt="" loading="lazy" /></figure>
                 </div>
             </div>
         </div>
@@ -1246,6 +1279,8 @@
                 <a href="cadastro.html" class="btn btn-cream">solicite um orçamento <span class="arr">→</span></a>
                 <a href="lista-espera.html" class="btn btn-ghost-light">faça parte do BIM Club <span class="arr">→</span></a>
             </div>
+            <!-- decorativo: o wordmark de verdade está no rodapé, logo abaixo -->
+            <div class="cta-mark rt rl" aria-hidden="true"><span class="us">_</span>modo<span class="us">_</span><span class="b">b</span>im</div>
         </div>
     </section>
 
@@ -1535,25 +1570,28 @@
     });
 
     /* ============================================ SCROLL REVEAL + TEXTO QUE SE MONTA ============================================ */
-    /* Quebra o conteúdo de .rt em palavras animáveis, preservando <em>, <span> e <br>.
-       Cada palavra recebe --i (sua posição) para escalonar o atraso da subida. */
-    function splitWords(root) {
+    /* Quebra o conteúdo de .rt em pedaços animáveis, preservando <em>, <span> e <br>.
+       Cada pedaço recebe --i (sua posição) para escalonar o atraso da subida.
+       Em .rt o pedaço é a palavra; em .rl é a letra, formando uma onda. */
+    function splitReveal(root) {
+        const byLetter = root.classList.contains('rl');
         let i = 0;
         (function walk(node) {
             [...node.childNodes].forEach(child => {
                 if (child.nodeType === Node.TEXT_NODE) {
                     if (!child.nodeValue.trim()) return;
                     const frag = document.createDocumentFragment();
-                    child.nodeValue.split(/(\s+)/).forEach(part => {
+                    const parts = byLetter ? [...child.nodeValue] : child.nodeValue.split(/(\s+)/);
+                    parts.forEach(part => {
                         if (!part) return;
                         if (!part.trim()) { frag.appendChild(document.createTextNode(part)); return; }
-                        const word = document.createElement('span');
-                        word.className = 'rt-w';
-                        word.style.setProperty('--i', i++);
+                        const piece = document.createElement('span');
+                        piece.className = 'rt-w';
+                        piece.style.setProperty('--i', i++);
                         const inner = document.createElement('i');
                         inner.textContent = part;
-                        word.appendChild(inner);
-                        frag.appendChild(word);
+                        piece.appendChild(inner);
+                        frag.appendChild(piece);
                     });
                     node.replaceChild(frag, child);
                 } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'BR') {
@@ -1562,7 +1600,7 @@
             });
         })(root);
     }
-    if (!reducedMotion) document.querySelectorAll('.rt').forEach(splitWords);
+    if (!reducedMotion) document.querySelectorAll('.rt').forEach(splitReveal);
 
     const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
