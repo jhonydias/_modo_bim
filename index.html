@@ -526,20 +526,53 @@
         /* ============================================
            GALLERY
            ============================================ */
-        .gallery-head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(36px, 5vw, 56px); }
-        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(155px, 19vw, 230px); gap: clamp(12px, 1.6vw, 20px); }
-        .gallery-grid figure { border-radius: 4px; overflow: hidden; background: var(--cream-2); }
-        .gallery-grid img { width: 100%; height: 100%; object-fit: cover; }
-        /* o hover só entra depois da revelação P&B → cor (ver bloco .bw em SCROLL REVEAL) */
-        .gallery-grid figure.in:hover img { transform: scale(1.04); transition-delay: 0ms; }
+        .gallery-head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(30px, 4vw, 48px); }
+
+        /* Faixa em movimento contínuo (ref. responsivecities: marquee + imagens em P&B
+           que ganham cor no hover). Fica fora do .wrap para sangrar de ponta a ponta. */
+        .marquee { overflow: hidden; --mq-gap: clamp(12px, 1.6vw, 20px); --mq-dur: 60s; }
+        .marquee-track {
+            display: flex;
+            gap: var(--mq-gap);
+            width: max-content;
+            animation: mqScroll var(--mq-dur) linear infinite;
+        }
+        /* pausa ao passar o mouse, para dar tempo de olhar (e de colorir) a peça */
+        .marquee:hover .marquee-track, .marquee:focus-within .marquee-track { animation-play-state: paused; }
+        @keyframes mqScroll { to { transform: translateX(calc(-50% - var(--mq-gap) / 2)); } }
+
+        /* aspect-ratio fixo (as seis peças são ~900×500) reserva a largura antes de a
+           imagem carregar — sem isso a faixa nasce colapsada com lazy loading */
+        .marquee figure {
+            flex: 0 0 auto;
+            height: clamp(180px, 22vw, 290px);
+            aspect-ratio: 900 / 500;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--cream-2);
+        }
+        .marquee img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* preto e branco por padrão — a cor chega quando o visitante se aproxima */
+            filter: grayscale(1) contrast(1.03);
+            transition: filter 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+        }
+        .marquee figure:hover img { filter: grayscale(0) contrast(1); transform: scale(1.04); }
+
         /* bloco de prova/depoimento — card quente Marrom (calor artesanal) com texto creme (contraste AA) */
-        .gallery-quote { display: flex; align-items: center; padding: clamp(24px, 2.6vw, 38px); background: var(--marrom); color: var(--cloud); border-radius: 4px; border-left: 3px solid var(--bege); }
-        /* explicit placement: tall left + two small (top) + tall right, quote spans the middle bottom */
-        .gallery-grid > :nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
-        .gallery-grid > :nth-child(2) { grid-column: 2; grid-row: 1; }
-        .gallery-grid > :nth-child(3) { grid-column: 4; grid-row: 1 / span 2; }
-        .gallery-grid > :nth-child(4) { grid-column: 3; grid-row: 1; }
-        .gallery-grid > :nth-child(5) { grid-column: 2 / span 2; grid-row: 2; }
+        .gallery-quote {
+            display: flex;
+            align-items: center;
+            max-width: 720px;
+            margin-top: clamp(30px, 4vw, 48px);
+            padding: clamp(24px, 2.6vw, 38px);
+            background: var(--marrom);
+            color: var(--cloud);
+            border-radius: 4px;
+            border-left: 3px solid var(--bege);
+        }
         .quote-tag { font-family: var(--detail); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: var(--cloud); display: block; margin-bottom: 14px; }
         .quote-tag b { color: var(--bege); font-family: var(--serif); }   /* underscore em Bege — acento quente */
         .gallery-quote p { font-family: var(--serif); font-style: italic; font-size: clamp(17px, 2vw, 22px); color: var(--cloud); line-height: 1.4; margin-bottom: 20px; }
@@ -658,7 +691,9 @@
             z-index: 0;
             height: auto;
             color: var(--cream);
-            opacity: 0.1;
+            /* sobe de 0.1 para 0.2 para o brilho que a atravessa ser perceptível
+               (ver @keyframes patShimmer em SCROLL REVEAL) */
+            opacity: 0.2;
         }
         /* #equipe: faixa lateral à direita, sangrando para fora da borda */
         .about .modo-tex { width: clamp(280px, 40vw, 520px); right: -6%; top: 50%; transform: translateY(-50%); }
@@ -701,30 +736,28 @@
         }
         .rt.in .rt-w > i { transform: none; opacity: 1; }
 
-        /* --- Imagem entra em preto e branco e ganha cor ao aparecer (cortina + leve zoom-out). --- */
+        /* --- Imagem entra em preto e branco e vira colorida ao aparecer (cortina + zoom-out).
+               Lenta de propósito: a passagem P&B → cor é para ser vista acontecendo. --- */
         .bw img {
-            filter: grayscale(1) contrast(1.05);
+            filter: grayscale(1) contrast(1.06);
             transform: scale(1.09);
             clip-path: inset(0 0 100% 0);
-            transition: filter 1.4s var(--ease-out), transform 1.5s var(--ease-out), clip-path 1.2s var(--ease-out);
-            transition-delay: var(--bw-delay, 0ms);
+            transition: filter 2.2s var(--ease-out) 0.35s, transform 1.8s var(--ease-out), clip-path 1.2s var(--ease-out);
         }
         .bw.in img { filter: grayscale(0) contrast(1); transform: none; clip-path: inset(0 0 0 0); }
-        .gallery-grid figure:nth-child(2) { --bw-delay: 110ms; }
-        .gallery-grid figure:nth-child(3) { --bw-delay: 220ms; }
-        .gallery-grid figure:nth-child(4) { --bw-delay: 330ms; }
 
-        /* --- Brilho que percorre o Pattern (ref. "data matters, meaning too"). --- */
+        /* --- Brilho que percorre o Pattern (ref. "data matters, meaning too": uma onda
+               de luz que atravessa a peça da esquerda para a direita). --- */
         @keyframes patShimmer {
             from { -webkit-mask-position: 150% 0; mask-position: 150% 0; }
             to   { -webkit-mask-position: -50% 0; mask-position: -50% 0; }
         }
         .modo-tex {
-            -webkit-mask-image: linear-gradient(102deg, rgba(0,0,0,0.4) 36%, #000 47%, #000 53%, rgba(0,0,0,0.4) 64%);
-            mask-image: linear-gradient(102deg, rgba(0,0,0,0.4) 36%, #000 47%, #000 53%, rgba(0,0,0,0.4) 64%);
-            -webkit-mask-size: 240% 100%;
-            mask-size: 240% 100%;
-            animation: patShimmer 7.5s linear infinite;
+            -webkit-mask-image: linear-gradient(102deg, rgba(0,0,0,0.22) 34%, #000 46%, #000 54%, rgba(0,0,0,0.22) 66%);
+            mask-image: linear-gradient(102deg, rgba(0,0,0,0.22) 34%, #000 46%, #000 54%, rgba(0,0,0,0.22) 66%);
+            -webkit-mask-size: 220% 100%;
+            mask-size: 220% 100%;
+            animation: patShimmer 6s linear infinite;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -732,6 +765,10 @@
             .rt .rt-w > i { transform: none; opacity: 1; transition: none; }
             .bw img, .bw.in img { filter: none; transform: none; clip-path: none; transition: none; }
             .modo-tex { animation: none; -webkit-mask-image: none; mask-image: none; }
+            /* faixa para de rodar sozinha e vira uma tira rolável pelo próprio visitante;
+               o P&B → cor no hover continua, porque não depende de movimento */
+            .marquee { overflow-x: auto; }
+            .marquee-track { animation: none; }
             html { scroll-behavior: auto; }
         }
 
@@ -749,11 +786,8 @@
             .team { grid-template-columns: 1fr; gap: 32px; }
             .team-photo { aspect-ratio: 4/3.4; max-height: 460px; }
             .faq-grid { grid-template-columns: 1fr; gap: 24px; }
-            /* gallery: simple 2-col of photos + full-width quote below (no overlap) */
-            .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; }
-            .gallery-grid > * { grid-column: auto !important; grid-row: auto !important; }
-            .gallery-grid figure { aspect-ratio: 3 / 4; }
-            .gallery-quote { grid-column: 1 / -1 !important; }
+            /* a faixa roda mais rápido em tela pequena, senão parece parada */
+            .marquee { --mq-dur: 42s; }
         }
         @media (max-width: 520px) {
             .section-nav { gap: 16px; overflow-x: auto; scrollbar-width: none; padding-right: 8px; }
@@ -762,7 +796,6 @@
             .nav-links { left: var(--gutter); right: var(--gutter); min-width: 0; }
             .hero-copy .display { font-size: clamp(33px, 9vw, 42px); }
             .steps { grid-template-columns: 1fr; }
-            .gallery-grid { grid-template-columns: 1fr 1fr; }
             .hero-actions { gap: 18px; }
             /* quiz: termômetro com rótulos compactos para caber sem overflow em telas estreitas */
             .therm-stops { font-size: 10px; gap: 8px; letter-spacing: 0.06em; }
@@ -1054,22 +1087,40 @@
                 <span class="label">A _modo_bim no mundo real</span>
                 <h2 class="h-sec rt" style="margin-top:14px;">Uma marca que você <em class="it">pega na mão.</em></h2>
             </div>
-            <div class="gallery-grid">
-                <figure class="tall reveal bw"><img src="img/brand-cracha.jpg" alt="Crachá da _modo_bim com a foto de Joene Louchard, arquiteta e co-fundadora" loading="lazy" /></figure>
-                <figure class="reveal bw"><img src="img/brand-cups.jpg" alt="Copos de café da _modo_bim em cereja e creme sobre uma mesa de madeira" loading="lazy" /></figure>
-                <figure class="tall reveal bw"><img src="img/brand-bag.jpg" alt="Sacola e folheto “Um novo modo de projetar” da _modo_bim" loading="lazy" /></figure>
-                <figure class="reveal bw"><img src="img/brand-notebook.jpg" alt="Site da _modo_bim apresentado em um notebook sobre uma poltrona vermelha" loading="lazy" /></figure>
-                <!-- DEPOIMENTOS: estado honesto enquanto não há relatos reais coletados (task 06).
-                     NÃO inventar nomes/relatos. Ao coletar, substitua o bloco .quote-invite por, ex.:
-                       <blockquote><p>“depoimento real do cliente…”</p>
-                         <span class="quote-tag">Nome Sobrenome — Escritório, Cidade</span></blockquote>
-                     mantendo o card e o estilo já definidos. -->
-                <div class="gallery-quote reveal">
-                    <div class="quote-invite">
-                        <span class="quote-tag">Prova real <b>_</b></span>
-                        <p>Os primeiros relatos de quem operou em BIM com a gente estão sendo colhidos agora. <em class="it">Quer ser um dos primeiros?</em></p>
-                        <a href="cadastro.html" class="tlink light">Trabalhe com a _modo_bim <span class="arr">→</span></a>
-                    </div>
+        </div>
+
+        <!-- Faixa contínua das peças da marca. As imagens ficam em preto e branco e
+             ganham cor quando o visitante passa o mouse; o segundo bloco é uma cópia
+             exata do primeiro, apenas para o loop não ter emenda. -->
+        <div class="marquee">
+            <div class="marquee-track">
+                <figure><img src="img/brand-cracha.jpg" alt="Crachá da _modo_bim com a foto de Joene Louchard, arquiteta e co-fundadora" loading="lazy" /></figure>
+                <figure><img src="img/brand-cups.jpg" alt="Copos de café da _modo_bim em cereja e creme sobre uma mesa de madeira" loading="lazy" /></figure>
+                <figure><img src="img/brand-bag.jpg" alt="Sacola e folheto “Um novo modo de projetar” da _modo_bim" loading="lazy" /></figure>
+                <figure><img src="img/brand-mousepad.jpg" alt="Mousepad cereja com o Pattern e o wordmark da _modo_bim" loading="lazy" /></figure>
+                <figure><img src="img/brand-notebook.jpg" alt="Site da _modo_bim apresentado em um notebook sobre uma poltrona vermelha" loading="lazy" /></figure>
+                <figure><img src="img/brand-pin.jpg" alt="Bottons da _modo_bim: “Escale com bim_” em verde e “teambim_” em cereja" loading="lazy" /></figure>
+
+                <figure aria-hidden="true"><img src="img/brand-cracha.jpg" alt="" loading="lazy" /></figure>
+                <figure aria-hidden="true"><img src="img/brand-cups.jpg" alt="" loading="lazy" /></figure>
+                <figure aria-hidden="true"><img src="img/brand-bag.jpg" alt="" loading="lazy" /></figure>
+                <figure aria-hidden="true"><img src="img/brand-mousepad.jpg" alt="" loading="lazy" /></figure>
+                <figure aria-hidden="true"><img src="img/brand-notebook.jpg" alt="" loading="lazy" /></figure>
+                <figure aria-hidden="true"><img src="img/brand-pin.jpg" alt="" loading="lazy" /></figure>
+            </div>
+        </div>
+
+        <div class="wrap">
+            <!-- DEPOIMENTOS: estado honesto enquanto não há relatos reais coletados (task 06).
+                 NÃO inventar nomes/relatos. Ao coletar, substitua o bloco .quote-invite por, ex.:
+                   <blockquote><p>“depoimento real do cliente…”</p>
+                     <span class="quote-tag">Nome Sobrenome — Escritório, Cidade</span></blockquote>
+                 mantendo o card e o estilo já definidos. -->
+            <div class="gallery-quote reveal">
+                <div class="quote-invite">
+                    <span class="quote-tag">Prova real <b>_</b></span>
+                    <p>Os primeiros relatos de quem operou em BIM com a gente estão sendo colhidos agora. <em class="it">Quer ser um dos primeiros?</em></p>
+                    <a href="cadastro.html" class="tlink light">Trabalhe com a _modo_bim <span class="arr">→</span></a>
                 </div>
             </div>
         </div>
