@@ -111,7 +111,6 @@
         /* Títulos: vermelho sobre fundo claro… */
         h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.015em; line-height: 1.04; color: var(--cereja); }
         /* …e branco sobre fundo cereja/quente. */
-        .about h1, .about h2, .about h3,
         .cta-final h1, .cta-final h2, .cta-final h3,
         .gallery-quote h2, .gallery-quote h3 { color: var(--cloud); }
         .display { font-size: clamp(40px, 6.4vw, 84px); }
@@ -469,43 +468,103 @@
         /* ============================================
            QUEM SOMOS (apresentação interativa)
            ============================================ */
-        .about { position: relative; overflow: hidden; background: var(--cereja); color: var(--cloud); }
-        .about > .wrap { position: relative; z-index: 1; }
-        .about .label { color: var(--cloud-muted); }
-        .about > .wrap > .label { display: block; margin-bottom: clamp(28px, 4vw, 44px); }
+        /* Split de duas cores (ref. Canva — proposta comercial 2026, pág. 3):
+           painel cereja sangrado com a foto · painel Cloud Dancer com o texto.
+           A regra de cor da task 08 passa a valer por painel, não pela seção inteira. */
+        .about { position: relative; overflow: hidden; padding: 0; background: var(--cream); color: var(--ink); }
 
         .team {
             display: grid;
-            grid-template-columns: 0.92fr 1fr;
-            gap: clamp(32px, 5vw, 72px);
-            align-items: center;
+            grid-template-columns: 1fr 1fr;
+            align-items: stretch;
+            min-height: min(86vh, 720px);
         }
-        .team-photo { border-radius: 4px; overflow: hidden; aspect-ratio: 1 / 1; background: var(--cereja-deep); }
-        .team-photo img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s var(--ease); }
+        .team-panel { position: relative; min-width: 0; }
 
-        .team-info { transition: opacity 0.4s var(--ease); }
-        .team.swapping .team-photo img,
-        .team.swapping .team-info { opacity: 0; }
+        /* --- painel esquerdo: a foto sangra no topo, na base e à direita. Só à esquerda
+               ela recua, para não ficar colada na borda da tela: o recuo alinha a foto com
+               a coluna de conteúdo do resto da página (mesma conta do padding-right do
+               painel claro, espelhada). --- */
+        .team-panel--photo {
+            display: grid;
+            align-content: center;
+            /* Cereja escuro, não o cereja principal: as bordas das três fotos ficam entre
+               #41-64 (vinheta do estúdio), e o #81161E é claro demais perto disso — o
+               esfumado virava um halo. O #470000 encosta nesses valores e o encontro
+               entre foto e fundo praticamente some. */
+            background: var(--cereja-deep);
+            overflow: hidden;
+            /* o recuo à esquerda existe só para a foto não colar na borda da tela — não
+               precisa espelhar a coluna de conteúdo, que em telas largas passa de 180px e
+               espremia o cartão */
+            padding: clamp(40px, 5vw, 80px) clamp(30px, 4.6vw, 72px);
+            padding-left: clamp(40px, 6vw, 96px);
+            /* o próprio bloco cereja é boleado, na mesma linguagem do cartão da foto */
+            border-radius: clamp(14px, 1.8vw, 28px);
+        }
+        /* Cartão de proporção fixa, e não a altura toda do painel: as fotos das bios são
+           verticais e têm muito fundo de estúdio vazio acima da cabeça. Numa caixa mais
+           estreita que a foto o `cover` corta só na horizontal e esse vazio aparece
+           inteiro; numa caixa mais larga o corte passa a ser vertical e o object-position
+           abaixo escolhe o trecho que interessa. */
+        .team-photo { position: relative; overflow: hidden; min-width: 0; aspect-ratio: 1 / 1; border-radius: clamp(10px, 1.3vw, 20px); }
+        /* a imagem é absoluta de propósito: se entrasse no fluxo, a altura da seção passaria
+           a depender da proporção da foto em cena (as das bios são verticais, a das duas é
+           horizontal) e a seção mudaria de tamanho a cada troca. Assim quem manda na altura
+           é sempre o painel de texto. O enquadramento está no corte dos arquivos em img/. */
+        .team-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s var(--ease); }
+        /* véu discreto no topo e na base: as três fotos são de fundo cereja, então serve
+           só para descolar os nomes de roupas claras */
+        .team-photo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(to bottom, rgba(71, 0, 0, 0.45) 0, rgba(71, 0, 0, 0) 22%);
+        }
+        /* As quatro bordas da foto se esfumam no cereja do painel, para não haver aresta
+           entre os dois. O esfumado é curto de propósito (últimos 7%): mais que isso
+           come a imagem em vez de só suavizar o encontro. Os dois eixos são cruzados com
+           mask-composite; onde não houver suporte, as camadas se somam e o efeito
+           simplesmente não aparece — nada quebra.
+           A máscara vai na imagem e no véu, nunca em .team-photo, senão levaria junto os
+           nomes, que ficam por cima e precisam continuar sólidos. */
+        .team-photo img,
+        .team-photo::after {
+            -webkit-mask-image:
+                linear-gradient(to bottom, transparent 0, #000 7%, #000 93%, transparent 100%),
+                linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
+            mask-image:
+                linear-gradient(to bottom, transparent 0, #000 7%, #000 93%, transparent 100%),
+                linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
+            -webkit-mask-composite: source-in;
+            mask-composite: intersect;
+        }
 
-        .team-title { color: var(--cloud); margin: 0 0 20px; font-size: clamp(26px, 3.4vw, 42px); }
-        .team-role { font-family: var(--detail); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cloud); font-weight: 600; margin-bottom: 18px; }
-        .team-body { color: var(--cloud-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 18px); max-width: 52ch; }
-
-        /* Selecionador (mesma marca da task 01) — aparece no hover dos nomes */
-        .team-picker { display: flex; flex-wrap: wrap; gap: clamp(28px, 5vw, 56px); margin-top: clamp(32px, 5vw, 48px); }
-        .pick {
-            position: relative;
+        /* --- nomes sobre a foto: são a legenda E o seletor (substituem o .team-picker).
+               O rótulo nunca muda; o estado é sinalizado pelo traço "_" da task 01. --- */
+        .team-names { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+        .team-name {
+            position: absolute;
+            pointer-events: auto;
             font-family: var(--serif);
-            font-size: clamp(18px, 2.1vw, 23px);
+            font-size: clamp(17px, 1.9vw, 25px);
             line-height: 1;
             color: var(--cloud);
-            padding-bottom: 16px;
+            padding-bottom: 15px;
             opacity: 0.82;
-            transition: opacity 0.3s var(--ease);
+            /* dayana.jpg tem fundo claro: o véu sozinho não basta */
+            text-shadow: 0 1px 16px rgba(71, 0, 0, 0.7);
+            transition: opacity 0.35s var(--ease);
         }
-        .pick:hover, .pick:focus-visible { opacity: 1; outline: none; }
-        .pick-label .b { font-style: italic; }
-        .pick-mark {
+        .team-name--a { top: clamp(24px, 4vw, 46px); right: clamp(22px, 3.4vw, 48px); text-align: right; }
+        .team-name--b { bottom: clamp(24px, 4vw, 46px); left: clamp(22px, 3.4vw, 48px); }
+        .team-name.is-dim { opacity: 0.5; }
+        .team-name.is-active { opacity: 1; }
+        .team-name:hover, .team-name:focus-visible { opacity: 1; }
+        /* sobre a foto, opacidade sozinha não marca foco: anel explícito */
+        .team-name:focus-visible { outline: 2px solid var(--cloud); outline-offset: 6px; border-radius: 2px; }
+        .name-mark {
             position: absolute;
             left: 0;
             bottom: 0;
@@ -519,9 +578,67 @@
             transform: translateY(5px);
             transition: opacity 0.35s var(--ease), transform 0.4s var(--ease-out);
         }
-        .pick:hover .pick-mark, .pick:focus-visible .pick-mark { opacity: 1; transform: translateY(0); }
-        .pick-mark i { flex: 1; height: 1.5px; background: var(--cloud); display: block; }
-        .pick-mark b { font-family: var(--serif); font-weight: 500; font-size: 15px; line-height: 0; color: var(--cloud); margin: 0 7px; transform: translateY(-3px); }
+        .team-name.is-active .name-mark,
+        .team-name:hover .name-mark,
+        .team-name:focus-visible .name-mark { opacity: 1; transform: translateY(0); }
+        .name-mark i { flex: 1; height: 1.5px; background: var(--cloud); display: block; }
+        .name-mark b { font-family: var(--serif); font-weight: 500; font-size: 15px; line-height: 0; color: var(--cloud); margin: 0 7px; transform: translateY(-3px); }
+
+        /* --- painel direito: Cloud Dancer, texto militar com destaques em cereja --- */
+        .team-panel--copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+            padding-top: clamp(56px, 7vw, 104px);
+            padding-bottom: clamp(56px, 7vw, 104px);
+            padding-left: clamp(30px, 4.6vw, 76px);
+            /* alinha a borda direita do texto com o conteúdo do resto da página (.wrap) */
+            padding-right: max(var(--gutter), calc(50vw - var(--maxw) / 2 + var(--gutter)));
+        }
+        .team-copy { position: relative; z-index: 1; width: 100%; }
+        /* clone invisível do estado default: reserva a altura do texto mais longo
+           para a seção não encolher (e empurrar a página) ao abrir uma bio */
+        .team-ghost { position: absolute; left: 0; right: 0; top: 0; visibility: hidden; pointer-events: none; }
+        .team-copy > .label { display: block; margin-bottom: clamp(18px, 2.4vw, 28px); }
+
+        /* especificidade acima de .reveal (0,1,0): o fade da troca precisa ser 0.4s
+           para fechar antes do swap de conteúdo em 280ms, não os 0.8s do reveal. */
+        .team .team-info,
+        .team .team-stats { transition: opacity 0.4s var(--ease), transform 0.8s var(--ease-out); }
+        .team.swapping .team-photo img,
+        .team.swapping .team-info,
+        .team.swapping .team-stats { opacity: 0; }
+
+        .team-title { color: var(--ink); margin: 0 0 clamp(18px, 2.4vw, 28px); font-size: clamp(26px, 3.2vw, 44px); }
+        .tt-mark { color: var(--cereja); font-weight: 500; }
+        .team-role { font-family: var(--detail); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cereja); font-weight: 600; margin-bottom: 16px; }
+        .team-body { color: var(--ink-soft); font-weight: 300; font-size: clamp(14.5px, 1.35vw, 16.5px); line-height: 1.62; max-width: 46ch; }
+        .team-body p + p { margin-top: 1em; }
+        .team-body strong { font-weight: 600; color: var(--ink); }
+        .team-body .hl { font-weight: 600; color: var(--cereja); }
+
+        /* Faixa de prova — persiste nos três estados (é da consultoria, não das pessoas),
+           por isso fica fora de .team-info e não some no .swapping. */
+        /* volta para o manifesto — a seta aponta para trás, então a animação do .tlink
+           (que empurra para a direita) é invertida aqui */
+        .team-back { margin-top: clamp(24px, 3vw, 34px); font-size: clamp(15px, 1.6vw, 18px); }
+        .team-back:hover .arr { transform: translateX(-4px); }
+        .team-back[hidden] { display: none; }
+
+        /* Faixa de prova — só no estado default: os números são da consultoria, não das
+           pessoas, então não cabem sobre a bio de uma delas. */
+        .team-stats[hidden] { display: none; }
+        .team-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: clamp(16px, 2.2vw, 30px);
+            margin-top: clamp(34px, 4.4vw, 56px);
+            padding-top: clamp(22px, 2.8vw, 34px);
+            border-top: 1px solid var(--line);
+        }
+        .stat-num { display: block; font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 3.4vw, 46px); line-height: 1; color: var(--cereja); font-variant-numeric: tabular-nums; }
+        .stat-cap { display: block; margin-top: 10px; font-family: var(--detail); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.45; color: var(--ink-soft); }
 
         /* ============================================
            GALLERY
@@ -717,8 +834,9 @@
                (ver @keyframes patShimmer em SCROLL REVEAL) */
             opacity: 0.2;
         }
-        /* #equipe: faixa lateral à direita, sangrando para fora da borda */
-        .about .modo-tex { width: clamp(280px, 40vw, 520px); right: -6%; top: 50%; transform: translateY(-50%); }
+        /* #equipe: o painel esquerdo virou foto sangrada, então a textura migra para o
+           painel claro — em cereja bem discreto, ancorada no canto inferior direito. */
+        .about .modo-tex { width: clamp(240px, 26vw, 400px); right: -8%; bottom: -10%; top: auto; transform: none; color: var(--cereja); opacity: 0.07; }
         /* cta-final: emoldura os dois cantos opostos */
         .cta-final .modo-tex { width: clamp(220px, 26vw, 420px); }
         .cta-final .modo-tex--tl { top: -6%; left: -5%; transform: scale(-1, 1); }
@@ -807,8 +925,17 @@
             .services-list { grid-template-columns: 1fr; }
             .training-grid { grid-template-columns: 1fr; gap: 40px; }
             .training-sticky { position: static; }
-            .team { grid-template-columns: 1fr; gap: 32px; }
-            .team-photo { aspect-ratio: 4/3.4; max-height: 460px; }
+            /* o split vira vertical: foto sangrada em cereja no topo, texto claro abaixo */
+            .team { grid-template-columns: 1fr; min-height: 0; }
+            /* empilhado, o recuo deixa de espelhar a coluna de conteúdo e vira só a margem
+               lateral padrão da página */
+            .team-panel--photo { padding: clamp(32px, 6vw, 48px) var(--gutter); }
+            .team-photo { max-height: 460px; }
+            .team-panel--copy { padding-left: var(--gutter); padding-right: var(--gutter); }
+            .team-stats { grid-template-columns: 1fr; gap: 0; }
+            .team-stats .stat { padding: 16px 0; border-bottom: 1px solid var(--line); }
+            .team-stats .stat:first-child { padding-top: 0; }
+            .team-stats .stat:last-child { padding-bottom: 0; border-bottom: 0; }
             .faq-grid { grid-template-columns: 1fr; gap: 24px; }
             /* empilha: coluna de peças · prova · coluna de peças — a prova segue no meio */
             .proof-band { grid-template-columns: 1fr; }
@@ -1080,26 +1207,58 @@
 
     <!-- ============================================ QUEM SOMOS (apresentação interativa) ============================================ -->
     <section class="section about" id="equipe">
-        <svg class="modo-tex" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
-        <div class="wrap">
-            <span class="label reveal">Quem está por trás da _modo_bim</span>
-            <div class="team reveal" id="team" data-state="default">
+        <div class="team" id="team" data-state="default">
+            <!-- Painel cereja: a foto sangra até a borda da viewport. Os nomes sobrepostos
+                 são, ao mesmo tempo, legenda da foto e seletor das bios. -->
+            <div class="team-panel team-panel--photo">
                 <div class="team-photo">
-                    <img id="teamImg" src="img/founders.jpg" alt="Joene Louchard e Dayana Ramos, fundadoras da _modo_bim" />
+                    <img id="teamImg" src="img/founders.jpg" loading="lazy" decoding="async" alt="Joene Louchard e Dayana Ramos, fundadoras da _modo_bim" />
+                    <div class="team-names" id="teamPicker" aria-label="Conheça as fundadoras">
+                        <button class="team-name team-name--a" type="button" data-slot="a" aria-pressed="false">
+                            <span class="name-label"></span>
+                            <span class="name-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
+                        </button>
+                        <button class="team-name team-name--b" type="button" data-slot="b" aria-pressed="false">
+                            <span class="name-label"></span>
+                            <span class="name-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
+                        </button>
+                    </div>
                 </div>
-                <div class="team-info" id="teamInfo">
-                    <h2 class="h-sec team-title" id="teamTitle">Profundidade acadêmica <em class="it">+</em> vivência real de mercado.</h2>
-                    <div class="team-role" id="teamRole" hidden></div>
-                    <p class="team-body" id="teamBody">Duas arquitetas de Belém, atuantes no Brasil, que se especializaram na metodologia BIM, viveram a dor do mercado por dentro e decidiram ser a resposta. A _modo_bim nasceu de uma convicção: BIM não é uma ferramenta a ser aprendida, é um modo de operar. Por isso começamos no diagnóstico e só terminamos quando o seu escritório anda sozinho.</p>
-                    <div class="team-picker" id="teamPicker" role="tablist" aria-label="Conheça as fundadoras">
-                        <button class="pick" type="button" data-slot="a">
-                            <span class="pick-label"></span>
-                            <span class="pick-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
+            </div>
+
+            <!-- Painel Cloud Dancer: texto em militar com destaques em cereja (regra task 08). -->
+            <div class="team-panel team-panel--copy">
+                <svg class="modo-tex" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
+                <div class="team-copy">
+                    <span class="label reveal">_quem somos</span>
+                    <div class="team-info reveal" id="teamInfo">
+                        <h2 class="h-sec team-title" id="teamTitle">Por trás da <span class="tt-mark">_modo_bim</span></h2>
+                        <div class="team-role" id="teamRole" hidden></div>
+                        <div class="team-body" id="teamBody">
+                            <p>A _modo_bim é uma consultoria de implementação BIM fundada por <strong>duas arquitetas de Belém do Pará</strong> que se especializaram na metodologia, <strong>viveram a dor do mercado por dentro</strong> e decidiram ser a resposta.</p>
+                            <p><strong>Dayana Ramos</strong> traz a base metodológica sólida; <strong>Joene Louchard</strong>, a experiência em projetos reais de grande porte. Juntas, reúnem o que o mercado raramente consegue combinar: <strong>profundidade acadêmica e vivência real de mercado.</strong></p>
+                            <p>Porque <span class="hl">BIM não é uma ferramenta a ser aprendida, é um modo de operar.</span> Um modo de pensar o projeto, a equipe, o processo e a entrega. Por isso o nome. Por isso começamos no diagnóstico e só terminamos quando o escritório anda sozinho.</p>
+                        </div>
+                        <!-- Caminho de volta explícito: clicar no nome ativo também volta, mas
+                             isso ninguém adivinha. Fica dentro de .team-info de propósito —
+                             assim entra no fade da troca e não desestabiliza a trava de altura. -->
+                        <button class="tlink team-back" type="button" id="teamBack" hidden>
+                            <span class="arr" aria-hidden="true">←</span> Voltar para a _modo_bim
                         </button>
-                        <button class="pick" type="button" data-slot="b">
-                            <span class="pick-label"></span>
-                            <span class="pick-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
-                        </button>
+                    </div>
+                    <div class="team-stats reveal" id="teamStats">
+                        <div class="stat">
+                            <span class="stat-num" data-count="100" data-suffix="%">100%</span>
+                            <span class="stat-cap">personalizado para o cliente</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num" data-count="3">3</span>
+                            <span class="stat-cap">pilares: tecnologia, pessoas e processos</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num">BR</span>
+                            <span class="stat-cap">atendimento em todo o país online</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1169,7 +1328,7 @@
             <div class="faq-list reveal">
                 <div class="faq-item">
                     <button class="faq-q" aria-expanded="false">Preciso já ter equipe montada? <span class="faq-icon"></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">Não. A implementação atende escritórios que já têm equipe e também quem está montando agora — estruturamos a função de cada pessoa desde o começo. Se você ainda trabalha sozinho(a), o caminho ideal são os Treinamentos.</div></div>
+                    <div class="faq-a"><div class="faq-a-inner">Não. A implementação atende escritórios que já têm equipe e também quem está montando agora, estruturamos a função de cada pessoa desde o começo. Se você ainda trabalha sozinho(a), o caminho ideal são os Treinamentos.</div></div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-q" aria-expanded="false">Qual software vocês implementam? <span class="faq-icon"></span></button>
@@ -1466,55 +1625,70 @@
         const teamTitle = document.getElementById('teamTitle');
         const teamRole = document.getElementById('teamRole');
         const teamBody = document.getElementById('teamBody');
-        const picks = team.querySelectorAll('.pick');
-        const BACK = '_modo_<span class="b">b</span>im';
+        const teamBack = document.getElementById('teamBack');
+        const teamStats = document.getElementById('teamStats');
+        const names = team.querySelectorAll('.team-name');
 
         const TEAM = {
             default: {
                 img: 'img/founders.jpg',
                 alt: 'Joene Louchard e Dayana Ramos, fundadoras da _modo_bim',
-                title: 'Profundidade acadêmica <em class="it">+</em> vivência real de mercado.',
+                // corte do cartão: a horizontal é centrada nas duas; nas verticais o corte
+                // é vertical e ancora embaixo, onde elas estão sentadas.
+                pos: 'center center',
+                title: 'Por trás da <span class="tt-mark">_modo_bim</span>',
                 role: '',
-                body: 'Duas arquitetas de Belém, atuantes no Brasil, que se especializaram na metodologia BIM, viveram a dor do mercado por dentro e decidiram ser a resposta. A _modo_bim nasceu de uma convicção: BIM não é uma ferramenta a ser aprendida, é um modo de operar. Por isso começamos no diagnóstico e só terminamos quando o seu escritório anda sozinho.'
+                body: '<p>A _modo_bim é uma consultoria de implementação BIM fundada por <strong>duas arquitetas de Belém do Pará</strong> que se especializaram na metodologia, <strong>viveram a dor do mercado por dentro</strong> e decidiram ser a resposta.</p>'
+                    + '<p><strong>Dayana Ramos</strong> traz a base metodológica sólida; <strong>Joene Louchard</strong>, a experiência em projetos reais de grande porte. Juntas, reúnem o que o mercado raramente consegue combinar: <strong>profundidade acadêmica e vivência real de mercado.</strong></p>'
+                    + '<p>Porque <span class="hl">BIM não é uma ferramenta a ser aprendida, é um modo de operar.</span> Um modo de pensar o projeto, a equipe, o processo e a entrega. Por isso o nome. Por isso começamos no diagnóstico e só terminamos quando o escritório anda sozinho.</p>'
             },
             joene: {
                 img: 'img/joene.jpg',
                 alt: 'Joene Louchard',
+                pos: 'center 88%',
                 title: 'Joene Louchard',
                 role: 'Co-fundadora · Arquiteta e Designer',
-                body: 'A vivência de mercado da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro — porque já esteve lá.'
+                body: '<p>A <strong>vivência de mercado</strong> da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro — porque já esteve lá.</p>'
             },
             dayana: {
                 img: 'img/dayana.jpg',
                 alt: 'Dayana Ramos',
+                pos: 'center 92%',
                 title: 'Dayana Ramos',
                 role: 'Co-fundadora · Arquiteta, especialista em BIM',
-                body: 'A base metodológica da _modo_bim. Dedicada a traduzir o BIM em processo aplicável. É quem garante que cada implementação tenha método, não improviso.'
+                body: '<p>A <strong>base metodológica</strong> da _modo_bim. Dedicada a traduzir o BIM em processo aplicável. É quem garante que cada implementação tenha método, não improviso.</p>'
             }
         };
 
-        // Dois slots fixos: A alterna Joene <-> voltar(modo_bim); B alterna Dayana <-> voltar.
-        function pickerFor(state) {
-            return [
-                state === 'joene'  ? { html: BACK, target: 'default' } : { html: 'Joene Louchard', target: 'joene' },
-                state === 'dayana' ? { html: BACK, target: 'default' } : { html: 'Dayana Ramos',   target: 'dayana' }
-            ];
-        }
+        // Os nomes sobre a foto são legenda E seletor. O rótulo é fixo — nunca vira "voltar"
+        // debaixo do dedo do usuário; quem sinaliza o estado é o traço "_" que acende.
+        const SLOTS = {
+            a: { key: 'joene',  label: '_joene louchard', name: 'Joene Louchard' },
+            b: { key: 'dayana', label: '_dayana ramos',   name: 'Dayana Ramos' }
+        };
+        names.forEach(btn => { btn.querySelector('.name-label').textContent = SLOTS[btn.dataset.slot].label; });
 
         function paint(state) {
             const d = TEAM[state];
             teamImg.src = d.img;
             teamImg.alt = d.alt;
+            teamImg.style.objectPosition = d.pos;
             teamTitle.innerHTML = d.title;
             if (d.role) { teamRole.textContent = d.role; teamRole.hidden = false; }
             else { teamRole.hidden = true; teamRole.textContent = ''; }
-            teamBody.textContent = d.body;
-            const opts = pickerFor(state);
-            picks.forEach((btn, i) => {
-                btn.querySelector('.pick-label').innerHTML = opts[i].html;
-                btn.dataset.target = opts[i].target;
-                const back = opts[i].target === 'default';
-                btn.setAttribute('aria-label', back ? 'Voltar para a apresentação da _modo_bim' : 'Ver apresentação de ' + opts[i].html);
+            teamBody.innerHTML = d.body;
+            teamBack.hidden = state === 'default';
+            teamStats.hidden = state !== 'default';
+            names.forEach(btn => {
+                const slot = SLOTS[btn.dataset.slot];
+                const active = state === slot.key;
+                btn.dataset.target = active ? 'default' : slot.key;
+                btn.classList.toggle('is-active', active);
+                btn.classList.toggle('is-dim', state !== 'default' && !active);
+                btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+                btn.setAttribute('aria-label', active
+                    ? 'Voltar para a apresentação da _modo_bim'
+                    : 'Ver apresentação de ' + slot.name);
             });
             team.dataset.state = state;
         }
@@ -1522,16 +1696,18 @@
         let swapTimer = null;
         function setState(state, animate = true) {
             if (state === team.dataset.state) return;
-            if (!animate) { paint(state); return; }
+            if (!animate) { paint(state); lockHeight(); return; }
             team.classList.add('swapping');
             clearTimeout(swapTimer);
             swapTimer = setTimeout(() => {
                 paint(state);
+                lockHeight();
                 team.classList.remove('swapping');
             }, 280);
         }
 
-        picks.forEach(btn => btn.addEventListener('click', () => setState(btn.dataset.target)));
+        names.forEach(btn => btn.addEventListener('click', () => setState(btn.dataset.target)));
+        teamBack.addEventListener('click', () => setState('default'));
 
         // Rolagem nunca revela sub-sessões: ao sair da viewport, volta ao default.
         const teamIO = new IntersectionObserver((entries) => {
@@ -1540,6 +1716,79 @@
         teamIO.observe(team);
 
         paint('default');
+
+        /* O manifesto é bem mais alto que as bios: sem reserva, abrir uma bio encolheria
+           a seção e puxaria o resto da página para cima. Um clone invisível do estado
+           default mede essa altura, e o ResizeObserver reajusta quando a largura muda. */
+        const teamInfo = document.getElementById('teamInfo');
+        const ghost = document.createElement('div');
+        ghost.className = 'team-info team-ghost';
+        ghost.setAttribute('aria-hidden', 'true');
+        ghost.innerHTML = '<h2 class="h-sec team-title">' + TEAM.default.title + '</h2>'
+            + '<div class="team-body">' + TEAM.default.body + '</div>';
+        teamInfo.parentNode.insertBefore(ghost, teamInfo);
+        // A reserva vai na seção, não no bloco de texto: assim as bios continuam
+        // centradas no painel em vez de deixarem um vão até a faixa de prova.
+        // A medição põe o clone em fluxo e esconde o bloco real por um instante, então
+        // mede a seção inteira — nada de deduzir a altura a partir de uma coluna só.
+        // Contas parciais quebravam ora no desktop (o min-height do CSS limitava a medida),
+        // ora no mobile (empilhado, a seção também carrega a altura da foto).
+        const copyPanel = team.querySelector('.team-panel--copy');
+        function lockHeight() {
+            team.style.minHeight = '';
+            const floor = parseFloat(getComputedStyle(team).minHeight) || 0;
+            team.style.minHeight = '0px';
+            ghost.style.position = 'static';
+            teamInfo.style.display = 'none';
+            const statsHidden = teamStats.hidden;
+            teamStats.hidden = false;           // a faixa faz parte do estado default
+            const target = team.offsetHeight;   // altura com o manifesto em cena
+            teamStats.hidden = statsHidden;
+            teamInfo.style.display = '';
+            ghost.style.position = '';
+            team.style.minHeight = Math.max(target, floor) + 'px';
+        }
+        lockHeight();
+        if (window.ResizeObserver) {
+            // só a mudança de largura importa; observar altura realimentaria o próprio lock
+            let lastWidth = -1;
+            new ResizeObserver(entries => {
+                const w = Math.round(entries[0].contentRect.width);
+                if (w === lastWidth) return;
+                lastWidth = w;
+                lockHeight();
+            }).observe(copyPanel);
+        } else window.addEventListener('resize', lockHeight);
+
+        // Sem pré-carga, o primeiro clique troca o src e a foto só chega depois do
+        // fade — a troca pisca vazia. Buscamos as duas quando o navegador está ocioso.
+        const preloadBios = () => [TEAM.joene.img, TEAM.dayana.img].forEach(src => { new Image().src = src; });
+        if ('requestIdleCallback' in window) requestIdleCallback(preloadBios, { timeout: 3000 });
+        else setTimeout(preloadBios, 1500);
+
+        /* Faixa de prova: os números contam uma única vez ao entrar em cena.
+           "BR" não anima. Com prefers-reduced-motion, ficam no valor final. */
+        const statNums = team.querySelectorAll('.stat-num[data-count]');
+        if (statNums.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            // não zerar de saída: até a faixa entrar em cena o número real fica visível.
+            // Zerado antes da hora, quem não rola até lá vê "0" no lugar de "3".
+            const statIO = new IntersectionObserver((entries, obs) => {
+                entries.forEach(e => {
+                    if (!e.isIntersecting) return;
+                    obs.unobserve(e.target);
+                    const el = e.target;
+                    const end = parseInt(el.dataset.count, 10);
+                    const suffix = el.dataset.suffix || '';
+                    const t0 = performance.now();
+                    (function step(now) {
+                        const p = Math.min((now - t0) / 900, 1);
+                        el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))) + suffix;
+                        if (p < 1) requestAnimationFrame(step);
+                    })(t0);
+                });
+            }, { threshold: 0.6 });
+            statNums.forEach(el => statIO.observe(el));
+        }
     }
 
     /* ============================================ FAQ ACCORDION ============================================ */
