@@ -7,6 +7,13 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-08-02
 
+### Ajustes na seção Implementações (task 13) — `index.html`
+- **Cada etapa ganhou descrição** (`.step-desc`), com os textos da task: diagnóstico, estruturação, treinamento e validação. Os nomes das etapas continuam como estavam.
+- **Os quatro glifos passaram a ser recortes do Pattern oficial** (`#modoPattern`), com as mesmas coordenadas e o mesmo viewBox recortado na caixa real do desenho (`7 21 208 166`). Antes eram um desenho à parte, feito à mão numa caixa `120×46`, que não batia com a forma oficial. A escada continua crescendo do 01 ao 04, agora acrescentando os blocos `mb-1`…`mb-4` do próprio Pattern.
+- O `.step-pat` passou a ter `aspect-ratio` em vez de altura fixa: com `height: 46px` numa arte de proporção 208/166 o desenho deitaria e deixaria de ser o Pattern. Saiu junto a regra `.step-pat .den`, que escondia traços de um markup que não existe mais.
+- **O divisor de cada etapa virou cereja** (era `var(--ink)`, verde militar), o mesmo vermelho do título e do label da seção.
+- **Removida a legenda** "*diagrama do processo + recortes anonimizados de manuais…*" e a regra `.process-foot .cap` que a estilizava.
+
 ### Ajustes de FAQ, travessões e serviços (task 12) — `index.html`, `cadastro.html`, `lista-espera.html`, `contrato.html`
 - **O FAQ foi para o fim do site.** Era a seção seguinte à galeria, antes do termômetro; agora é a última seção de conteúdo, entre o termômetro e o CTA final, que continua fechando a página. O comentário do quiz que descrevia a vizinhança antiga foi atualizado. Nenhuma âncora mudou: `#faq` no menu e o `id` da seção são os mesmos, e o acordeão continua funcionando (conferido no navegador).
 - **Travessões removidos de todo o texto visível**, nas quatro páginas: títulos e `og:title` (`_modo_bim · um novo modo de projetar`), `meta description`, `aria-label` do wordmark, subheads, rótulos de etapa dos formulários (`Etapa 01 · Identificação e contato`), opções e copy do termômetro, e a dica do CEP no `contrato.html`. A escolha do substituto seguiu o caso: **vírgula** onde o travessão era pausa dentro da frase, e **`·`** onde ele separava dois rótulos, que é o separador que a marca já usa nos eyebrows e no rodapé (`belém · pará · brasil`). Comentários de código e CSS ficaram como estavam, não são texto do site.

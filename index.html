@@ -434,14 +434,17 @@
         .process-head { max-width: 60ch; margin-bottom: clamp(48px, 7vw, 80px); }
         .process-head .h-sec { margin: 18px 0 22px; }
         .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 3vw, 40px); }
-        .step { border-top: 1px solid var(--ink); padding-top: 22px; }
-        /* swatch do Pattern: densidade/altura crescem do step 01 ao 04 (da bagunça à autonomia) */
-        .step-pat { display: block; width: 100%; max-width: 150px; height: 46px; margin-bottom: 26px; color: var(--olive); }
-        .step-pat line { stroke: currentColor; stroke-width: 2.2px; stroke-linecap: square; }
+        /* divisor em cereja (task 13): é o mesmo vermelho do título e do label da seção */
+        .step { border-top: 1px solid var(--cereja); padding-top: 22px; }
+        /* Swatch do Pattern oficial: o desenho é o mesmo do #modoPattern, e a escada cresce
+           do step 01 ao 04 (da bagunça à autonomia). A proporção acompanha o viewBox recortado,
+           senão o traço deitaria e o glifo deixaria de ser o Pattern. */
+        .step-pat { display: block; width: clamp(92px, 9vw, 124px); height: auto; aspect-ratio: 208 / 166; margin-bottom: 22px; color: var(--olive); }
+        .step-pat line { stroke: currentColor; stroke-width: 2.6px; stroke-linecap: square; }
         .step-num { font-family: var(--serif); font-size: clamp(34px, 4vw, 48px); color: var(--ink); line-height: 1; margin-bottom: 10px; }
         .step-name { font-family: var(--detail); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); }
+        .step-desc { margin-top: 10px; font-size: 15px; line-height: 1.5; font-weight: 300; color: var(--ink-muted); max-width: 30ch; }
         .process-foot { margin-top: clamp(40px, 6vw, 64px); }
-        .process-foot .cap { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink-muted); margin-bottom: 32px; }
         .process-actions { display: flex; align-items: center; gap: 28px 36px; flex-wrap: wrap; }
 
         /* ============================================
@@ -1016,7 +1019,6 @@
             .modo-tex .mb-1 { display: none; }
             .about .modo-tex { width: clamp(220px, 66vw, 320px); }
             .cta-final .modo-tex { width: clamp(180px, 50vw, 260px); }
-            .step-pat .den { display: none; }
         }
     </style>
 </head>
@@ -1176,56 +1178,102 @@
                 <p class="lead">A jornada completa de quem tem (ou está montando) um escritório e precisa que a equipe inteira opere em BIM, com método, não no improviso.</p>
             </div>
 
+            <!-- Os quatro glifos são recortes do Pattern oficial (#modoPattern, no topo do body):
+                 mesmas coordenadas, mesmo viewBox, mesma proporção. Cada etapa acrescenta o bloco
+                 seguinte da escada, então o desenho cresce junto com a jornada. O viewBox está
+                 cortado na caixa real do desenho (x 10→212, y 24→184, mais a metade do traço). -->
             <div class="steps">
                 <div class="step reveal">
-                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
-                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
-                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
+                    <svg class="step-pat" viewBox="7 21 208 166" aria-hidden="true" focusable="false">
+                        <g class="mb mb-1">
+                            <line x1="10" y1="184" x2="30" y2="184"/><line x1="36" y1="184" x2="46" y2="184"/>
+                            <line x1="10" y1="176" x2="24" y2="176"/><line x1="30" y1="176" x2="42" y2="176"/>
+                            <line x1="14" y1="168" x2="34" y2="168"/>
+                        </g>
                     </svg>
                     <div class="step-num">01</div>
                     <div class="step-name">Diagnóstico</div>
+                    <p class="step-desc">Leitura da maturidade atual e das dores reais do escritório.</p>
                 </div>
                 <div class="step reveal">
-                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
-                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
-                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
-                        <line x1="30" y1="32" x2="50" y2="32"/><line class="den" x1="54" y1="32" x2="60" y2="32"/>
-                        <line x1="30" y1="28" x2="47" y2="28"/><line class="den" x1="51" y1="28" x2="59" y2="28"/>
+                    <svg class="step-pat" viewBox="7 21 208 166" aria-hidden="true" focusable="false">
+                        <g class="mb mb-1">
+                            <line x1="10" y1="184" x2="30" y2="184"/><line x1="36" y1="184" x2="46" y2="184"/>
+                            <line x1="10" y1="176" x2="24" y2="176"/><line x1="30" y1="176" x2="42" y2="176"/>
+                            <line x1="14" y1="168" x2="34" y2="168"/>
+                        </g>
+                        <g class="mb mb-2">
+                            <line x1="48" y1="148" x2="92" y2="148"/>
+                            <line x1="48" y1="140" x2="80" y2="140"/><line x1="86" y1="140" x2="100" y2="140"/>
+                            <line x1="52" y1="132" x2="96" y2="132"/>
+                            <line x1="48" y1="124" x2="88" y2="124"/>
+                        </g>
                     </svg>
                     <div class="step-num">02</div>
                     <div class="step-name">Estruturação</div>
+                    <p class="step-desc">Definição de processos, papéis, padrões e do template-base.</p>
                 </div>
                 <div class="step reveal">
-                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
-                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
-                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
-                        <line x1="30" y1="32" x2="50" y2="32"/><line class="den" x1="54" y1="32" x2="60" y2="32"/>
-                        <line x1="30" y1="28" x2="47" y2="28"/><line class="den" x1="51" y1="28" x2="59" y2="28"/>
-                        <line x1="56" y1="22" x2="82" y2="22"/>
-                        <line x1="56" y1="18" x2="78" y2="18"/><line class="den" x1="82" y1="18" x2="88" y2="18"/>
+                    <svg class="step-pat" viewBox="7 21 208 166" aria-hidden="true" focusable="false">
+                        <g class="mb mb-1">
+                            <line x1="10" y1="184" x2="30" y2="184"/><line x1="36" y1="184" x2="46" y2="184"/>
+                            <line x1="10" y1="176" x2="24" y2="176"/><line x1="30" y1="176" x2="42" y2="176"/>
+                            <line x1="14" y1="168" x2="34" y2="168"/>
+                        </g>
+                        <g class="mb mb-2">
+                            <line x1="48" y1="148" x2="92" y2="148"/>
+                            <line x1="48" y1="140" x2="80" y2="140"/><line x1="86" y1="140" x2="100" y2="140"/>
+                            <line x1="52" y1="132" x2="96" y2="132"/>
+                            <line x1="48" y1="124" x2="88" y2="124"/>
+                        </g>
+                        <g class="mb mb-3">
+                            <line x1="96" y1="108" x2="150" y2="108"/>
+                            <line x1="96" y1="100" x2="158" y2="100"/>
+                            <line x1="100" y1="92" x2="150" y2="92"/>
+                            <line x1="96" y1="84" x2="160" y2="84"/>
+                            <line x1="104" y1="76" x2="148" y2="76"/>
+                        </g>
                     </svg>
                     <div class="step-num">03</div>
                     <div class="step-name">Treinamento da equipe</div>
+                    <p class="step-desc">Capacitação prática da equipe na metodologia e no software.</p>
                 </div>
                 <div class="step reveal">
-                    <svg class="step-pat" viewBox="0 0 120 46" preserveAspectRatio="xMinYMax meet" aria-hidden="true" focusable="false">
-                        <line x1="4" y1="42" x2="14" y2="42"/><line class="den" x1="20" y1="42" x2="27" y2="42"/>
-                        <line x1="6" y1="38" x2="13" y2="38"/><line class="den" x1="19" y1="38" x2="26" y2="38"/>
-                        <line x1="30" y1="32" x2="50" y2="32"/><line class="den" x1="54" y1="32" x2="60" y2="32"/>
-                        <line x1="30" y1="28" x2="47" y2="28"/><line class="den" x1="51" y1="28" x2="59" y2="28"/>
-                        <line x1="56" y1="22" x2="82" y2="22"/>
-                        <line x1="56" y1="18" x2="78" y2="18"/><line class="den" x1="82" y1="18" x2="88" y2="18"/>
-                        <line x1="86" y1="12" x2="116" y2="12"/>
-                        <line x1="86" y1="8" x2="114" y2="8"/>
-                        <line x1="90" y1="4" x2="116" y2="4"/>
+                    <svg class="step-pat" viewBox="7 21 208 166" aria-hidden="true" focusable="false">
+                        <g class="mb mb-1">
+                            <line x1="10" y1="184" x2="30" y2="184"/><line x1="36" y1="184" x2="46" y2="184"/>
+                            <line x1="10" y1="176" x2="24" y2="176"/><line x1="30" y1="176" x2="42" y2="176"/>
+                            <line x1="14" y1="168" x2="34" y2="168"/>
+                        </g>
+                        <g class="mb mb-2">
+                            <line x1="48" y1="148" x2="92" y2="148"/>
+                            <line x1="48" y1="140" x2="80" y2="140"/><line x1="86" y1="140" x2="100" y2="140"/>
+                            <line x1="52" y1="132" x2="96" y2="132"/>
+                            <line x1="48" y1="124" x2="88" y2="124"/>
+                        </g>
+                        <g class="mb mb-3">
+                            <line x1="96" y1="108" x2="150" y2="108"/>
+                            <line x1="96" y1="100" x2="158" y2="100"/>
+                            <line x1="100" y1="92" x2="150" y2="92"/>
+                            <line x1="96" y1="84" x2="160" y2="84"/>
+                            <line x1="104" y1="76" x2="148" y2="76"/>
+                        </g>
+                        <g class="mb mb-4">
+                            <line x1="150" y1="64" x2="212" y2="64"/>
+                            <line x1="150" y1="56" x2="208" y2="56"/>
+                            <line x1="146" y1="48" x2="212" y2="48"/>
+                            <line x1="152" y1="40" x2="206" y2="40"/>
+                            <line x1="150" y1="32" x2="210" y2="32"/>
+                            <line x1="156" y1="24" x2="200" y2="24"/>
+                        </g>
                     </svg>
                     <div class="step-num">04</div>
                     <div class="step-name">Validação</div>
+                    <p class="step-desc">Projeto-piloto acompanhado, com ajustes e refinamento.</p>
                 </div>
             </div>
 
             <div class="process-foot reveal">
-                <p class="cap">*diagrama do processo + recortes anonimizados de manuais, a prova que ninguém mostra.*</p>
                 <div class="process-actions">
                     <a href="cadastro.html" class="btn btn-olive">Solicite seu orçamento <span class="arr">→</span></a>
                     <a href="#treinamentos" class="tlink">Ainda trabalha sozinho(a)? Comece pelos Treinamentos <span class="arr">→</span></a>
