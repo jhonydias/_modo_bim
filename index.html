@@ -802,7 +802,7 @@
         .faq-a-inner { padding: 0 0 28px; max-width: 60ch; color: var(--ink-soft); font-weight: 300; font-size: 16px; }
 
         /* ============================================
-           QUIZ — Termômetro de Maturidade BIM
+           QUIZ — direcionamento de serviço
            ============================================ */
         .quiz { background: var(--cream); }
         .quiz-head { max-width: 60ch; margin-bottom: clamp(36px, 5vw, 56px); }
@@ -820,17 +820,22 @@
         .quiz-step { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
         .quiz-step[hidden] { display: none; }
         .quiz-count { font-family: var(--detail); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; margin-bottom: 14px; display: block; }
-        .quiz-step legend { font-family: var(--serif); font-size: clamp(22px, 3vw, 32px); line-height: 1.12; color: var(--cereja); padding: 0; }
-        .quiz-opts { display: grid; gap: 12px; margin-top: 24px; }
+        /* o float tira a legend do posicionamento especial do fieldset (que a jogaria para o
+           topo da caixa) e deixa o contador "pergunta N de 5" aparecer acima dela, na ordem do HTML */
+        .quiz-step legend { float: left; width: 100%; margin-bottom: 24px; font-family: var(--serif); font-size: clamp(22px, 3vw, 32px); line-height: 1.12; color: var(--cereja); padding: 0; }
+        .quiz-opts { clear: both; display: grid; gap: 12px; margin-top: 24px; }
         .quiz-opt { position: relative; }
         .quiz-opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
         .quiz-opt label {
             display: block;
             padding: 15px 22px;
             border: 1px solid var(--line);
-            border-radius: 999px;
+            /* bloco, não pílula: as frases das alternativas quebram em duas linhas no mobile,
+               e o raio grande deforma quando isso acontece */
+            border-radius: 10px;
             background: var(--cream);
             font-size: clamp(15px, 1.6vw, 17px);
+            line-height: 1.35;
             color: var(--ink-soft);
             cursor: pointer;
             transition: border-color 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease-out);
@@ -843,24 +848,15 @@
         .quiz-back:hover { color: var(--cereja); }
         .quiz-back[hidden] { display: none; }
 
-        /* Resultado — termômetro no idioma da marca (linha + marcador "_") */
+        /* Resultado — uma das duas telas de direcionamento (treinamento ou implementação) */
         .quiz-result[hidden] { display: none; }
         .quiz-result .label { color: var(--cereja); }
         .quiz-result h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 3.6vw, 40px); color: var(--cereja); margin: 12px 0 10px; letter-spacing: -0.015em; }
         .quiz-result .res-sub { color: var(--ink-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 18px); max-width: 52ch; margin-bottom: 40px; }
-        .therm { margin: 0 0 38px; }
-        .therm-track { position: relative; height: 2px; background: var(--line); }
-        .therm-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--olive); width: 0; transition: width 0.9s var(--ease-out); }
-        .therm-mark { position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); transition: left 0.9s var(--ease-out); }
-        .therm-mark b { font-family: var(--serif); font-weight: 500; font-size: 24px; line-height: 0; color: var(--cereja); }
-        .therm-stops { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
-        .therm-stops span { font-family: var(--detail); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; transition: color 0.3s var(--ease); }
-        .therm-stops span:last-child { text-align: right; }
-        .therm-stops span.on { color: var(--cereja); }
         .quiz-cta { display: flex; align-items: center; gap: 22px 28px; flex-wrap: wrap; }
         .quiz-restart-row { margin-top: 30px; }
         @media (prefers-reduced-motion: reduce) {
-            .quiz-bar span, .therm-fill, .therm-mark, .quiz-opt label { transition: none; }
+            .quiz-bar span, .quiz-opt label { transition: none; }
         }
 
         /* ============================================
@@ -1015,8 +1011,7 @@
             .hero-copy .display { font-size: clamp(33px, 9vw, 42px); }
             .steps { grid-template-columns: 1fr; }
             .hero-actions { gap: 18px; }
-            /* quiz: termômetro com rótulos compactos para caber sem overflow em telas estreitas */
-            .therm-stops { font-size: 10px; gap: 8px; letter-spacing: 0.06em; }
+            /* quiz: alternativas mais compactas para as frases longas caberem em telas estreitas */
             .quiz-opt label { padding: 14px 18px; }
             /* Pattern degrada: simplifica densidade e reduz tamanho da textura */
             .modo-tex .mb-1 { display: none; }
@@ -1455,53 +1450,77 @@
         </div>
     </section>
 
-    <!-- ============================================ QUIZ — Termômetro de Maturidade BIM ============================================
+    <!-- ============================================ QUIZ — direcionamento de serviço ============================================
          Posicionado FORA do bloco .hsections (scroll horizontal), entre a galeria e o FAQ:
          fecha o funil com o lead já aquecido. (Local alternativo válido: entre o hero e .hsections.)
-         TODO (task 05): textos das perguntas e dos resultados PENDENTES de validação do dono.
-         Roteamento: solo/autônomo → lista-espera.html (BIM Club); equipe/escritório → cadastro.html.
-         O nível vai na URL como ?nivel=… (sem dados pessoais). -->
-    <section class="section quiz" id="termometro">
+         Conteúdo: tasks/14/quiz-direcionamento-modobim.pdf. São 5 perguntas de resposta única,
+         uma por tela, e dois resultados: Treinamento → lista-espera.html; Implementação → cadastro.html.
+         A ordem das alternativas é fixa (é ela que carrega a pontuação, ver o JS) e o perfil
+         vai na URL do CTA como ?perfil=… (sem dados pessoais). -->
+    <section class="section quiz" id="quiz">
         <div class="wrap">
             <div class="quiz-head reveal">
-                <span class="label">Termômetro de Maturidade BIM</span>
+                <span class="label">Quiz de direcionamento</span>
                 <h2 class="h-sec">Qual serviço é o ideal para o <em class="it">seu perfil?</em></h2>
-                <p class="lead">3 perguntas rápidas. No fim, você vê onde está, e qual é o próximo passo certo pra você.</p>
+                <p class="lead">5 perguntas rápidas. No fim, você vê qual é o próximo passo certo pra você.</p>
             </div>
 
             <div class="quiz-card reveal">
                 <div class="quiz-bar" aria-hidden="true"><span id="quizProgress"></span></div>
 
-                <form id="quizForm" aria-label="Termômetro de Maturidade BIM">
+                <form id="quizForm" aria-label="Quiz de direcionamento de serviço">
                     <fieldset class="quiz-step" data-step="0">
-                        <span class="quiz-count">Pergunta 1 de 3</span>
-                        <legend>Como você trabalha hoje?</legend>
+                        <span class="quiz-count">Pergunta 1 de 5</span>
+                        <legend>Como você atua na arquitetura hoje?</legend>
                         <div class="quiz-opts">
-                            <div class="quiz-opt"><input type="radio" name="q1" id="q1a" value="0" data-team="solo"><label for="q1a">Sozinho(a), autônomo(a) ou recém-formado(a)</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q1" id="q1b" value="1" data-team="office"><label for="q1b">Com uma equipe pequena, ainda informal</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q1" id="q1c" value="2" data-team="office"><label for="q1c">Escritório com equipe e funções definidas</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1a" value="0"><label for="q1a">Sou estudante ou estou me formando agora</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1b" value="1"><label for="q1b">Trabalho por conta própria, com projetos meus</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1c" value="2"><label for="q1c">Sou de um escritório com equipe fixa</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1d" value="3"><label for="q1d">Sou sócio ou coordeno projetos de uma empresa</label></div>
                         </div>
                     </fieldset>
 
                     <fieldset class="quiz-step" data-step="1" hidden>
-                        <span class="quiz-count">Pergunta 2 de 3</span>
-                        <legend>Seu processo BIM hoje é...</legend>
+                        <span class="quiz-count">Pergunta 2 de 5</span>
+                        <legend>Quem vai usar o BIM no seu dia a dia?</legend>
                         <div class="quiz-opts">
-                            <div class="quiz-opt"><input type="radio" name="q2" id="q2a" value="0"><label for="q2a">Não existe, quero começar</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q2" id="q2b" value="1"><label for="q2b">No improviso: cada projeto de um jeito</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q2" id="q2c" value="2"><label for="q2c">Parcialmente padronizado</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q2" id="q2d" value="3"><label for="q2d">Com método e padrão já definidos</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2a" value="0"><label for="q2a">Só eu</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2b" value="1"><label for="q2b">Eu e um parceiro ou estagiário eventual</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2c" value="2"><label for="q2c">Uma equipe de 3 a 10 pessoas</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2d" value="3"><label for="q2d">Várias equipes ou disciplinas diferentes</label></div>
                         </div>
                     </fieldset>
 
                     <fieldset class="quiz-step" data-step="2" hidden>
-                        <span class="quiz-count">Pergunta 3 de 3</span>
-                        <legend>Qual é a sua maior dor hoje?</legend>
+                        <span class="quiz-count">Pergunta 3 de 5</span>
+                        <legend>Qual frase descreve melhor sua relação com o BIM?</legend>
                         <div class="quiz-opts">
-                            <div class="quiz-opt"><input type="radio" name="q3" id="q3a" value="0"><label for="q3a">Quero começar do jeito certo</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q3" id="q3b" value="1"><label for="q3b">Retrabalho, arquivos refeitos toda hora</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q3" id="q3c" value="2"><label for="q3c">Equipe sem clareza de função</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q3" id="q3d" value="2"><label for="q3d">Tudo depende de mim</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3a" value="0"><label for="q3a">Ouço falar, mas ainda não sei o que muda na prática</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3b" value="1"><label for="q3b">Sei modelar um pouco, mas metodologia ainda é abstrato pra mim</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3c" value="2"><label for="q3c">Já modelamos em BIM, mas cada projeto sai de um jeito</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3d" value="3"><label for="q3d">Precisamos padronizar e atender exigências de contratantes</label></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="quiz-step" data-step="3" hidden>
+                        <span class="quiz-count">Pergunta 4 de 5</span>
+                        <legend>O que te fez procurar a _modo_bim?</legend>
+                        <div class="quiz-opts">
+                            <div class="quiz-opt"><input type="radio" name="q4" id="q4a" value="0"><label for="q4a">Quero entrar no mercado com um diferencial real</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q4" id="q4b" value="1"><label for="q4b">Quero parar de perder tempo com retrabalho nos meus projetos</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q4" id="q4c" value="2"><label for="q4c">O escritório precisa de padrão: template, nomenclatura, entregáveis</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q4" id="q4d" value="3"><label for="q4d">Precisamos de fluxo entre as pessoas, não só de gente que sabe o software</label></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="quiz-step" data-step="4" hidden>
+                        <span class="quiz-count">Pergunta 5 de 5</span>
+                        <legend>Daqui a alguns meses, o que teria mudado?</legend>
+                        <div class="quiz-opts">
+                            <div class="quiz-opt"><input type="radio" name="q5" id="q5a" value="0"><label for="q5a">Eu dominaria o processo BIM do início ao fim de um projeto</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q5" id="q5b" value="1"><label for="q5b">Eu conseguiria entregar sozinho com mais segurança e velocidade</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q5" id="q5c" value="2"><label for="q5c">O escritório teria um método que independe de quem está no projeto</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q5" id="q5d" value="3"><label for="q5d">Conseguiríamos escalar a produção sem aumentar a equipe</label></div>
                         </div>
                     </fieldset>
 
@@ -1511,23 +1530,11 @@
                 </form>
 
                 <div class="quiz-result" id="quizResult" hidden role="status" aria-live="polite">
-                    <span class="label">Seu termômetro</span>
+                    <span class="label">Seu resultado</span>
                     <h3 id="resTitle"></h3>
                     <p class="res-sub" id="resSub"></p>
-                    <div class="therm" aria-hidden="true">
-                        <div class="therm-track">
-                            <div class="therm-fill" id="thermFill"></div>
-                            <div class="therm-mark" id="thermMark"><b>_</b></div>
-                        </div>
-                        <div class="therm-stops">
-                            <span data-lvl="inicio">Início</span>
-                            <span data-lvl="estruturacao">Em estruturação</span>
-                            <span data-lvl="autonomo">Quase autônomo</span>
-                        </div>
-                    </div>
                     <div class="quiz-cta">
                         <a class="btn btn-olive" id="resPrimary" href="cadastro.html">solicite um orçamento <span class="arr">→</span></a>
-                        <a class="tlink" id="resSecondary" href="lista-espera.html">caminho alternativo <span class="arr">→</span></a>
                     </div>
                     <div class="quiz-restart-row">
                         <button type="button" class="quiz-back" id="quizRestart">↺ refazer o teste</button>
@@ -2060,27 +2067,32 @@
     revealReady = true;
     if (pendingPanel >= 0) revealPanel(pendingPanel);
 
-    /* ============================================ QUIZ — Termômetro de Maturidade BIM ============================================ */
+    /* ============================================ QUIZ — direcionamento de serviço ============================================ */
     const quizForm = document.getElementById('quizForm');
     if (quizForm) {
         const steps = [...quizForm.querySelectorAll('.quiz-step')];
         const progress = document.getElementById('quizProgress');
         const backBtn = document.getElementById('quizBack');
         const result = document.getElementById('quizResult');
+        const names = steps.map(s => s.querySelector('input').name);
         let cur = 0;
 
-        // Copy dos níveis — PENDENTE de validação do dono (task 05). pos = posição do marcador no termômetro (%).
-        const LEVELS = {
-            inicio:       { pos: 12, title: 'Você está no <em class="it">Início</em>.',          sub: 'O melhor momento para construir no método certo, e não precisar refazer tudo quando o trabalho crescer.' },
-            estruturacao: { pos: 50, title: 'Você está em <em class="it">Estruturação</em>.',    sub: 'Você já roda BIM, mas no improviso. Estruturar o processo agora é o que separa crescer com método de crescer no caos.' },
-            autonomo:     { pos: 88, title: 'Você está <em class="it">Quase autônomo</em>.',     sub: 'Você já tem método. O próximo passo é consolidar a autonomia da equipe e blindar o padrão que você construiu.' }
+        // Pontuação: em toda pergunta as DUAS PRIMEIRAS alternativas apontam para treinamento
+        // e as duas últimas para implementação, na ordem fixa do documento da task 14. É por isso
+        // que o value de cada opção é só o índice dela: a marcação não fica escrita no HTML.
+        const TRAINING_PICKS = 2;
+        const PROFILES = {
+            treinamento: {
+                title: '<em class="it">Treinamento</em> BIM na Prática',
+                sub: 'Você está no início da jornada, e esse é exatamente o melhor momento para aprender BIM do jeito certo, antes de pegar vícios. Aqui você não aprende só a operar o software: entende a metodologia por trás dele.',
+                cta: { href: 'lista-espera.html', text: 'Entre na lista de espera' }
+            },
+            implementacao: {
+                title: '<em class="it">Implementação</em> BIM',
+                sub: 'Sua questão não é individual, é estrutural. Quando existe equipe, o BIM só funciona se o método for da empresa, e não da cabeça de uma pessoa. O primeiro passo é entender onde o seu escritório está hoje.',
+                cta: { href: 'cadastro.html', text: 'Solicite um orçamento' }
+            }
         };
-        // Roteamento: solo → BIM Club (lista-espera); office → diagnóstico (cadastro). O outro caminho fica como link secundário.
-        const ROUTES = {
-            solo:   { primary: { href: 'lista-espera.html', text: 'Entre no BIM Club' },     secondary: { href: 'cadastro.html',     text: 'Tenho escritório: quero um diagnóstico' } },
-            office: { primary: { href: 'cadastro.html',     text: 'Faça seu diagnóstico' },  secondary: { href: 'lista-espera.html', text: 'Sou autônomo(a): conheça o BIM Club' } }
-        };
-        const levelFor = score => score <= 2 ? 'inicio' : score <= 4 ? 'estruturacao' : 'autonomo';
 
         function showStep(i, focus = true) {
             steps.forEach((s, n) => { s.hidden = n !== i; });
@@ -2094,37 +2106,36 @@
         }
 
         function finish() {
-            const score = ['q1', 'q2', 'q3'].reduce((s, n) => {
+            const picks = names.map(n => {
                 const el = quizForm.querySelector(`input[name="${n}"]:checked`);
-                return s + (el ? +el.value : 0);
-            }, 0);
-            const teamEl = quizForm.querySelector('input[name="q1"]:checked');
-            const team = teamEl && teamEl.dataset.team === 'office' ? 'office' : 'solo';
-            const lvl = levelFor(score);
-            const L = LEVELS[lvl], R = ROUTES[team];
+                return el ? +el.value : -1;
+            });
+            let t = 0, i = 0;
+            picks.forEach(v => { if (v < 0) return; v < TRAINING_PICKS ? t++ : i++; });
+            // Com 5 respostas não há empate; se alguma ficar em branco, a pergunta 2 decide.
+            const key = t !== i
+                ? (t > i ? 'treinamento' : 'implementacao')
+                : (picks[1] > -1 && picks[1] < TRAINING_PICKS ? 'treinamento' : 'implementacao');
+            const P = PROFILES[key];
 
             quizForm.hidden = true;
             progress.style.width = '100%';
-            document.getElementById('resTitle').innerHTML = L.title;
-            document.getElementById('resSub').textContent = L.sub;
-
-            const fill = document.getElementById('thermFill');
-            const mark = document.getElementById('thermMark');
-            requestAnimationFrame(() => { fill.style.width = L.pos + '%'; mark.style.left = L.pos + '%'; });
-            document.querySelectorAll('.therm-stops span').forEach(s => s.classList.toggle('on', s.dataset.lvl === lvl));
+            document.getElementById('resTitle').innerHTML = P.title;
+            document.getElementById('resSub').textContent = P.sub;
 
             const primary = document.getElementById('resPrimary');
-            const secondary = document.getElementById('resSecondary');
-            // nível na URL (sem dados pessoais)
-            primary.href = R.primary.href + '?nivel=' + lvl;
-            primary.innerHTML = R.primary.text + ' <span class="arr">→</span>';
-            secondary.href = R.secondary.href + '?nivel=' + lvl;
-            secondary.innerHTML = R.secondary.text + ' <span class="arr">→</span>';
+            // perfil na URL (sem dados pessoais), para a página de destino saber de onde o lead veio
+            primary.href = P.cta.href + '?perfil=' + key;
+            primary.innerHTML = P.cta.text + ' <span class="arr">→</span>';
 
             result.hidden = false;
         }
 
-        quizForm.addEventListener('change', (e) => {
+        // Avança na seleção. O evento é 'click', não 'change': o clique também acontece quando
+        // a pessoa volta e reconfirma a MESMA alternativa (aí não há change, e ela ficaria presa
+        // na tela). Seleção por teclado (setas e espaço) dispara click antes do change, então
+        // esse caminho também está coberto.
+        quizForm.addEventListener('click', (e) => {
             if (!e.target.matches('input[type="radio"]')) return;
             if (cur < steps.length - 1) showStep(cur + 1);
             else finish();
