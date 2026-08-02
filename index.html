@@ -656,7 +656,10 @@
             align-items: center;
         }
 
-        .vmarquee { overflow: hidden; height: clamp(460px, 70vh, 740px); --mq-dur: 46s; }
+        /* --mq-dur acompanha a quantidade de tiles: a animação percorre metade da pista, então
+           entrar um tile por coluna (de 5 para 6) deixaria a faixa 20% mais rápida na mesma
+           duração. 46s → 55s mantém a velocidade de leitura de antes. */
+        .vmarquee { overflow: hidden; height: clamp(460px, 70vh, 740px); --mq-dur: 55s; }
         .vmarquee-track {
             display: flex;
             flex-direction: column;
@@ -670,8 +673,8 @@
         @keyframes mqScrollY { to { transform: translateY(calc(-50% - var(--mq-gap) / 2)); } }
 
         /* aspect-ratio fixo reserva a altura antes de a mídia carregar — sem isso a faixa
-           nasce colapsada com lazy loading. Retrato por padrão, porque as fotos e cinco
-           dos seis clipes foram feitos em pé; .mq-wide é a exceção deitada. */
+           nasce colapsada com lazy loading. Retrato por padrão, porque as fotos e seis
+           dos sete clipes foram feitos em pé; .mq-wide é a exceção deitada. */
         .vmarquee figure {
             flex: 0 0 auto;
             /* teto de largura: em retrato, a coluna cheia daria um tile mais alto que a
@@ -1001,7 +1004,7 @@
             /* empilha: coluna de peças · prova · coluna de peças — a prova segue no meio */
             .proof-band { grid-template-columns: 1fr; }
             /* mais alta que antes: os tiles agora são retrato e não cabiam nos 380px */
-            .vmarquee { height: clamp(380px, 56vh, 520px); --mq-dur: 32s; }
+            .vmarquee { height: clamp(380px, 56vh, 520px); --mq-dur: 38s; }
             .gallery-quote { align-self: auto; }
         }
         @media (max-width: 520px) {
@@ -1157,7 +1160,7 @@
                     <p class="svc-desc">_Plano de execução BIM, coordenação e compatibilização de projetos.</p>
                 </div>
                 <div class="svc reveal">
-                    <h3 class="svc-name">Treinamento BIM</h3>
+                    <h3 class="svc-name">Treinamento BIM na Prática</h3>
                     <p class="svc-desc">_Do comando ao método: você operando BIM de verdade.</p>
                 </div>
             </div>
@@ -1390,12 +1393,14 @@
                     <figure><video src="img/real/clip-07.mp4" poster="img/real/clip-07.jpg" muted loop playsinline preload="none" aria-label="Estação de trabalho com dois monitores durante o expediente"></video></figure>
                     <figure><img src="img/real/foto-03.jpg" alt="Turma acompanhando uma apresentação em uma sala clara, com bandeirinhas de festa junina no teto" loading="lazy" /></figure>
                     <figure><video src="img/real/clip-09.mp4" poster="img/real/clip-09.jpg" muted loop playsinline preload="none" aria-label="Pessoa trabalhando em um notebook à mesa, com luz de janela"></video></figure>
+                    <figure><img src="img/real/foto-12.jpg" alt="Aluna sorrindo à mesa, com o notebook coberto de adesivos da _modo_bim e uma tela de projeto BIM projetada na parede atrás" loading="lazy" /></figure>
                     <figure><video src="img/real/clip-11.mp4" poster="img/real/clip-11.jpg" muted loop playsinline preload="none" aria-label="Modelo BIM sendo manipulado na tela de um notebook"></video></figure>
 
                     <figure aria-hidden="true"><img src="img/real/foto-01.jpg" alt="" loading="lazy" /></figure>
                     <figure aria-hidden="true"><video src="img/real/clip-07.mp4" poster="img/real/clip-07.jpg" muted loop playsinline preload="none"></video></figure>
                     <figure aria-hidden="true"><img src="img/real/foto-03.jpg" alt="" loading="lazy" /></figure>
                     <figure aria-hidden="true"><video src="img/real/clip-09.mp4" poster="img/real/clip-09.jpg" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true"><img src="img/real/foto-12.jpg" alt="" loading="lazy" /></figure>
                     <figure aria-hidden="true"><video src="img/real/clip-11.mp4" poster="img/real/clip-11.jpg" muted loop playsinline preload="none"></video></figure>
                 </div>
             </div>
@@ -1409,7 +1414,7 @@
                 <div class="quote-stack" id="quoteStack">
                     <blockquote class="quote is-on">
                         <p>Muito satisfeita com os conteúdos e com o conhecimento em BIM. Através do curso foi possível ter uma melhor noção do processo projetual na prática, desde a concepção até a real execução.</p>
-                        <cite>Cliente Treinamento BIM</cite>
+                        <cite>Cliente Treinamento BIM na Prática</cite>
                     </blockquote>
                     <blockquote class="quote">
                         <p>Meninas vocês arrasam, assistir as aulas de vocês me inspirou muito em colocar em prática tudo o que eu aprendi e evoluir no meu aprendizado e desenvolvimento. Sucesso!</p>
@@ -1417,7 +1422,7 @@
                     </blockquote>
                     <blockquote class="quote">
                         <p>Antes de fazer o curso, o BIM parecia uma realidade muito distante. O treinamento abriu os meus olhos para entender que, na verdade, ele é o presente e o futuro das construções. Aprendemos que BIM não se resume a softwares, mas está ligado a fluxos, processos, gestão! É o tipo de conhecimento que gostaria de ter adquirido antes.</p>
-                        <cite>Cliente Treinamento BIM</cite>
+                        <cite>Cliente Treinamento BIM na Prática</cite>
                     </blockquote>
                 </div>
 
@@ -1437,12 +1442,14 @@
                     <figure><video src="img/real/clip-08.mp4" poster="img/real/clip-08.jpg" muted loop playsinline preload="none" aria-label="Mãos manuseando um projeto em um tablet, junto à janela"></video></figure>
                     <figure><img src="img/real/foto-04.jpg" alt="Dois notebooks lado a lado exibindo um relatório de clash detection" loading="lazy" /></figure>
                     <figure><video src="img/real/clip-10.mp4" poster="img/real/clip-10.jpg" muted loop playsinline preload="none" aria-label="Duas pessoas trabalhando lado a lado em computadores"></video></figure>
+                    <figure><video src="img/real/clip-13.mp4" poster="img/real/clip-13.jpg" muted loop playsinline preload="none" aria-label="Arquiteta desenhando em um tablet à mesa, com café na mão e a vidraça do escritório ao fundo"></video></figure>
 
                     <figure class="mq-wide" aria-hidden="true"><video src="img/real/clip-06.mp4" poster="img/real/clip-06.jpg" muted loop playsinline preload="none"></video></figure>
                     <figure aria-hidden="true"><img src="img/real/foto-02.jpg" alt="" loading="lazy" /></figure>
                     <figure aria-hidden="true"><video src="img/real/clip-08.mp4" poster="img/real/clip-08.jpg" muted loop playsinline preload="none"></video></figure>
                     <figure aria-hidden="true"><img src="img/real/foto-04.jpg" alt="" loading="lazy" /></figure>
                     <figure aria-hidden="true"><video src="img/real/clip-10.mp4" poster="img/real/clip-10.jpg" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true"><video src="img/real/clip-13.mp4" poster="img/real/clip-13.jpg" muted loop playsinline preload="none"></video></figure>
                 </div>
             </div>
         </div>
@@ -1965,7 +1972,7 @@
 
     /* ============================================ GALERIA — VÍDEOS DA FAIXA ============================================
        Os clipes nascem com preload="none": nada é baixado até entrarem em cena. Aqui só
-       tocam os que estão visíveis, e pausam ao sair — sem isso seriam doze vídeos
+       tocam os que estão visíveis, e pausam ao sair — sem isso seriam catorze vídeos
        decodificando ao mesmo tempo. Com prefers-reduced-motion nenhum toca: fica o pôster,
        coerente com a faixa, que também para de rolar nesse modo. */
     const mqVideos = document.querySelectorAll('.vmarquee video');

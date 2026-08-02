@@ -7,6 +7,13 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-08-02
 
+### Mais uma foto e mais um clipe na faixa "A _modo_bim acontecendo" — `index.html`, `img/real/`
+- Entraram `12.jpeg` e `13.mp4` de `img/modobimreal/`, transcodificados com a mesma receita do resto da faixa e nomeados pelo número do original: **`foto-12.jpg`** (78 KB, 720×1280 nativo, mozjpeg, sem upscale para 1080 porque a origem já é menor) e **`clip-13.mp4`** (185 KB, H.264 High, CRF 33, 30 fps, sem trilha de áudio, `faststart`) com o pôster **`clip-13.jpg`** tirado do segundo 2,5.
+- **O clipe é retrato, não deitado.** O arquivo é gravado em 1024×576 com matriz de rotação, então só a leitura crua do container diz "paisagem"; exibido são 576×1024. A rotação foi assada na transcodificação (o `.mp4` publicado já sai 576×1024, sem metadado de rotação, que é o que o `object-fit: cover` do tile espera) e o tile ficou no retrato padrão, sem `.mq-wide`.
+- **Um por coluna**, mantendo o ritmo de foto/clipe: `foto-12` entra entre `clip-09` e `clip-11` na coluna que desce, que passa a alternar perfeitamente; `clip-13` fecha a coluna que sobe. As duas metades de cada pista continuam idênticas — é isso que faz o loop não ter emenda —, então cada arquivo aparece duas vezes, a segunda com `aria-hidden`.
+- **`--mq-dur` subiu de 46s para 55s** (e de 32s para 38s no mobile). A animação percorre metade da pista em duração fixa: com 6 tiles por coluna no lugar de 5, a mesma duração deixaria a faixa 20% mais rápida. O ajuste proporcional mantém a velocidade de leitura de antes.
+- Os dois novos vídeos entram no mesmo regime dos outros: `preload="none"`, mudos, em loop, e tocados só quando visíveis pelo `IntersectionObserver` — nada de novo no JS, que já é agnóstico à quantidade. Conferido no navegador: 14 elementos de vídeo, os 14 com `preload="none"`, nenhum erro de mídia, e o `clip-13` decodifica em 576×1024 / 7,33 s.
+
 ### Ajustes na seção Implementações (task 13) — `index.html`
 - **Cada etapa ganhou descrição** (`.step-desc`), com os textos da task: diagnóstico, estruturação, treinamento e validação. Os nomes das etapas continuam como estavam.
 - **Os quatro glifos passaram a ser recortes do Pattern oficial** (`#modoPattern`), com as mesmas coordenadas e o mesmo viewBox recortado na caixa real do desenho (`7 21 208 166`). Antes eram um desenho à parte, feito à mão numa caixa `120×46`, que não batia com a forma oficial. A escada continua crescendo do 01 ao 04, agora acrescentando os blocos `mb-1`…`mb-4` do próprio Pattern.
