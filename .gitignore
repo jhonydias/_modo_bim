@@ -13,3 +13,6 @@
 /contexts/
 # Pasta de tarefas local
 /tasks/
+# Originais de câmera das fotos e vídeos da faixa "no mundo real" (~209MB).
+# O site consome as versões web em /img/real/ — estas ficam só na máquina.
+/img/modobimreal/

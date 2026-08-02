@@ -7,6 +7,14 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-08-02
 
+### Faixa "A _modo_bim no mundo real" com material real — `index.html`, `img/real/`
+- As seis fotos de peças da marca eram provisórias e saíram. Entraram **4 fotos e 6 vídeos** de treinamentos e equipes trabalhando, cinco por coluna, alternando foto e clipe. O título da seção passou de "Uma marca que você pega na mão" para **"A _modo_bim acontecendo"**, que é o que o material novo mostra.
+- **Os tiles viraram retrato** (`aspect-ratio: 3 / 4`), porque as fotos e cinco dos seis clipes foram feitos em pé; `.mq-wide` (`16 / 9`) é a exceção deitada. A largura ganhou teto de 340 px: na largura cheia da coluna, um tile retrato fica mais alto que a faixa inteira e só caberia um de cada vez. A faixa subiu para `clamp(460px, 70vh, 740px)` no desktop e `clamp(380px, 56vh, 520px)` no mobile.
+- **Vídeos mudos, em loop, com `preload="none"` e pôster.** Nada é baixado até o clipe entrar em cena, e um `IntersectionObserver` toca só os visíveis, pausando o resto — sem isso seriam doze elementos decodificando ao mesmo tempo. Medido no navegador: 2 tocando, 10 pausados. Com `prefers-reduced-motion` nenhum toca e fica o pôster, coerente com a faixa, que também para de rolar nesse modo. Os clipes mantêm o preto e branco que ganha cor no hover, igual às fotos.
+- **Transcodificação: 209 MB → 7,2 MB**, pôsteres incluídos. Vídeos em H.264 progressivo (640 px de largura nos verticais, 854 nos deitados, CRF 33, 30 fps, sem trilha de áudio, `faststart`) e fotos em 1080 px mozjpeg. Os originais seguem em `img/modobimreal/`, fora do site.
+- `05.mp4` ficou de fora: 42 minutos e 162 MB em 640×368 — gravação integral de uma aula, não peça de vitrine.
+- As seis `img/brand-*.jpg` deixaram de ser referenciadas por qualquer página.
+
 ### Databases do Notion criados e integração validada (task 08) — `tasks/08/notion-integracao.md`
 - Os dois databases do passo 2 do doc foram **criados via API** dentro das páginas "Cadastro de Clientes" e "Lista de Espera", com os nomes e tipos de coluna exatamente como `buildNotionProps_()` espera (`script/Code.gs:358`) — `Cadastros` (18 propriedades) e `Lista de Espera` (17). `Status` (Novo · Contato feito · Proposta · Fechado · Perdido), `Estado` (27 UFs) e `Ramo de Atividade` já vêm com as opções carregadas; os demais *selects* se preenchem sozinhos conforme os leads chegam.
 - **Integração testada de ponta a ponta** com um token temporário: uma página `[TESTE]` gravada em cada base com o mesmo payload do Apps Script e lida de volta pela API. Confirmou o que a tabela de "erros comuns" prevê: nomes acentuados batendo (`Razão Social`, `Inscrição Estadual`, `Endereço`, `Nível BIM`), tipos `email`/`phone_number`/`url`/`date` aceitos, e a troca de vírgula por barra do `nSelect_()` funcionando (`Revit, Navisworks` → `Revit / Navisworks`) — vírgula quebraria a opção do select em duas.
