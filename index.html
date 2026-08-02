@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="_modo_bim — consultoria de implementação BIM. Estruturamos processo, equipe e cultura até seu escritório operar com autonomia real. Um novo modo de projetar." />
-    <meta property="og:title" content="_modo_bim — um novo modo de projetar" />
+    <meta name="description" content="_modo_bim, consultoria de implementação BIM. Estruturamos processo, equipe e cultura até seu escritório operar com autonomia real. Um novo modo de projetar." />
+    <meta property="og:title" content="_modo_bim · um novo modo de projetar" />
     <meta property="og:description" content="Consultoria de implementação BIM. Do diagnóstico à autonomia, com acompanhamento real." />
     <meta property="og:url" content="https://jhonydias.github.io/_modo_bim/" />
     <meta property="og:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
     <meta name="twitter:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
-    <title>_modo_bim — um novo modo de projetar</title>
+    <title>_modo_bim · um novo modo de projetar</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
     <!-- Fonts -->
@@ -412,20 +412,19 @@
         .services-head { max-width: 60ch; margin-bottom: clamp(32px, 4.5vw, 60px); }
         .services-head .h-sec { margin: 16px 0 20px; }
         .services-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(28px, 5vw, 72px); }
+        /* sem numeração lateral (task 12): o serviço é só nome + descrição, e a
+           descrição já começa com "_", que é quem faz o papel de marcador. */
         .svc {
             display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 6px 16px;
-            align-items: baseline;
+            gap: 6px;
             border-top: 1px solid var(--line);
             padding: clamp(15px, 1.9vw, 22px) 0;
             transition: border-color 0.35s var(--ease);
         }
         .svc:hover { border-color: var(--cereja); }
-        .svc-num { font-family: var(--detail); font-size: 11px; letter-spacing: 0.18em; font-weight: 600; color: var(--cereja); }
         .svc-name { font-family: var(--serif); font-size: clamp(19px, 2.1vw, 26px); line-height: 1.1; color: var(--cereja); }
         .svc-name .us { color: rgba(129, 22, 30, 0.42); }
-        .svc-desc { grid-column: 2; font-size: clamp(14px, 1.5vw, 16px); color: var(--ink-soft); font-weight: 300; max-width: 40ch; }
+        .svc-desc { font-size: clamp(14px, 1.5vw, 16px); color: var(--ink-soft); font-weight: 300; max-width: 40ch; }
         .services-foot { margin-top: clamp(30px, 4vw, 52px); display: flex; align-items: center; gap: 22px 32px; flex-wrap: wrap; }
 
         /* ============================================
@@ -1063,7 +1062,7 @@
 <!-- ============================================ NAV ============================================ -->
 <header class="nav">
     <div class="wrap nav-inner">
-        <a href="#top" class="wordmark" aria-label="_modo_bim — início">_modo_<span class="b">b</span>im</a>
+        <a href="#top" class="wordmark" aria-label="_modo_bim, início">_modo_<span class="b">b</span>im</a>
         <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="navLinks">
             <span></span><span></span><span></span>
         </button>
@@ -1097,7 +1096,7 @@
             <div class="hero-copy">
                 <span class="label">Consultoria de implementação BIM</span>
                 <h1 class="display rt">Um novo <span class="us">modo_</span><br /><em class="it">de projetar.</em></h1>
-                <p class="lead">Somos uma consultoria de implementação BIM que estrutura processo, equipe e cultura — até seu escritório operar com autonomia real.</p>
+                <p class="lead">Somos uma consultoria de implementação BIM que estrutura processo, equipe e cultura, até seu escritório operar com autonomia real.</p>
                 <div class="hero-actions">
                     <a href="cadastro.html" class="btn btn-olive">solicite um orçamento <span class="arr">→</span></a>
                     <a href="#implementacoes" class="tlink">Saiba mais <span class="arr">→</span></a>
@@ -1136,34 +1135,28 @@
 
             <div class="services-list">
                 <div class="svc reveal">
-                    <span class="svc-num">01</span>
                     <h3 class="svc-name">Consultoria BIM</h3>
-                    <p class="svc-desc">Diagnóstico e direção estratégica antes de qualquer decisão.</p>
+                    <p class="svc-desc">_Diagnóstico e direção estratégica antes de qualquer decisão.</p>
                 </div>
                 <div class="svc reveal">
-                    <span class="svc-num">02</span>
-                    <h3 class="svc-name">Projetos em BIM</h3>
-                    <p class="svc-desc">Desenvolvimento com padrão e precisão técnica.</p>
+                    <h3 class="svc-name">Implementação BIM</h3>
+                    <p class="svc-desc">_Jornada completa com Método BIM na Prática.</p>
                 </div>
                 <div class="svc reveal">
-                    <span class="svc-num">03</span>
                     <h3 class="svc-name">Criação de Templates</h3>
-                    <p class="svc-desc">Arquivos-base prontos para produção real.</p>
+                    <p class="svc-desc">_Arquivos-base prontos para produção real.</p>
                 </div>
                 <div class="svc reveal">
-                    <span class="svc-num">04</span>
                     <h3 class="svc-name">Criação de Bibliotecas</h3>
-                    <p class="svc-desc">Objetos e showroom sob medida para sua empresa.</p>
+                    <p class="svc-desc">_Objetos e showroom sob medida para sua empresa.</p>
                 </div>
                 <div class="svc reveal">
-                    <span class="svc-num">05</span>
                     <h3 class="svc-name">Coordenação BIM</h3>
-                    <p class="svc-desc">Plano de execução BIM, coordenação e compatibilização de projetos.</p>
+                    <p class="svc-desc">_Plano de execução BIM, coordenação e compatibilização de projetos.</p>
                 </div>
                 <div class="svc reveal">
-                    <span class="svc-num">06</span>
                     <h3 class="svc-name">Treinamento BIM</h3>
-                    <p class="svc-desc">Do comando ao método: você operando BIM de verdade.</p>
+                    <p class="svc-desc">_Do comando ao método: você operando BIM de verdade.</p>
                 </div>
             </div>
 
@@ -1232,7 +1225,7 @@
             </div>
 
             <div class="process-foot reveal">
-                <p class="cap">*diagrama do processo + recortes anonimizados de manuais — a prova que ninguém mostra.*</p>
+                <p class="cap">*diagrama do processo + recortes anonimizados de manuais, a prova que ninguém mostra.*</p>
                 <div class="process-actions">
                     <a href="cadastro.html" class="btn btn-olive">Solicite seu orçamento <span class="arr">→</span></a>
                     <a href="#treinamentos" class="tlink">Ainda trabalha sozinho(a)? Comece pelos Treinamentos <span class="arr">→</span></a>
@@ -1247,7 +1240,7 @@
             <div class="training-sticky reveal">
                 <span class="label">Treinamentos</span>
                 <h2 class="h-sec rt">Para quem está <em class="it">começando</em> certo.</h2>
-                <p class="lead">Para autônomos e recém-formados que querem dominar o método desde o início — no seu ritmo e no seu orçamento.</p>
+                <p class="lead">Para autônomos e recém-formados que querem dominar o método desde o início, no seu ritmo e no seu orçamento.</p>
             </div>
             <div class="training-body reveal">
                 <p><strong>Aqui não é consultoria.</strong> São aulas e materiais diretos para você aprender a organizar seu trabalho desde já e não precisar reconstruir tudo quando o escritório crescer.</p>
@@ -1407,36 +1400,8 @@
         </div>
     </section>
 
-    <!-- ============================================ FAQ ============================================ -->
-    <section class="section faq" id="faq">
-        <div class="wrap faq-grid">
-            <div class="reveal">
-                <span class="label">FAQ</span>
-                <h2 class="h-sec" style="margin-top:16px;">Perguntas <em class="it">frequentes.</em></h2>
-            </div>
-            <div class="faq-list reveal">
-                <div class="faq-item">
-                    <button class="faq-q" aria-expanded="false">Preciso já ter equipe montada? <span class="faq-icon"></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">Não. A implementação atende escritórios que já têm equipe e também quem está montando agora, estruturamos a função de cada pessoa desde o começo. Se você ainda trabalha sozinho(a), o caminho ideal são os Treinamentos.</div></div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-q" aria-expanded="false">Qual software vocês implementam? <span class="faq-icon"></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">Trabalhamos principalmente com Revit e Archicad. Mais importante que a ferramenta é o método: implementamos o BIM na ordem certa para o seu fluxo, não o contrário.</div></div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-q" aria-expanded="false">Quanto tempo dura a implementação? <span class="faq-icon"></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">A jornada completa, do diagnóstico à autonomia, leva em média 6 meses de parceria real, com acompanhamento durante todo o processo.</div></div>
-                </div>
-                <div class="faq-item">
-                    <button class="faq-q" aria-expanded="false">Onde vocês atendem? <span class="faq-icon"></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">Somos de Belém, Pará, e atendemos escritórios em todo o Brasil de forma remota, com encontros e acompanhamento à distância.</div></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ============================================ QUIZ — Termômetro de Maturidade BIM ============================================
-         Posicionado FORA do bloco .hsections (scroll horizontal), entre o FAQ e o CTA final:
+         Posicionado FORA do bloco .hsections (scroll horizontal), entre a galeria e o FAQ:
          fecha o funil com o lead já aquecido. (Local alternativo válido: entre o hero e .hsections.)
          TODO (task 05): textos das perguntas e dos resultados PENDENTES de validação do dono.
          Roteamento: solo/autônomo → lista-espera.html (BIM Club); equipe/escritório → cadastro.html.
@@ -1445,8 +1410,8 @@
         <div class="wrap">
             <div class="quiz-head reveal">
                 <span class="label">Termômetro de Maturidade BIM</span>
-                <h2 class="h-sec">Quão maduro é o BIM do <em class="it">seu escritório?</em></h2>
-                <p class="lead">3 perguntas rápidas. No fim, você vê onde está — e qual é o próximo passo certo pra você.</p>
+                <h2 class="h-sec">Qual serviço é o ideal para o <em class="it">seu perfil?</em></h2>
+                <p class="lead">3 perguntas rápidas. No fim, você vê onde está, e qual é o próximo passo certo pra você.</p>
             </div>
 
             <div class="quiz-card reveal">
@@ -1457,7 +1422,7 @@
                         <span class="quiz-count">Pergunta 1 de 3</span>
                         <legend>Como você trabalha hoje?</legend>
                         <div class="quiz-opts">
-                            <div class="quiz-opt"><input type="radio" name="q1" id="q1a" value="0" data-team="solo"><label for="q1a">Sozinho(a) — autônomo(a) ou recém-formado(a)</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q1" id="q1a" value="0" data-team="solo"><label for="q1a">Sozinho(a), autônomo(a) ou recém-formado(a)</label></div>
                             <div class="quiz-opt"><input type="radio" name="q1" id="q1b" value="1" data-team="office"><label for="q1b">Com uma equipe pequena, ainda informal</label></div>
                             <div class="quiz-opt"><input type="radio" name="q1" id="q1c" value="2" data-team="office"><label for="q1c">Escritório com equipe e funções definidas</label></div>
                         </div>
@@ -1467,7 +1432,7 @@
                         <span class="quiz-count">Pergunta 2 de 3</span>
                         <legend>Seu processo BIM hoje é...</legend>
                         <div class="quiz-opts">
-                            <div class="quiz-opt"><input type="radio" name="q2" id="q2a" value="0"><label for="q2a">Não existe — quero começar</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q2" id="q2a" value="0"><label for="q2a">Não existe, quero começar</label></div>
                             <div class="quiz-opt"><input type="radio" name="q2" id="q2b" value="1"><label for="q2b">No improviso: cada projeto de um jeito</label></div>
                             <div class="quiz-opt"><input type="radio" name="q2" id="q2c" value="2"><label for="q2c">Parcialmente padronizado</label></div>
                             <div class="quiz-opt"><input type="radio" name="q2" id="q2d" value="3"><label for="q2d">Com método e padrão já definidos</label></div>
@@ -1479,7 +1444,7 @@
                         <legend>Qual é a sua maior dor hoje?</legend>
                         <div class="quiz-opts">
                             <div class="quiz-opt"><input type="radio" name="q3" id="q3a" value="0"><label for="q3a">Quero começar do jeito certo</label></div>
-                            <div class="quiz-opt"><input type="radio" name="q3" id="q3b" value="1"><label for="q3b">Retrabalho — arquivos refeitos toda hora</label></div>
+                            <div class="quiz-opt"><input type="radio" name="q3" id="q3b" value="1"><label for="q3b">Retrabalho, arquivos refeitos toda hora</label></div>
                             <div class="quiz-opt"><input type="radio" name="q3" id="q3c" value="2"><label for="q3c">Equipe sem clareza de função</label></div>
                             <div class="quiz-opt"><input type="radio" name="q3" id="q3d" value="2"><label for="q3d">Tudo depende de mim</label></div>
                         </div>
@@ -1512,6 +1477,36 @@
                     <div class="quiz-restart-row">
                         <button type="button" class="quiz-back" id="quizRestart">↺ refazer o teste</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ FAQ ============================================
+         Última seção de conteúdo do site (task 12): as dúvidas ficam por último, logo antes
+         do CTA final, que continua fechando a página. -->
+    <section class="section faq" id="faq">
+        <div class="wrap faq-grid">
+            <div class="reveal">
+                <span class="label">FAQ</span>
+                <h2 class="h-sec" style="margin-top:16px;">Perguntas <em class="it">frequentes.</em></h2>
+            </div>
+            <div class="faq-list reveal">
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Preciso já ter equipe montada? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Não. A implementação atende escritórios que já têm equipe e também quem está montando agora, estruturamos a função de cada pessoa desde o começo. Se você ainda trabalha sozinho(a), o caminho ideal são os Treinamentos.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Qual software vocês implementam? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Trabalhamos principalmente com Revit e Archicad. Mais importante que a ferramenta é o método: implementamos o BIM na ordem certa para o seu fluxo, não o contrário.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Quanto tempo dura a implementação? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">A jornada completa, do diagnóstico à autonomia, leva em média 6 meses de parceria real, com acompanhamento durante todo o processo.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Onde vocês atendem? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Somos de Belém, Pará, e atendemos escritórios em todo o Brasil de forma remota, com encontros e acompanhamento à distância.</div></div>
                 </div>
             </div>
         </div>
@@ -1737,7 +1732,7 @@
                 pos: 'center 88%',
                 title: 'Joene Louchard',
                 role: 'Co-fundadora · Arquiteta e Designer',
-                body: '<p>A <strong>vivência de mercado</strong> da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro — porque já esteve lá.</p>'
+                body: '<p>A <strong>vivência de mercado</strong> da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro, porque já esteve lá.</p>'
             },
             dayana: {
                 img: 'img/dayana.jpg',
@@ -2021,7 +2016,7 @@
 
         // Copy dos níveis — PENDENTE de validação do dono (task 05). pos = posição do marcador no termômetro (%).
         const LEVELS = {
-            inicio:       { pos: 12, title: 'Você está no <em class="it">Início</em>.',          sub: 'O melhor momento para construir no método certo — e não precisar refazer tudo quando o trabalho crescer.' },
+            inicio:       { pos: 12, title: 'Você está no <em class="it">Início</em>.',          sub: 'O melhor momento para construir no método certo, e não precisar refazer tudo quando o trabalho crescer.' },
             estruturacao: { pos: 50, title: 'Você está em <em class="it">Estruturação</em>.',    sub: 'Você já roda BIM, mas no improviso. Estruturar o processo agora é o que separa crescer com método de crescer no caos.' },
             autonomo:     { pos: 88, title: 'Você está <em class="it">Quase autônomo</em>.',     sub: 'Você já tem método. O próximo passo é consolidar a autonomia da equipe e blindar o padrão que você construiu.' }
         };
