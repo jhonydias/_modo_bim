@@ -111,8 +111,7 @@
         /* Títulos: vermelho sobre fundo claro… */
         h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.015em; line-height: 1.04; color: var(--cereja); }
         /* …e branco sobre fundo cereja/quente. */
-        .cta-final h1, .cta-final h2, .cta-final h3,
-        .gallery-quote h2, .gallery-quote h3 { color: var(--cloud); }
+        .cta-final h1, .cta-final h2, .cta-final h3 { color: var(--cloud); }
         .display { font-size: clamp(40px, 6.4vw, 84px); }
         .h-sec { font-size: clamp(30px, 4.4vw, 56px); line-height: 1.08; }
         em.it { font-style: italic; font-weight: 300; }
@@ -696,21 +695,73 @@
         .vmarquee figure:hover img,
         .vmarquee figure:hover video { filter: grayscale(0) contrast(1); transform: scale(1.04); }
 
-        /* Prova social — única mancha de cor no meio das peças em P&B.
-           Cereja com texto branco, seguindo a regra de cor da marca. */
+        /* Prova social — o bloco é claro; o vermelho fica no balão, que é quem "fala".
+           A mancha de cor no meio das peças em P&B continua, só que menor e com forma. */
         .gallery-quote {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
             align-self: stretch;
             padding: clamp(28px, 3vw, 44px);
+        }
+        .quote-tag { font-family: var(--detail); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: var(--cereja); display: block; margin-bottom: 18px; }
+        .quote-tag b { color: var(--ink-muted); font-family: var(--serif); }
+
+        /* os três na mesma célula: a altura é a do maior, então trocar de depoimento
+           não muda o tamanho do bloco nem empurra as colunas de imagem */
+        .quote-stack { display: grid; width: 100%; }
+        .quote {
+            grid-area: 1 / 1;
+            /* a célula reserva a altura do maior depoimento, mas cada balão fica do
+               tamanho do próprio texto e centrado nesse espaço — esticado, um relato
+               curto viraria um bloco vermelho quase vazio */
+            align-self: center;
+            position: relative;
             background: var(--cereja);
             color: var(--cloud);
-            border-radius: 4px;
+            border-radius: 20px;
+            padding: clamp(30px, 3.4vw, 42px) clamp(24px, 2.8vw, 34px) clamp(24px, 2.8vw, 32px);
             box-shadow: 0 30px 80px -50px rgba(71, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out), visibility 0.7s;
         }
-        .quote-tag { font-family: var(--detail); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: var(--cloud); display: block; margin-bottom: 16px; }
-        .quote-tag b { color: var(--cloud-muted); font-family: var(--serif); }
-        .gallery-quote p { font-family: var(--serif); font-style: italic; font-size: clamp(18px, 2.1vw, 24px); color: var(--cloud); line-height: 1.35; margin-bottom: 24px; }
+        .quote.is-on { opacity: 1; visibility: visible; transform: none; }
+        /* aspas grandes: deixam claro de saída que quem fala é outra pessoa */
+        .quote::before {
+            content: '\201C';
+            position: absolute;
+            top: clamp(2px, 0.6vw, 10px);
+            left: clamp(14px, 1.8vw, 22px);
+            font-family: var(--serif);
+            font-size: clamp(72px, 8vw, 118px);
+            line-height: 1;
+            color: rgba(239, 238, 233, 0.2);
+            pointer-events: none;
+        }
+        /* rabicho do balão */
+        .quote::after {
+            content: '';
+            position: absolute;
+            left: clamp(30px, 3.4vw, 44px);
+            bottom: -13px;
+            width: 0;
+            height: 0;
+            border: 14px solid transparent;
+            border-right: 0;
+            border-bottom: 0;
+            border-top-color: var(--cereja);
+        }
+        .quote p { position: relative; font-family: var(--serif); font-style: italic; font-size: clamp(17px, 1.9vw, 22px); color: var(--cloud); line-height: 1.38; margin-bottom: 20px; }
+        .quote cite { font-family: var(--detail); font-style: normal; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--cloud-muted); }
+
+        .quote-nav { display: flex; gap: 4px; margin: 26px 0 22px; }
+        .qdot { width: 24px; height: 24px; display: grid; place-items: center; }
+        .qdot i { width: 8px; height: 8px; border-radius: 50%; background: rgba(76, 79, 55, 0.3); display: block; transition: background 0.35s var(--ease), transform 0.35s var(--ease-out); }
+        .qdot.is-on i { background: var(--cereja); transform: scale(1.3); }
+        .qdot:hover i, .qdot:focus-visible i { background: var(--cereja); }
 
         /* ============================================
            FAQ
@@ -1308,17 +1359,34 @@
                 </div>
             </div>
 
-            <!-- DEPOIMENTOS: estado honesto enquanto não há relatos reais coletados (task 06).
-                 NÃO inventar nomes/relatos. Ao coletar, substitua o bloco .quote-invite por, ex.:
-                   <blockquote><p>“depoimento real do cliente…”</p>
-                     <span class="quote-tag">Nome Sobrenome — Escritório, Cidade</span></blockquote>
-                 mantendo o card e o estilo já definidos. -->
+            <!-- DEPOIMENTOS reais coletados (task 11). O bloco em si é claro; o vermelho
+                 fica no balão, que é o que "fala". Os três ficam empilhados na mesma célula
+                 de grid, então a altura é sempre a do maior e a troca não empurra a faixa. -->
             <div class="gallery-quote reveal">
-                <div class="quote-invite">
-                    <span class="quote-tag">Prova real <b>_</b></span>
-                    <p>Os primeiros relatos de quem operou em BIM com a gente estão sendo colhidos agora. <em class="it">Quer ser um dos primeiros?</em></p>
-                    <a href="cadastro.html" class="tlink light">Trabalhe com a _modo_bim <span class="arr">→</span></a>
+                <span class="quote-tag">Prova real <b>_</b></span>
+
+                <div class="quote-stack" id="quoteStack">
+                    <blockquote class="quote is-on">
+                        <p>Muito satisfeita com os conteúdos e com o conhecimento em BIM. Através do curso foi possível ter uma melhor noção do processo projetual na prática, desde a concepção até a real execução.</p>
+                        <cite>Cliente Treinamento BIM</cite>
+                    </blockquote>
+                    <blockquote class="quote">
+                        <p>Meninas vocês arrasam, assistir as aulas de vocês me inspirou muito em colocar em prática tudo o que eu aprendi e evoluir no meu aprendizado e desenvolvimento. Sucesso!</p>
+                        <cite>Cliente Implementação BIM</cite>
+                    </blockquote>
+                    <blockquote class="quote">
+                        <p>Antes de fazer o curso, o BIM parecia uma realidade muito distante. O treinamento abriu os meus olhos para entender que, na verdade, ele é o presente e o futuro das construções. Aprendemos que BIM não se resume a softwares, mas está ligado a fluxos, processos, gestão! É o tipo de conhecimento que gostaria de ter adquirido antes.</p>
+                        <cite>Cliente Treinamento BIM</cite>
+                    </blockquote>
                 </div>
+
+                <div class="quote-nav" id="quoteNav" role="group" aria-label="Escolher depoimento">
+                    <button class="qdot" type="button" aria-label="Ver depoimento 1 de 3" aria-pressed="true"><i></i></button>
+                    <button class="qdot" type="button" aria-label="Ver depoimento 2 de 3" aria-pressed="false"><i></i></button>
+                    <button class="qdot" type="button" aria-label="Ver depoimento 3 de 3" aria-pressed="false"><i></i></button>
+                </div>
+
+                <a href="cadastro.html" class="tlink">Trabalhe com a _modo_bim <span class="arr">→</span></a>
             </div>
 
             <div class="vmarquee vmarquee--up">
@@ -1810,6 +1878,46 @@
             }, { threshold: 0.6 });
             statNums.forEach(el => statIO.observe(el));
         }
+    }
+
+    /* ============================================ PROVA SOCIAL — CARROSSEL ============================================
+       Três depoimentos empilhados; só um visível por vez. Gira sozinho, mas para enquanto
+       a pessoa está lendo (mouse ou teclado) e enquanto o bloco não está em cena. Com
+       prefers-reduced-motion não gira: fica o primeiro e os pontinhos fazem a troca. */
+    const quoteStack = document.getElementById('quoteStack');
+    if (quoteStack) {
+        const quotes = quoteStack.querySelectorAll('.quote');
+        const dots = document.querySelectorAll('#quoteNav .qdot');
+        const host = quoteStack.closest('.gallery-quote');
+        const reduceMo = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let atual = 0, giro = null, emCena = false, lendo = false;
+
+        function mostrar(n) {
+            atual = (n + quotes.length) % quotes.length;
+            quotes.forEach((q, k) => q.classList.toggle('is-on', k === atual));
+            dots.forEach((d, k) => {
+                d.classList.toggle('is-on', k === atual);
+                d.setAttribute('aria-pressed', k === atual ? 'true' : 'false');
+            });
+        }
+        function parar() { clearInterval(giro); giro = null; }
+        function girar() {
+            parar();
+            if (reduceMo || !emCena || lendo) return;
+            giro = setInterval(() => mostrar(atual + 1), 7000);
+        }
+
+        dots.forEach((d, k) => d.addEventListener('click', () => { mostrar(k); girar(); }));
+        host.addEventListener('mouseenter', () => { lendo = true; parar(); });
+        host.addEventListener('mouseleave', () => { lendo = false; girar(); });
+        host.addEventListener('focusin', () => { lendo = true; parar(); });
+        host.addEventListener('focusout', () => { lendo = false; girar(); });
+
+        new IntersectionObserver((entries) => {
+            entries.forEach(e => { emCena = e.isIntersecting; girar(); });
+        }, { threshold: 0.35 }).observe(host);
+
+        mostrar(0);
     }
 
     /* ============================================ GALERIA — VÍDEOS DA FAIXA ============================================

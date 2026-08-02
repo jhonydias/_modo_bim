@@ -7,6 +7,13 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-08-02
 
+### Prova social com depoimentos reais (task 11) — `index.html`
+- Entraram os **três depoimentos coletados** no lugar do bloco provisório da task 06, que dizia que os relatos ainda estavam sendo colhidos. A regra de "não inventar depoimento" cumpriu o papel até aqui e sai junto com o bloco.
+- **O vermelho deixou de ser o fundo e virou o balão.** O `.gallery-quote` passou a claro, e o depoimento fica num balão cereja com rabicho — quem fala ali é o cliente, não a página. Aspas duplas grandes em creme translúcido no canto superior deixam isso explícito de saída.
+- **Troca suave entre os três**, com giro automático a cada 7 s. Para enquanto a pessoa está lendo (`mouseenter`/`focusin`) e enquanto o bloco não está em cena; com `prefers-reduced-motion` não gira, e os pontinhos fazem a troca manual. `aria-pressed` acompanha o ponto ativo; os depoimentos ocultos ficam `visibility: hidden`, fora da árvore de acessibilidade.
+- **A altura não oscila na troca.** Os três ficam empilhados na mesma célula de grid, então o bloco reserva a altura do maior; cada balão usa `align-self: center` e fica do tamanho do próprio texto — esticado, o depoimento curto viraria um retângulo vermelho quase vazio. Medido: 545 px nos três estados.
+- `.gallery-quote` saiu do seletor que força `color: var(--cloud)` em títulos sobre fundo cereja — o bloco não é mais escuro.
+
 ### Faixa "A _modo_bim no mundo real" com material real — `index.html`, `img/real/`
 - As seis fotos de peças da marca eram provisórias e saíram. Entraram **4 fotos e 6 vídeos** de treinamentos e equipes trabalhando, cinco por coluna, alternando foto e clipe. O título da seção passou de "Uma marca que você pega na mão" para **"A _modo_bim acontecendo"**, que é o que o material novo mostra.
 - **Os tiles viraram retrato** (`aspect-ratio: 3 / 4`), porque as fotos e cinco dos seis clipes foram feitos em pé; `.mq-wide` (`16 / 9`) é a exceção deitada. A largura ganhou teto de 340 px: na largura cheia da coluna, um tile retrato fica mais alto que a faixa inteira e só caberia um de cada vez. A faixa subiu para `clamp(460px, 70vh, 740px)` no desktop e `clamp(380px, 56vh, 520px)` no mobile.
