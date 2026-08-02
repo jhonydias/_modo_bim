@@ -3,12 +3,19 @@
  *  _modo_bim — Backend Apps Script
  *  2026
  * ============================================================
- *  Recebe dois tipos de formulário (HTML hospedados no GitHub
+ *  Recebe três tipos de formulário (HTML hospedados no GitHub
  *  Pages) e armazena em abas separadas da mesma planilha,
  *  gerando protocolo único e disparando e-mails de confirmação.
  *
- *    tipo: 'cadastro'      → aba "Cadastros"      · MB-2026-NNNN
+ *    tipo: 'orcamento'     → aba "Orçamentos"      · OR-2026-NNNN
+ *    tipo: 'cadastro'      → aba "Cadastros"       · MB-2026-NNNN
  *    tipo: 'lista-espera'  → aba "Lista de Espera" · LE-2026-NNNN
+ *
+ *  'orcamento' é o funil de entrada (cadastro.html, linkado na landing):
+ *  diagnóstico do cenário + agendamento da reunião de alinhamento.
+ *  'cadastro' são os dados contratuais (contrato.html, enviado por URL
+ *  direta só quando o cliente vai fechar) — por isso ele não aparece
+ *  em nenhum link público.
  *
  *  Cada envio também é espelhado no Notion (software oficial da
  *  _modo_bim) via API. A planilha permanece como backup e fonte
@@ -43,6 +50,7 @@ const CONFIG = {
  *  Extensões › Apps Script › Configurações do projeto › Propriedades do script:
  *
  *    NOTION_TOKEN            → secret da integração interna (ntn_...)
+ *    NOTION_DB_ORCAMENTOS    → ID do database "Orçamentos"
  *    NOTION_DB_CADASTROS     → ID do database "Cadastros"
  *    NOTION_DB_LISTA_ESPERA  → ID do database "Lista de Espera"
  *
@@ -59,6 +67,34 @@ const NOTION = {
  *  SCHEMAS — configuração por tipo de formulário
  * ============================================================ */
 const FORMS = {
+    'orcamento': {
+        SHEET_NAME: 'Orçamentos',
+        NOTION_DB_KEY: 'NOTION_DB_ORCAMENTOS',
+        PROTOCOL_PREFIX: 'OR',
+        LABEL: 'Orçamento',
+        COLUMNS: [
+            'Timestamp', 'Protocolo',
+            'Nome Completo', 'Empresa / Escritório', 'E-mail', 'Telefone / WhatsApp',
+            'Produtos e Serviços', 'Gargalo Atual', 'Expectativa com BIM',
+            'Pessoas no Treinamento', 'Software de Interesse', 'Nível da Equipe',
+            'Reunião (1ª opção)', 'Reunião (2ª opção)', 'Observações',
+            'User Agent'
+        ],
+        REQUIRED: {
+            nomeCompleto: 'Nome completo',
+            empresa: 'Empresa / Escritório',
+            email: 'E-mail de contato',
+            telefone: 'Telefone / WhatsApp',
+            produtosServicos: 'Produtos ou serviços',
+            gargalo: 'Maior problema ou gargalo',
+            objetivoBIM: 'Expectativa com o BIM',
+            qtdPessoas: 'Quantidade de pessoas no treinamento',
+            softwareInteresse: 'Software de interesse',
+            nivelEquipe: 'Nível da equipe',
+            reuniao1: 'Reunião — 1ª opção',
+            reuniao2: 'Reunião — 2ª opção'
+        }
+    },
     'cadastro': {
         SHEET_NAME: 'Cadastros',
         NOTION_DB_KEY: 'NOTION_DB_CADASTROS',
@@ -257,6 +293,16 @@ function appendToSheet_(data, protocolo, formConfig) {
  * Constrói a linha respeitando a ordem das colunas de cada schema.
  */
 function buildRow_(d, timestamp, protocolo, formConfig) {
+    if (formConfig.PROTOCOL_PREFIX === 'OR') {
+        return [
+            timestamp, protocolo,
+            d.nomeCompleto || '', d.empresa || '', d.email || '', d.telefone || '',
+            d.produtosServicos || '', d.gargalo || '', d.objetivoBIM || '',
+            d.qtdPessoas || '', d.softwareInteresse || '', d.nivelEquipe || '',
+            formatDataHora_(d.reuniao1), formatDataHora_(d.reuniao2), d.observacoes || '',
+            d.userAgent || ''
+        ];
+    }
     if (formConfig.PROTOCOL_PREFIX === 'MB') {
         return [
             timestamp, protocolo,
@@ -358,6 +404,28 @@ function pushNotionPage_(data, protocolo, formConfig) {
 function buildNotionProps_(d, protocolo, formConfig) {
     const recebidoEm = notionDate_(new Date());
 
+    if (formConfig.PROTOCOL_PREFIX === 'OR') {
+        return {
+            'Nome Completo':          nTitle_(d.nomeCompleto),
+            'Protocolo':              nText_(protocolo),
+            'Recebido em':            nDate_(recebidoEm),
+            'Empresa':                nText_(d.empresa),
+            'E-mail':                 nEmail_(d.email),
+            'Telefone':               nPhone_(d.telefone),
+            'Produtos e Serviços':    nText_(d.produtosServicos),
+            'Gargalo Atual':          nText_(d.gargalo),
+            'Expectativa com BIM':    nText_(d.objetivoBIM),
+            'Pessoas no Treinamento': nNumber_(d.qtdPessoas),
+            'Software de Interesse':  nMultiSelect_(d.softwareInteresse),
+            'Nível da Equipe':        nSelect_(d.nivelEquipe),
+            'Reunião (1ª opção)':     nDate_(notionDataHora_(d.reuniao1)),
+            'Reunião (2ª opção)':     nDate_(notionDataHora_(d.reuniao2)),
+            'Observações':            nText_(d.observacoes),
+            'Status':                 nSelect_('Novo'),
+            'User Agent':             nText_(d.userAgent)
+        };
+    }
+
     if (formConfig.PROTOCOL_PREFIX === 'MB') {
         return {
             'Razão Social':        nTitle_(d.razaoSocial),
@@ -419,6 +487,25 @@ function nSelect_(v) {
     return { select: s ? { name: s.replace(/,/g, ' /').substring(0, 100) } : null };
 }
 
+/**
+ * Multi-select: o formulário manda os valores separados por ", ".
+ * Aqui a vírgula é o separador de verdade — ao contrário de nSelect_,
+ * onde ela quebraria uma opção só em duas.
+ */
+function nMultiSelect_(v) {
+    const s = notionStr_(v);
+    if (!s) return { multi_select: [] };
+    const nomes = s.split(',')
+        .map(x => x.trim().substring(0, 100))
+        .filter(Boolean);
+    return { multi_select: nomes.map(name => ({ name: name })) };
+}
+
+function nNumber_(v) {
+    const n = Number(notionStr_(v));
+    return { number: isNaN(n) || notionStr_(v) === '' ? null : n };
+}
+
 function nEmail_(v) {
     const s = notionStr_(v);
     return { email: (s && validarEmail_(s)) ? s : null };
@@ -450,7 +537,42 @@ function notionDate_(dateObj) {
     return Utilities.formatDate(dateObj, tz, "yyyy-MM-dd'T'HH:mm:ssXXX");
 }
 
+/**
+ * `datetime-local` chega como "2026-08-10T14:30" — sem fuso. A API do
+ * Notion aceita, mas guarda como horário sem timezone e o app exibe no
+ * fuso de quem lê; carimbar o fuso do script mantém o horário que a
+ * pessoa escolheu. Formato só validado, nunca reinterpretado por Date():
+ * `new Date("2026-08-10T14:30")` mudaria de significado conforme o
+ * servidor que rodar o script.
+ */
+function notionDataHora_(v) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(notionStr_(v));
+    if (!m) return '';
+    const tz = Session.getScriptTimeZone() || 'America/Belem';
+    const offset = Utilities.formatDate(new Date(), tz, 'XXX');   // ex.: -03:00
+    return m[1] + '-' + m[2] + '-' + m[3] + 'T' + m[4] + ':' + m[5] + ':00' + offset;
+}
+
+/**
+ * Mesma string, agora legível na planilha e no e-mail: 10/08/2026 14:30.
+ */
+function formatDataHora_(v) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(notionStr_(v));
+    if (!m) return notionStr_(v);
+    return m[3] + '/' + m[2] + '/' + m[1] + ' ' + m[4] + ':' + m[5];
+}
+
 /* --- Fila de reenvio ------------------------------------------------- */
+
+/**
+ * Nome do tipo a partir do schema — é ele que a fila de reenvio grava e
+ * usa depois para achar o FORMS de volta. Derivado, não escrito à mão:
+ * um tipo novo entrava na fila com o rótulo errado.
+ */
+function tipoDoForm_(formConfig) {
+    const tipo = Object.keys(FORMS).filter(k => FORMS[k].PROTOCOL_PREFIX === formConfig.PROTOCOL_PREFIX)[0];
+    return tipo || '';
+}
 
 function queueNotionRetry_(data, protocolo, formConfig, error) {
     try {
@@ -467,7 +589,7 @@ function queueNotionRetry_(data, protocolo, formConfig, error) {
         sheet.appendRow([
             Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm:ss'),
             protocolo,
-            formConfig.PROTOCOL_PREFIX === 'MB' ? 'cadastro' : 'lista-espera',
+            tipoDoForm_(formConfig),
             0,
             String(error).substring(0, 500),
             JSON.stringify(data).substring(0, 45000)
@@ -571,6 +693,11 @@ function validatePayload_(data, formConfig) {
         if (data.cnpj && !validarCNPJ_(data.cnpj)) errors.push('CNPJ inválido');
         if (data.cpfRepresentante && !validarCPF_(data.cpfRepresentante)) errors.push('CPF inválido');
         if (data.cep && data.cep.replace(/\D/g, '').length !== 8) errors.push('CEP inválido');
+    } else if (formConfig.PROTOCOL_PREFIX === 'OR') {
+        if (data.telefone && !validarTelefone_(data.telefone)) errors.push('Telefone inválido');
+        if (data.qtdPessoas && !validarQuantidade_(data.qtdPessoas)) errors.push('Quantidade de pessoas inválida');
+        if (data.reuniao1 && !validarDataHora_(data.reuniao1)) errors.push('1ª opção de reunião inválida');
+        if (data.reuniao2 && !validarDataHora_(data.reuniao2)) errors.push('2ª opção de reunião inválida');
     } else {
         // Lista de espera
         if (data.telefone && !validarTelefone_(data.telefone)) errors.push('Telefone inválido');
@@ -617,9 +744,26 @@ function validarTelefone_(tel) {
     return digits.length === 10 || digits.length === 11;
 }
 
+function validarQuantidade_(v) {
+    const n = Number(v);
+    return !isNaN(n) && n >= 1 && n <= 999 && n === Math.floor(n);
+}
+
+/**
+ * Aceita só o formato do `datetime-local` ("2026-08-10T14:30", com
+ * segundos opcionais). Não checa se a data é futura: o navegador já
+ * faz isso e um relógio adiantado do cliente não deve derrubar o envio.
+ */
+function validarDataHora_(v) {
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(String(v).trim());
+}
+
 /* ============================================================
  *  SANITIZAÇÃO
  * ============================================================ */
+
+/* Campos de texto livre — cabem uma resposta, não um nome próprio. */
+const CAMPOS_LONGOS = ['objetivo', 'produtosServicos', 'gargalo', 'objetivoBIM', 'observacoes'];
 
 function sanitizeData_(data) {
     const cleaned = {};
@@ -628,8 +772,7 @@ function sanitizeData_(data) {
         if (typeof value === 'string') {
             value = value.trim();
             value = value.replace(/<[^>]*>/g, '');
-            // Campo de texto livre (objetivo) precisa de mais espaço
-            const maxLen = key === 'objetivo' ? 2000 : 500;
+            const maxLen = CAMPOS_LONGOS.indexOf(key) !== -1 ? 2000 : 500;
             if (value.length > maxLen) value = value.substring(0, maxLen);
         }
         cleaned[key] = value;
@@ -661,9 +804,12 @@ function checkRateLimit_(data, tipo) {
 
 function sendAdminEmail_(data, protocolo, formConfig) {
     const subject = `[${CONFIG.COMPANY_NAME}] ${formConfig.LABEL} · ${protocolo}`;
-    const rows = (formConfig.PROTOCOL_PREFIX === 'MB')
-        ? renderCadastroRows_(data)
-        : renderListaEsperaRows_(data);
+    const renderers = {
+        'OR': renderOrcamentoRows_,
+        'MB': renderCadastroRows_,
+        'LE': renderListaEsperaRows_
+    };
+    const rows = renderers[formConfig.PROTOCOL_PREFIX](data);
 
     const html = `
     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #EFEEE9; padding: 0;">
@@ -690,6 +836,24 @@ function sendAdminEmail_(data, protocolo, formConfig) {
         htmlBody: html,
         name: CONFIG.COMPANY_NAME
     });
+}
+
+function renderOrcamentoRows_(d) {
+    return `
+        ${renderRow_('Nome', d.nomeCompleto)}
+        ${renderRow_('Empresa / Escritório', d.empresa)}
+        ${renderRow_('E-mail', d.email)}
+        ${renderRow_('Telefone', d.telefone)}
+        ${renderRow_('Produtos e serviços', d.produtosServicos)}
+        ${renderRow_('Gargalo hoje', d.gargalo)}
+        ${renderRow_('Expectativa com BIM', d.objetivoBIM)}
+        ${renderRow_('Pessoas no treinamento', d.qtdPessoas)}
+        ${renderRow_('Software de interesse', d.softwareInteresse)}
+        ${renderRow_('Nível da equipe', d.nivelEquipe)}
+        ${renderRow_('Reunião — 1ª opção', formatDataHora_(d.reuniao1))}
+        ${renderRow_('Reunião — 2ª opção', formatDataHora_(d.reuniao2))}
+        ${renderRow_('Observações', d.observacoes)}
+    `;
 }
 
 function renderCadastroRows_(d) {
@@ -728,21 +892,34 @@ function renderListaEsperaRows_(d) {
 function sendClientEmail_(data, protocolo, formConfig) {
     if (!data.email || !validarEmail_(data.email)) return;
 
-    const isWaitlist = formConfig.PROTOCOL_PREFIX === 'LE';
-    const subject = isWaitlist
-        ? `Você está na lista de espera · ${protocolo}`
-        : `Recebemos seu cadastro · ${protocolo}`;
-
+    const prefix = formConfig.PROTOCOL_PREFIX;
     const saudacao = escapeHtml_(
-        isWaitlist
-            ? (data.nomeCompleto || 'tudo bem')
-            : (data.razaoSocial || 'cliente')
+        prefix === 'MB'
+            ? (data.razaoSocial || 'cliente')
+            : (data.nomeCompleto || 'tudo bem')
     );
 
-    const titulo = isWaitlist ? 'Você está dentro.' : 'Recebido.';
-    const corpo = isWaitlist
-        ? `Olá, ${saudacao}. Sua vaga na lista de espera da próxima turma está garantida. Avisaremos você pelo e-mail e WhatsApp informados assim que abrirmos as inscrições.`
-        : `Olá, ${saudacao}. Seja bem-vindo à _modo_bim, estamos muito felizes em trabalharmos juntos. Suas informações chegaram até nós com sucesso. Em breve, nossa equipe entrará em contato.`;
+    const textos = {
+        'OR': {
+            subject: `Recebemos sua solicitação · ${protocolo}`,
+            titulo: 'Recebido.',
+            corpo: `Olá, ${saudacao}. Sua solicitação de orçamento chegou até nós. Vamos analisar o cenário que você descreveu e confirmar por este e-mail uma das duas opções de horário que você indicou para a reunião de alinhamento.`
+        },
+        'MB': {
+            subject: `Recebemos seu cadastro · ${protocolo}`,
+            titulo: 'Recebido.',
+            corpo: `Olá, ${saudacao}. Seja bem-vindo à _modo_bim, estamos muito felizes em trabalharmos juntos. Suas informações chegaram até nós com sucesso. Em breve, nossa equipe entrará em contato.`
+        },
+        'LE': {
+            subject: `Você está na lista de espera · ${protocolo}`,
+            titulo: 'Você está dentro.',
+            corpo: `Olá, ${saudacao}. Sua vaga na lista de espera da próxima turma está garantida. Avisaremos você pelo e-mail e WhatsApp informados assim que abrirmos as inscrições.`
+        }
+    }[prefix];
+
+    const subject = textos.subject;
+    const titulo = textos.titulo;
+    const corpo = textos.corpo;
 
     const html = `
     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #EFEEE9;">
@@ -819,6 +996,32 @@ function escapeHtml_(s) {
  *  TESTES — execute no editor para validar permissões
  * ============================================================ */
 
+function testeOrcamento() {
+    const fakeData = {
+        tipo: 'orcamento',
+        nomeCompleto: 'Maria das Graças',
+        empresa: 'Glimmerock Arquitetura',
+        email: 'jhonymarlon@gmail.com',
+        telefone: '(91) 99999-9999',
+        produtosServicos: 'Projetos de arquitetura residencial e gerenciamento de obras.',
+        gargalo: 'Retrabalho e incompatibilidade entre os projetos complementares.',
+        objetivoBIM: 'Reduzir erros em obra e padronizar as entregas do escritório.',
+        qtdPessoas: '8',
+        softwareInteresse: 'Revit, Navisworks',
+        nivelEquipe: 'Equipe mista',
+        reuniao1: '2026-09-10T14:30',
+        reuniao2: '2026-09-12T09:00',
+        observacoes: 'Preferência por reunião online.',
+        userAgent: 'Teste manual via editor'
+    };
+
+    const formConfig = FORMS['orcamento'];
+    ensureSheetExists_(formConfig);
+    const protocolo = generateProtocol_(formConfig);
+    appendToSheet_(fakeData, protocolo, formConfig);
+    Logger.log('✅ Orçamento OK — Protocolo: ' + protocolo);
+}
+
 function testeCadastro() {
     const fakeData = {
         tipo: 'cadastro',
@@ -887,33 +1090,47 @@ function testeManual() {
  * cria uma página de teste em cada database configurado.
  */
 function testeNotion() {
-    ['cadastro', 'lista-espera'].forEach(tipo => {
+    const fakes = {
+        'orcamento': {
+            nomeCompleto: '[TESTE] Maria das Graças', empresa: 'Glimmerock Arquitetura',
+            email: 'jhonymarlon@gmail.com', telefone: '(91) 99999-9999',
+            produtosServicos: 'Projetos de arquitetura residencial e gerenciamento de obras.',
+            gargalo: 'Retrabalho e incompatibilidade entre os complementares.',
+            objetivoBIM: 'Reduzir erros em obra e padronizar as entregas.',
+            qtdPessoas: '8',
+            // com vírgula de propósito: exercita a quebra do nMultiSelect_()
+            softwareInteresse: 'Revit, Navisworks',
+            nivelEquipe: 'Equipe mista',
+            reuniao1: '2026-09-10T14:30', reuniao2: '2026-09-12T09:00',
+            observacoes: 'Preferência por reunião online.', userAgent: 'testeNotion()'
+        },
+        'cadastro': {
+            razaoSocial: '[TESTE] Glimmerock Arquitetura LTDA', nomeFantasia: 'Glimmerock',
+            cnpj: '11.222.333/0001-81', ramoAtividade: 'Arquitetura',
+            cpfRepresentante: '111.444.777-35', cargo: 'Sócia-Diretora',
+            email: 'jhonymarlon@gmail.com', telefone: '(91) 99999-9999',
+            site: 'www.glimmerock.com.br', cep: '66000-000',
+            logradouro: 'Av. Presidente Vargas', numero: '100', bairro: 'Campina',
+            cidade: 'Belém', estado: 'PA', userAgent: 'testeNotion()'
+        },
+        'lista-espera': {
+            nomeCompleto: '[TESTE] Maria das Graças', email: 'jhonymarlon@gmail.com',
+            telefone: '(91) 98888-7777', cidade: 'Belém', estado: 'PA',
+            empresa: 'Glimmerock Arquitetura', cargo: 'Arquiteta',
+            softwareAtual: 'AutoCAD', nivelBIM: 'Iniciante', softwareInteresse: 'Archicad',
+            objetivo: 'Quero aprender BIM do zero para aplicar no escritório.',
+            comoConheceu: 'Instagram', bimclub: 'Sim', userAgent: 'testeNotion()'
+        }
+    };
+
+    Object.keys(fakes).forEach(tipo => {
         const formConfig = FORMS[tipo];
         const dbId = PropertiesService.getScriptProperties().getProperty(formConfig.NOTION_DB_KEY);
         if (!dbId) {
             Logger.log('⚠️  ' + formConfig.NOTION_DB_KEY + ' não configurado — pulando ' + tipo);
             return;
         }
-        const fake = (tipo === 'cadastro')
-            ? {
-                razaoSocial: '[TESTE] Glimmerock Arquitetura LTDA', nomeFantasia: 'Glimmerock',
-                cnpj: '11.222.333/0001-81', ramoAtividade: 'Arquitetura',
-                cpfRepresentante: '111.444.777-35', cargo: 'Sócia-Diretora',
-                email: 'jhonymarlon@gmail.com', telefone: '(91) 99999-9999',
-                site: 'www.glimmerock.com.br', cep: '66000-000',
-                logradouro: 'Av. Presidente Vargas', numero: '100', bairro: 'Campina',
-                cidade: 'Belém', estado: 'PA', userAgent: 'testeNotion()'
-            }
-            : {
-                nomeCompleto: '[TESTE] Maria das Graças', email: 'jhonymarlon@gmail.com',
-                telefone: '(91) 98888-7777', cidade: 'Belém', estado: 'PA',
-                empresa: 'Glimmerock Arquitetura', cargo: 'Arquiteta',
-                softwareAtual: 'AutoCAD', nivelBIM: 'Iniciante', softwareInteresse: 'Archicad',
-                objetivo: 'Quero aprender BIM do zero para aplicar no escritório.',
-                comoConheceu: 'Instagram', bimclub: 'Sim', userAgent: 'testeNotion()'
-            };
-
-        const res = pushNotionPage_(fake, formConfig.PROTOCOL_PREFIX + '-TESTE-0000', formConfig);
+        const res = pushNotionPage_(fakes[tipo], formConfig.PROTOCOL_PREFIX + '-TESTE-0000', formConfig);
         Logger.log((res.ok ? '✅ ' : '❌ ') + tipo + ' → ' + (res.ok ? res.pageId : res.error));
     });
 }
