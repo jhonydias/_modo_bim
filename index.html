@@ -289,6 +289,25 @@
         }
         .sec-link:hover { opacity: 1; }
         .sec-link.active { color: var(--cereja-deep); opacity: 1; }
+        /* Link para fora da landing dentro do selecionador (produtos.html). Herda a
+           tipografia do .sec-link, mas não é um painel: nunca fica "ativo" e não entra
+           na conta do scroll horizontal. Encostado à direita, com seta para dizer que sai daqui. */
+        .sec-out {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--serif);
+            font-size: clamp(17px, 2.1vw, 22px);
+            font-weight: 400;
+            line-height: 1;
+            color: var(--cereja);
+            white-space: nowrap;
+            opacity: 0.62;
+            transition: opacity 0.3s var(--ease), gap 0.35s var(--ease-out);
+        }
+        .sec-out:hover { opacity: 1; gap: 12px; }
+        .sec-out .arr { font-size: 0.78em; }
         .sec-indicator {
             position: absolute;
             bottom: 8px;
@@ -1006,7 +1025,7 @@
         @media (max-width: 520px) {
             .section-nav { gap: 16px; overflow-x: auto; scrollbar-width: none; padding-right: 8px; }
             .section-nav::-webkit-scrollbar { display: none; }
-            .sec-link { font-size: clamp(13px, 3.6vw, 16px); }
+            .sec-link, .sec-out { font-size: clamp(13px, 3.6vw, 16px); }
             .nav-links { left: var(--gutter); right: var(--gutter); min-width: 0; }
             .hero-copy .display { font-size: clamp(33px, 9vw, 42px); }
             .steps { grid-template-columns: 1fr; }
@@ -1070,9 +1089,10 @@
             <a href="#nossos-servicos">nossos serviços</a>
             <a href="#implementacoes">implementações</a>
             <a href="#treinamentos">treinamentos</a>
+            <a href="produtos.html">produtos</a>
             <a href="#equipe">quem somos</a>
             <a href="#faq">dúvidas</a>
-            <a href="cadastro.html" class="nav-cta">solicite uma proposta</a>
+            <a href="cadastro.html" class="nav-cta">Solicite uma proposta</a>
         </nav>
     </div>
     <div class="section-bar" id="sectionBar">
@@ -1082,6 +1102,9 @@
                 <a href="#nossos-servicos" class="sec-link" data-target="nossos-servicos">nossos serviços</a>
                 <a href="#implementacoes" class="sec-link" data-target="implementacoes">implementações</a>
                 <a href="#treinamentos" class="sec-link" data-target="treinamentos">treinamentos</a>
+                <!-- Produtos é outra página, não um painel: fica fora do array de .sec-link
+                     (que alimenta o índice do scroll horizontal) e por isso usa .sec-out. -->
+                <a href="produtos.html" class="sec-out">produtos <span class="arr">→</span></a>
                 <span class="sec-indicator" aria-hidden="true"><i></i><b>_</b><i></i></span>
             </nav>
         </div>
@@ -1599,6 +1622,7 @@
                 <a href="#nossos-servicos">nossos serviços</a>
                 <a href="#implementacoes">implementações</a>
                 <a href="#treinamentos">treinamentos</a>
+                <a href="produtos.html">produtos</a>
                 <a href="#equipe">quem somos</a>
                 <a href="cadastro.html">proposta</a>
                 <a href="lista-espera.html">lista de espera</a>
