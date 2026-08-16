@@ -5,6 +5,26 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ---
 
+## 2026-08-16
+
+### Copy, CTAs e FAQ (task 16) — `index.html`, `cadastro.html`
+- **"orçamento" virou "proposta" em todo o texto visível.** São 8 pontos no `index.html` (nav-cta, botão do hero, rodapés de "nossos serviços" e de "implementações", botão do resultado do quiz, CTA final, link do rodapé e o `text` de `PROFILES.implementacao` no JS do quiz) e 4 no `cadastro.html` (meta description, `<title>`, eyebrow e o botão de capa). O que o cliente pede é uma proposta comercial; "orçamento" reduzia a conversa a preço.
+- **Duas ocorrências ficaram de fora, de propósito.** `index.html:1289` ("no seu ritmo e no seu orçamento") é o sentido financeiro, dinheiro disponível, não o documento. E `cadastro.html:962` mantém `FORM_TYPE = 'orcamento'`: esse identificador é chave de integração, aparece em `script/Code.gs` (`FORMS['orcamento']`, aba "Orçamentos", prefixo `OR-2026-NNNN`) e em `script/notion-bootstrap.mjs` (`NOTION_DB_ORCAMENTOS`) — renomear quebraria a planilha e o Notion sem ganho nenhum de leitura.
+- **Passo 03 das implementações:** "Capacitação prática da equipe **na metodologia** e no software" → "**nos processos** e no software". É o que a etapa entrega de fato, e não repete a palavra que já dá nome ao método.
+- **Abertura da aba Treinamentos:** "Aqui não é consultoria" → "**Aqui não é uma implementação**". O contraste útil ali é com o outro produto da casa, não com a categoria do negócio: quem lê essa aba está decidindo entre Treinamento e Implementação.
+- **CTA da faixa "prova real":** "Trabalhe com a _modo_bim" → "Solicite uma proposta", alinhando o link ao mesmo verbo dos outros CTAs que levam ao `cadastro.html`.
+- **FAQ, primeira pergunta:** "Preciso já ter equipe montada?" virou "**Preciso ter uma equipe grande?**". A resposta antiga dizia que a implementação também serve para quem está montando equipe agora, o que contraria o corte comercial real: implementação a partir de 3 pessoas, abaixo disso o caminho é Treinamento. A resposta nova diz isso com todas as letras.
+- **Botão do BIM Club** deixou de cair na `lista-espera.html` e passou a abrir a comunidade no WhatsApp (`chat.whatsapp.com/DPEoInYVkh6J0Af3Xw2A3Q`) em nova aba, com `rel="noopener"`. Eram coisas diferentes empilhadas no mesmo destino: lista de espera é dos Treinamentos, BIM Club é a comunidade. Os outros três links para `lista-espera.html` (aba Treinamentos, rodapé e resultado "treinamento" do quiz) continuam como estavam.
+- Conferido por varredura: o único "orçamento" que sobra no HTML é o da linha 1289, e nenhum outro CTA mudou de destino.
+
+### Refinamento técnico da task 15 — `tasks/16/`, `tasks/17/`
+- A task 15 pedia o refinamento das duas frentes soltas, não a implementação delas. As solicitações foram quebradas em duas tasks executáveis, cada uma com arquivo, linha e texto exato de antes/depois.
+- **`tasks/16` — copy, CTAs e FAQ:** "orçamento" → "proposta" nos 8 pontos do `index.html` e nos 4 do `cadastro.html`, descrição do passo 03 de implementações, frase de abertura dos treinamentos, CTA da faixa "prova real", nova pergunta de FAQ sobre tamanho de equipe (corte de 3 pessoas) e o botão do BIM Club apontando para a comunidade no WhatsApp (`chat.whatsapp.com/DPEoInYVkh6J0Af3Xw2A3Q`), em nova aba, sem mexer nos outros links de lista de espera. Ficou registrado o que **não** pode mudar junto: o `orçamento` de `index.html:1289` é o sentido financeiro, e o `FORM_TYPE = 'orcamento'` de `cadastro.html:962` é chave de integração com `script/Code.gs` e com o Notion.
+- **`tasks/17` — aba Produtos:** página `produtos.html` nova (shell da landing, sem barra selecionadora nem seções horizontais), grade de cards que são só link de redirecionamento para Kiwify/Hotmart, começando por Diagnóstico e E-book gratuitos. O ponto técnico que a task fixa: a `.section-nav` não é menu — cada `.sec-link[data-target]` alimenta o índice do scroll horizontal (`index.html:1636-1638` e `1715`), então o link de produtos entra no `.nav-links` e no `footer-nav`, e nunca como um quinto `.sec-link`.
+- Pendência do cliente anotada dentro da task 17: nome, descrição e URLs de redirecionamento dos dois produtos.
+
+---
+
 ## 2026-08-02
 
 ### Mais uma foto e mais um clipe na faixa "A _modo_bim acontecendo" — `index.html`, `img/real/`
