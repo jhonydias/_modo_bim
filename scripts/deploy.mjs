@@ -11,7 +11,7 @@
  *
  * Uso: npm run deploy
  */
-import { execFileSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -25,11 +25,15 @@ const DEPLOYMENT_ID = 'AKfycbyRHztm-hPx5A_k4-BCxOQje0Stq-ifz_VGU4u3Z7fbOy2_rAmfW
 function clasp(...args) {
     console.log('\n$ clasp ' + args.join(' '));
     try {
-        return execFileSync('npx', ['--no-install', 'clasp', ...args], {
+        // O binário do clasp no Windows é um .cmd, que o Node só executa via
+        // shell. Daí execSync com string única: execFileSync + shell:true
+        // dispararia DEP0190 a cada publicação.
+        const bin = join(RAIZ, 'node_modules', '.bin', 'clasp');
+        const cmd = `"${bin}" ` + args.map((a) => (/[\s"]/.test(a) ? `"${a.replace(/"/g, '\\"')}"` : a)).join(' ');
+        return execSync(cmd, {
             cwd: RAIZ,
             encoding: 'utf8',
-            stdio: ['inherit', 'pipe', 'inherit'],
-            shell: process.platform === 'win32'
+            stdio: ['inherit', 'pipe', 'inherit']
         });
     } catch {
         // O clasp já imprimiu o próprio erro em stderr. Aqui só traduzimos os
