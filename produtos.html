@@ -228,6 +228,10 @@
             gap: clamp(20px, 2.6vw, 30px);
             margin-top: clamp(44px, 6vw, 72px);
         }
+        /* Enquanto há um único produto, o card ocupa uma coluna só (largura
+           controlada, alinhado à esquerda com o título). Ao voltar a ter dois
+           ou mais, é só remover o modificador e o grid volta a repeat(2, 1fr). */
+        .prod-grid--single { grid-template-columns: minmax(0, 620px); }
         /* O card é o link inteiro. Produto sem link ainda usa <div> no lugar do <a>
            (.is-soon), então nada aqui depende da tag. */
         .prod-card {
@@ -424,22 +428,15 @@
                 <p class="lead">Materiais diretos, tirados do mesmo método que aplicamos dentro dos escritórios. Comece pelos gratuitos e vá no seu ritmo.</p>
             </div>
 
-            <div class="prod-grid">
-                <!-- Diagnóstico BIM — quando o link existir:
-                <a class="prod-card reveal" href="URL_DO_DIAGNOSTICO" target="_blank" rel="noopener"> ... <span class="prod-go">acessar <span class="arr">→</span></span></a> -->
+            <div class="prod-grid prod-grid--single">
+                <!-- Diagnóstico BIM + E-book: um único produto gratuito.
+                     Quando o link existir, troque a <div class="prod-card is-soon"> pelo <a>
+                     abaixo e a tag "Em breve · gratuito" por "Gratuito":
+                <a class="prod-card reveal" href="URL_DO_PRODUTO" target="_blank" rel="noopener"> ... <span class="prod-go">acessar <span class="arr">→</span></span></a> -->
                 <div class="prod-card is-soon reveal">
                     <span class="prod-tag">Em breve · gratuito</span>
-                    <h2 class="prod-name">Diagnóstico BIM</h2>
-                    <p class="prod-desc">_Um raio-x do estágio de maturidade BIM do seu escritório, com o que atacar primeiro.</p>
-                    <span class="prod-go">em breve</span>
-                </div>
-
-                <!-- E-book — quando o link existir:
-                <a class="prod-card reveal" href="URL_DO_EBOOK" target="_blank" rel="noopener"> ... <span class="prod-go">acessar <span class="arr">→</span></span></a> -->
-                <div class="prod-card is-soon reveal">
-                    <span class="prod-tag">Em breve · gratuito</span>
-                    <h2 class="prod-name">E-book</h2>
-                    <p class="prod-desc">_O básico bem feito: o que o BIM exige de processo antes de exigir qualquer software.</p>
+                    <h2 class="prod-name">Diagnóstico BIM + E-book</h2>
+                    <p class="prod-desc">O GPS e o mapa da _modo_bim: descubra o próximo passo a partir de onde você está.</p>
                     <span class="prod-go">em breve</span>
                 </div>
             </div>
