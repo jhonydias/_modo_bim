@@ -507,7 +507,12 @@
                painel claro, espelhada). --- */
         .team-panel--photo {
             display: grid;
-            align-content: center;
+            /* stretch, não center: a altura do painel é ditada pelo texto ao lado, que é
+               bem mais alto que um cartão quadrado. Com o cartão travado em 1/1 sobravam
+               ~200px de cereja sólido em cima E embaixo em toda faixa acima de 900px
+               (medido: 195px em 1024, 207px em 1180, 214px em 1440) — o fundo virava uma
+               laje maior que a própria foto. Preenchendo, o cereja fica só no padding. */
+            align-content: stretch;
             /* Cereja escuro, não o cereja principal: as bordas das três fotos ficam entre
                #41-64 (vinheta do estúdio), e o #81161E é claro demais perto disso — o
                esfumado virava um halo. O #470000 encosta nesses valores e o encontro
@@ -522,12 +527,14 @@
             /* o próprio bloco cereja é boleado, na mesma linguagem do cartão da foto */
             border-radius: clamp(14px, 1.8vw, 28px);
         }
-        /* Cartão de proporção fixa, e não a altura toda do painel: as fotos das bios são
-           verticais e têm muito fundo de estúdio vazio acima da cabeça. Numa caixa mais
-           estreita que a foto o `cover` corta só na horizontal e esse vazio aparece
-           inteiro; numa caixa mais larga o corte passa a ser vertical e o object-position
-           abaixo escolhe o trecho que interessa. */
-        .team-photo { position: relative; overflow: hidden; min-width: 0; aspect-ratio: 1 / 1; border-radius: clamp(10px, 1.3vw, 20px); }
+        /* O cartão acompanha a altura do painel (ver align-content acima). O corte fica
+           vertical — que é o eixo certo: as três fotos são de estúdio, verticais ou
+           quase, e o object-position de cada uma já escolhe a faixa que interessa.
+           Verificado nas três: em proporção retrato (~0.58) a foto das duas continua
+           inteira, porque elas estão centradas e próximas.
+           O min-height é só uma rede: se algum dia o painel de texto encolher, o cartão
+           não colapsa junto. */
+        .team-photo { position: relative; overflow: hidden; min-width: 0; min-height: 320px; border-radius: clamp(10px, 1.3vw, 20px); }
         /* a imagem é absoluta de propósito: se entrasse no fluxo, a altura da seção passaria
            a depender da proporção da foto em cena (as das bios são verticais, a das duas é
            horizontal) e a seção mudaria de tamanho a cada troca. Assim quem manda na altura
@@ -564,7 +571,8 @@
         /* --- nomes sobre a foto: são a legenda E o seletor (substituem o .team-picker).
                O rótulo nunca muda; o estado é sinalizado pelo traço "_" da task 01. --- */
         .team-names { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-        .team-name {
+        .team-name,
+        .team-back {
             position: absolute;
             pointer-events: auto;
             font-family: var(--serif);
@@ -583,7 +591,29 @@
         .team-name.is-active { opacity: 1; }
         .team-name:hover, .team-name:focus-visible { opacity: 1; }
         /* sobre a foto, opacidade sozinha não marca foco: anel explícito */
-        .team-name:focus-visible { outline: 2px solid var(--cloud); outline-offset: 6px; border-radius: 2px; }
+        .team-name:focus-visible, .team-back:focus-visible { outline: 2px solid var(--cloud); outline-offset: 6px; border-radius: 2px; }
+
+        /* --- caminho de volta: o canto que sobra (os nomes tomam o superior direito e o
+               inferior esquerdo). Menor que os nomes de propósito — é ação, não legenda,
+               e não deve competir com eles pela atenção. --- */
+        .team-back {
+            bottom: clamp(24px, 4vw, 46px);
+            right: clamp(22px, 3.4vw, 48px);
+            text-align: right;
+            font-size: clamp(13.5px, 1.4vw, 17px);
+            /* Divide a base do cartão com o nome que fica no canto inferior esquerdo.
+               Em duas colunas o cartão chega a ter só 347px de largura (viewport 901) e
+               os dois em uma linha se sobrepõem — medido: -14px de folga em 901, -1px em
+               1180. Com o teto de largura o rótulo quebra em duas linhas e a folga volta
+               a ser positiva em toda a faixa, sem encurtar o texto. */
+            max-width: 38%;
+            line-height: 1.2;
+        }
+        .team-back[hidden] { display: none; }
+        .team-back:hover, .team-back:focus-visible { opacity: 1; }
+        /* a seta aponta para trás, então ela recua no hover em vez de avançar */
+        .team-back .arr { font-style: normal; display: inline-block; transition: transform 0.35s var(--ease-out); }
+        .team-back:hover .arr { transform: translateX(-4px); }
         .name-mark {
             position: absolute;
             left: 0;
@@ -600,7 +630,9 @@
         }
         .team-name.is-active .name-mark,
         .team-name:hover .name-mark,
-        .team-name:focus-visible .name-mark { opacity: 1; transform: translateY(0); }
+        .team-name:focus-visible .name-mark,
+        .team-back:hover .name-mark,
+        .team-back:focus-visible .name-mark { opacity: 1; transform: translateY(0); }
         .name-mark i { flex: 1; height: 1.5px; background: var(--cloud); display: block; }
         .name-mark b { font-family: var(--serif); font-weight: 500; font-size: 15px; line-height: 0; color: var(--cloud); margin: 0 7px; transform: translateY(-3px); }
 
@@ -640,11 +672,8 @@
 
         /* Faixa de prova — persiste nos três estados (é da consultoria, não das pessoas),
            por isso fica fora de .team-info e não some no .swapping. */
-        /* volta para o manifesto — a seta aponta para trás, então a animação do .tlink
-           (que empurra para a direita) é invertida aqui */
-        .team-back { margin-top: clamp(24px, 3vw, 34px); font-size: clamp(15px, 1.6vw, 18px); }
-        .team-back:hover .arr { transform: translateX(-4px); }
-        .team-back[hidden] { display: none; }
+        /* (o caminho de volta mora agora sobre a foto, junto dos nomes — ver .team-back
+           na seção dos nomes acima) */
 
         /* Faixa de prova — só no estado default: os números são da consultoria, não das
            pessoas, então não cabem sobre a bio de uma delas. */
@@ -1005,11 +1034,28 @@
             .training-grid { grid-template-columns: 1fr; gap: 40px; }
             .training-sticky { position: static; }
             /* o split vira vertical: foto sangrada em cereja no topo, texto claro abaixo */
-            .team { grid-template-columns: 1fr; min-height: 0; }
+            /* `auto 1fr` é o que impede o painel da foto de inchar ao abrir uma bio.
+               O lockHeight() põe um min-height na .team para a seção não encolher na
+               troca; empilhado são DUAS linhas automáticas, e essa sobra era repartida
+               entre as duas — o painel da foto ia de 753px para ~1010px em 768, tudo em
+               cereja vazio, porque o cartão tem proporção fixa e não cresce junto.
+               Com a linha da foto em `auto` e a do texto em `1fr`, a sobra fica toda com
+               o texto (que já centra o conteúdo) e a foto tem a mesma altura nos três
+               estados: as duas juntas, só a Joene e só a Dayana. */
+            .team { grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-height: 0; }
             /* empilhado, o recuo deixa de espelhar a coluna de conteúdo e vira só a margem
                lateral padrão da página */
             .team-panel--photo { padding: clamp(32px, 6vw, 48px) var(--gutter); }
-            .team-photo { max-height: 460px; }
+            /* Empilhado o painel não tem irmão que dite a altura, então o cartão volta a
+               ter proporção própria — quadrada, ocupando a largura toda.
+               O que estava aqui antes era `max-height: 460px`, e era o bug: combinado com
+               `aspect-ratio: 1/1`, o teto de altura puxava a LARGURA junto para 460px
+               dentro de um painel de 753 a 885px. A foto encostava à esquerda e sobravam
+               de 247 a 371px de cereja sólido à direita — a "barra vermelha" fora de
+               centro que aparecia em iPad retrato.
+               Quadrado, e não um corte largo: as fotos das bios são verticais e ancoradas
+               embaixo (`center 88%`/`92%`); em 4/3 a joene.jpg ficava sem a cabeça. */
+            .team-photo { aspect-ratio: 1 / 1; max-height: none; min-height: 0; }
             .team-panel--copy { padding-left: var(--gutter); padding-right: var(--gutter); }
             .team-stats { grid-template-columns: 1fr; gap: 0; }
             .team-stats .stat { padding: 16px 0; border-bottom: 1px solid var(--line); }
@@ -1344,6 +1390,16 @@
                             <span class="name-label"></span>
                             <span class="name-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
                         </button>
+                        <!-- Caminho de volta, no canto que sobra (os nomes ocupam o
+                             superior direito e o inferior esquerdo). Mesma linguagem dos
+                             nomes — serif em cloud, traço "_" no hover — para ler como
+                             parte do mesmo conjunto. Só aparece com uma bio aberta.
+                             NÃO leva a classe .team-name de propósito: o JS itera
+                             `.team-name` esperando um data-slot em SLOTS. -->
+                        <button class="team-back" type="button" id="teamBack" hidden>
+                            <span class="name-label"><span class="arr" aria-hidden="true">←</span> voltar para a _modo_bim</span>
+                            <span class="name-mark" aria-hidden="true"><i></i><b>_</b><i></i></span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1361,12 +1417,6 @@
                             <p><strong>Dayana Ramos</strong> traz a base metodológica sólida; <strong>Joene Louchard</strong>, a experiência em projetos reais de grande porte. Juntas, reúnem o que o mercado raramente consegue combinar: <strong>profundidade acadêmica e vivência real de mercado.</strong></p>
                             <p>Porque <span class="hl">BIM não é uma ferramenta a ser aprendida, é um modo de operar.</span> Um modo de pensar o projeto, a equipe, o processo e a entrega. Por isso o nome. Por isso começamos no diagnóstico e só terminamos quando o escritório anda sozinho.</p>
                         </div>
-                        <!-- Caminho de volta explícito: clicar no nome ativo também volta, mas
-                             isso ninguém adivinha. Fica dentro de .team-info de propósito —
-                             assim entra no fade da troca e não desestabiliza a trava de altura. -->
-                        <button class="tlink team-back" type="button" id="teamBack" hidden>
-                            <span class="arr" aria-hidden="true">←</span> Voltar para a _modo_bim
-                        </button>
                     </div>
                     <div class="team-stats reveal" id="teamStats">
                         <div class="stat">
