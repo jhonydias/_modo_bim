@@ -640,7 +640,14 @@
         .team-panel--copy {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            /* start, não center: a altura do painel é travada na do estado default (o
+               lockHeight impede a seção de encolher na troca), mas o texto de uma bio é
+               bem mais curto — 208 a 255px contra 643px do manifesto, em 1024. Centrado,
+               essa diferença era repartida em cima e embaixo e o "_quem somos" descia
+               194px na bio da Joene e 217px na da Dayana, abrindo um vão no topo.
+               Ancorado no início, o rótulo e o título ficam no mesmo lugar nos três
+               estados e a sobra vai toda para o fim do painel. */
+            justify-content: flex-start;
             overflow: hidden;
             padding-top: clamp(56px, 7vw, 104px);
             padding-bottom: clamp(56px, 7vw, 104px);
