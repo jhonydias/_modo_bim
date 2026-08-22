@@ -44,13 +44,14 @@ No topo do `Code.gs`, há um objeto `CONFIG` — só ajuste se quiser:
    ```
 
 ### 7. Conectar o front-end
-1. Abra o `index.html`.
-2. Procure pela linha:
-   ```js
-   const ENDPOINT_URL = 'COLE_AQUI_A_URL_DO_APPS_SCRIPT_WEB_APP';
-   ```
-3. Substitua pela URL que você copiou no passo 6.
-4. Salve e teste localmente abrindo o `index.html` no navegador.
+1. Abra o **`js/config.js`** — é o único lugar do site que guarda o endpoint.
+2. Substitua o valor de `ENDPOINT_URL` pela URL que você copiou no passo 6.
+3. Salve. As três páginas de formulário (`cadastro.html`, `contrato.html`, `lista-espera.html`)
+   leem daí; nenhuma delas tem a URL escrita dentro.
+4. Rode `npm run check:endpoint` para confirmar que nada ficou hardcoded.
+
+> Este passo só é necessário **uma vez**, ou ao trocar de projeto Apps Script. Publicações normais
+> do backend não mudam a URL — veja abaixo.
 
 ### 8. Subir no GitHub Pages
 1. Crie um repositório público no GitHub: `modo-bim-cadastro` (ou outro nome).
@@ -66,16 +67,37 @@ No topo do `Code.gs`, há um objeto `CONFIG` — só ajuste se quiser:
 
 ## 🔧 Como atualizar depois
 
-**Se editar o `Code.gs`:**
-- Não basta salvar! Precisa republicar:
-    1. **Implantar → Gerenciar implantações**
-    2. Clique no ✏️ (lápis) da implantação ativa
-    3. Em "Versão", escolha **Nova versão**
-    4. Clique em **Implantar**
-- A URL **continua a mesma**, então o front não precisa mudar.
+**Se editar o `script/Code.gs`:**
 
-**Se editar o `index.html`:**
+```bash
+npm run deploy
+```
+
+Só isso. O script publica o `Code.gs` do repositório e reimplanta **sempre a mesma implantação**,
+então **a URL não muda** e nenhum HTML precisa ser tocado. Ao final ele confere que o ID publicado
+bate com o de `js/config.js` e avisa se não bater.
+
+Pré-requisitos (uma vez por máquina):
+
+1. `npm install`
+2. Habilitar a Apps Script API em <https://script.google.com/home/usersettings>
+3. `npx clasp login`
+
+> ⚠️ **Nunca use "Implantar → Nova implantação" no editor.** O trecho `AKfyc...` da URL é o **ID da
+> implantação**, não o da versão: criar uma implantação nova gera uma **URL nova** e quebra os três
+> formulários até alguém editar o `js/config.js`. Foi exatamente esse o problema que a task 20
+> resolveu. Se precisar publicar pelo editor, use **Gerenciar implantações → ✏️ → Nova versão**.
+
+**Se editar o `index.html` ou outra página:**
 - Apenas faça commit/push no GitHub — o Pages atualiza sozinho em ~1 min.
+
+**Comandos disponíveis:**
+
+| comando | o que faz |
+|---|---|
+| `npm run deploy` | publica `script/Code.gs` na implantação fixa (URL estável) |
+| `npm run pull` | traz do Apps Script o código que está no ar, para comparar com o repo |
+| `npm run check:endpoint` | falha se alguma página HTML voltar a ter a URL escrita dentro |
 
 ---
 

@@ -1,0 +1,7 @@
+# O que o clasp NÃO envia para o Apps Script.
+# Padrões relativos ao rootDir de .clasp.json (a pasta script/).
+# Ignora tudo e libera só o que é código do Apps Script — assim
+# script/notion-bootstrap.mjs (ferramenta local do Notion) fica de fora.
+**/**
+!Code.gs
+!appsscript.json
