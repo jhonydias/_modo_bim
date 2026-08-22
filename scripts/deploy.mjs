@@ -67,8 +67,10 @@ console.log('Implantação alvo: ' + DEPLOYMENT_ID);
 
 clasp('push', '--force');
 
+// Mantém o rótulo "prod01" na descrição: é como a implantação de produção
+// sempre foi identificada no editor. O carimbo só diz quando foi a última.
 const carimbo = new Date().toISOString().slice(0, 16).replace('T', ' ');
-const saida = clasp('deploy', '-i', DEPLOYMENT_ID, '-d', `deploy ${carimbo}`);
+const saida = clasp('deploy', '-i', DEPLOYMENT_ID, '-d', `prod01 · ${carimbo}`);
 console.log(saida);
 
 // Verificação: o clasp ecoa o ID da implantação publicada. Se vier outro,
