@@ -24,12 +24,24 @@ const DEPLOYMENT_ID = 'AKfycbyRHztm-hPx5A_k4-BCxOQje0Stq-ifz_VGU4u3Z7fbOy2_rAmfW
 
 function clasp(...args) {
     console.log('\n$ clasp ' + args.join(' '));
-    return execFileSync('npx', ['--no-install', 'clasp', ...args], {
-        cwd: RAIZ,
-        encoding: 'utf8',
-        stdio: ['inherit', 'pipe', 'inherit'],
-        shell: process.platform === 'win32'
-    });
+    try {
+        return execFileSync('npx', ['--no-install', 'clasp', ...args], {
+            cwd: RAIZ,
+            encoding: 'utf8',
+            stdio: ['inherit', 'pipe', 'inherit'],
+            shell: process.platform === 'win32'
+        });
+    } catch {
+        // O clasp já imprimiu o próprio erro em stderr. Aqui só traduzimos os
+        // dois tropeços de setup, para não devolver stack trace de Node.
+        console.error('\n✗ O comando `clasp ' + args[0] + '` falhou. Checklist de setup:\n');
+        console.error('  1. npm install');
+        console.error('  2. Apps Script API ligada em https://script.google.com/home/usersettings');
+        console.error('  3. npx clasp login');
+        console.error('  4. .clasp.json na raiz, com o scriptId e "rootDir": "script"\n');
+        console.error('  Detalhes em tasks/20/task_text.md §02.');
+        process.exit(1);
+    }
 }
 
 // A URL que o front usa hoje. Depois do deploy ela tem que continuar igual.
