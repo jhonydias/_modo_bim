@@ -917,11 +917,17 @@
 
 </div>
 
+<script src="js/config.js"></script>
 <script>
     /* ============================================
-       CONFIG
+       CONFIG — o endpoint vem de js/config.js
        ============================================ */
-    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbyRHztm-hPx5A_k4-BCxOQje0Stq-ifz_VGU4u3Z7fbOy2_rAmfWB8vQ0lfvIdbZso/exec';
+    const CONFIG = window.MODOBIM_CONFIG || {};
+    const ENDPOINT_URL = CONFIG.ENDPOINT_URL || '';
+    const DEV_MODE = CONFIG.DEV_MODE === true;
+    if (!ENDPOINT_URL && !DEV_MODE) {
+        console.error('[modobim] js/config.js não carregou — o formulário não conseguirá enviar.');
+    }
     const FORM_TYPE = 'lista-espera';
 
     /* ============================================
@@ -1125,7 +1131,15 @@
                 userAgent: navigator.userAgent
             };
 
-            if (ENDPOINT_URL && ENDPOINT_URL !== 'COLE_AQUI_A_URL_DO_APPS_SCRIPT_WEB_APP') {
+            if (!ENDPOINT_URL && !DEV_MODE) {
+                // js/config.js não carregou. Sem esta guarda, cairíamos no ramo
+                // DEV abaixo e mostraríamos tela de sucesso sem salvar nada.
+                const erroConfig = new Error('Configuração do site não carregou. Recarregue a página e tente de novo.');
+                erroConfig.fromConfig = true;
+                throw erroConfig;
+            }
+
+            if (!DEV_MODE) {
                 const res = await fetch(ENDPOINT_URL, {
                     method: 'POST',
                     mode: 'cors',
@@ -1145,6 +1159,7 @@
                 }
                 document.getElementById('protocolNumber').textContent = result.protocolo || 'LE-2026-0001';
             } else {
+                // DEV mode — ligado explicitamente em js/config.js
                 console.log('📤 Payload (modo dev):', payload);
                 await new Promise(r => setTimeout(r, 800));
                 document.getElementById('protocolNumber').textContent = 'LE-2026-DEV';
@@ -1154,7 +1169,7 @@
         } catch (err) {
             console.error('Erro ao enviar:', err);
             const banner = document.getElementById('error-' + totalSteps);
-            banner.textContent = err.fromServer
+            banner.textContent = (err.fromServer || err.fromConfig)
                 ? err.message
                 : 'Erro ao enviar. Verifique sua conexão e tente novamente.';
             banner.classList.add('visible');

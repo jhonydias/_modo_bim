@@ -1,0 +1,15 @@
+{
+  "name": "modo-bim",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site _modo_bim (GitHub Pages) + backend Apps Script",
+  "type": "module",
+  "scripts": {
+    "deploy": "node scripts/deploy.mjs",
+    "pull": "clasp pull",
+    "check:endpoint": "node scripts/check-endpoint.mjs"
+  },
+  "devDependencies": {
+    "@google/clasp": "2.4.2"
+  }
+}

@@ -16,3 +16,8 @@
 # Originais de câmera das fotos e vídeos da faixa "no mundo real" (~209MB).
 # O site consome as versões web em /img/real/ — estas ficam só na máquina.
 /img/modobimreal/
+# Dependencias Node (tooling de deploy do Apps Script — task 20)
+/node_modules/
+
+# Credenciais do clasp, se o npm as gerar localmente. Nunca versionar.
+.clasprc.json
