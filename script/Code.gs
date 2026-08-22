@@ -90,9 +90,10 @@ const FORMS = {
             objetivoBIM: 'Expectativa com o BIM',
             qtdPessoas: 'Quantidade de pessoas no treinamento',
             softwareInteresse: 'Software de interesse',
-            nivelEquipe: 'Nível da equipe',
-            reuniao1: 'Reunião — 1ª opção',
-            reuniao2: 'Reunião — 2ª opção'
+            nivelEquipe: 'Nível da equipe'
+            // reuniao1/reuniao2 saíram do formulário na task 18 (agendamento
+            // migrou para o Calendly na tela de sucesso). As colunas e as
+            // propriedades do Notion continuam existindo — só chegam vazias.
         }
     },
     'cadastro': {
