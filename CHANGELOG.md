@@ -5,6 +5,17 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ---
 
+## 2026-08-22
+
+### Ajustes de CTA, Calendly e copy (task 18) — `index.html`, `produtos.html`, `cadastro.html`, `lista-espera.html`
+- **"Saiba mais" agora leva a _nossos serviços_ (item 01).** Os dois links `Saiba mais` da landing (`index.html:1125` no hero e `index.html:1145` no fim do statement "nosso modo") passaram de `href="#implementacoes"` para `href="#nossos-servicos"`. Cliente pediu o do hero; trocamos os dois porque é o mesmo rótulo, com o mesmo peso, na mesma página, e `#nossos-servicos` é o painel imediatamente seguinte ao statement. Não precisou mexer no JS: o handler de scroll horizontal (`index.html:1771-1779`) é genérico e `nossos-servicos` já está em `panelIds`. Os links que apontam para implementações de propósito (carro-chefe, "conheça a implementação", nav, barra e rodapé) ficaram como estavam.
+- **Calendly na tela de sucesso da proposta (item 02) — `cadastro.html`.** A Etapa 04 · Agendamento pedia duas opções de data/hora (`reuniao1`/`reuniao2`); o cliente decidiu que o Calendly substitui isso. Removidos os dois campos `datetime-local` e o bloco de validação que impedia horários iguais (`r1.value === r2.value`) — se ficasse, `r1` viraria `null` e quebraria. A Etapa 04 vira "Detalhes finais": mantém só o campo opcional de observações e o botão de envio, com eyebrow e subhead reescritos (não falam mais de horário). Na tela de sucesso, depois do card de protocolo, entrou o bloco `.success-cta` com o rótulo "Agora marque o seu horário", o botão cream (`background: var(--cloud)`, cantos retos, seta deslocando no hover) para `https://calendly.com/modobim/propos_bim` em nova aba, e a linha de apoio "Descubra o próximo passo a partir de onde você está." A `success-text` deixou de prometer confirmar "uma das duas opções de horário". O `.protocol-card` teve o `margin-bottom` reduzido de 48px para 24px, para o botão não abrir um vão.
+- **Backend intocado, de propósito.** As colunas/propriedades `reuniao1`/`reuniao2` continuam em `script/Code.gs` e `script/notion-bootstrap.mjs`; sem os campos no formulário elas apenas chegam vazias — a validação no Apps Script é guardada por `if (data.reuniao1 && ...)`, então nada quebra. O link do Calendly **não** entrou no e-mail de confirmação (decisão do cliente).
+- **Frase da aba vermelha / CTA final (item 03).** "Seu escritório está pronto para implementar BIM?" → "Seu escritório está pronto para o novo modo de projetar?" nas duas ocorrências do mesmo bloco `.cta-final`: `index.html:1605` e `produtos.html:456`. O cursor `_` no fim e o `max-width: 16ch` do `h2` ficaram como estavam.
+- **Nome do treinamento na lista de espera (item 04) — `lista-espera.html:713`.** "treinamento Modo BIM" → "treinamento BIM na Prática" (com P maiúsculo, alinhado a `index.html:1181`). Era a única ocorrência de "treinamento Modo BIM" no site; o resto da frase não mudou.
+
+---
+
 ## 2026-08-16
 
 ### Aba Produtos (task 17) — `produtos.html` (nova), `index.html`

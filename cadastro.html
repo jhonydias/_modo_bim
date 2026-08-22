@@ -583,7 +583,7 @@
             border-bottom: 1px solid var(--cloud-line);
             padding: 28px 64px;
             display: inline-block;
-            margin-bottom: 48px;
+            margin-bottom: 24px;
         }
         .protocol-label {
             font-family: var(--detail);
@@ -600,6 +600,45 @@
             font-weight: 400;
             letter-spacing: 0.04em;
             color: var(--cloud);
+        }
+
+        .success-cta {
+            margin: 0 0 40px;
+        }
+        .success-cta-label {
+            font-family: var(--detail);
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--cloud-soft);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        .success-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--cloud);
+            color: var(--cereja);
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+            padding: 14px 28px;
+        }
+        .success-cta-btn .arrow {
+            display: inline-block;
+            transition: transform 0.3s var(--ease-out);
+        }
+        .success-cta-btn:hover .arrow { transform: translateX(4px); }
+        .success-cta-note {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--cloud-soft);
+            max-width: 40ch;
+            margin: 14px auto 0;
+            line-height: 1.6;
         }
 
         .success-footer {
@@ -890,9 +929,9 @@
          STAGE 4: AGENDAMENTO
          ============================================ -->
     <section class="stage" id="stage-4">
-        <div class="eyebrow">Etapa 04 · Agendamento</div>
+        <div class="eyebrow">Etapa 04 · Detalhes finais</div>
         <h2 class="headline">Vamos <em>conversar.</em></h2>
-        <p class="subhead">Indique duas opções de dia e horário de sua preferência para a nossa reunião de alinhamento. Confirmamos uma delas por e-mail.</p>
+        <p class="subhead">Assim que enviar, você já marca a reunião de alinhamento pelo nosso calendário, no horário que preferir.</p>
 
         <div class="error-banner" id="error-4">Preencha os campos obrigatórios antes de enviar.</div>
 
@@ -900,21 +939,6 @@
         <input type="text" name="website_url" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
         <div class="fields">
-            <div class="fields two-col" style="grid-column: 1 / -1; margin-bottom: 0;">
-                <div class="field">
-                    <label>1ª opção <span class="required">*</span></label>
-                    <input type="datetime-local" name="reuniao1" data-required data-future />
-                    <span class="field-bar"></span>
-                    <span class="field-error">Escolha uma data futura</span>
-                </div>
-                <div class="field">
-                    <label>2ª opção <span class="required">*</span></label>
-                    <input type="datetime-local" name="reuniao2" data-required data-future />
-                    <span class="field-bar"></span>
-                    <span class="field-error">Escolha uma data futura</span>
-                </div>
-            </div>
-
             <div class="field">
                 <label>Algo mais que devemos saber? <span class="optional">opcional</span></label>
                 <textarea name="observacoes" rows="2" placeholder="Prazos, restrições de agenda, contexto extra..."></textarea>
@@ -936,10 +960,15 @@
             <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>
         </div>
         <h2 class="success-headline">Recebido.</h2>
-        <p class="success-text">Sua solicitação chegou até nós. Vamos analisar o seu cenário e confirmar por e-mail uma das duas opções de horário que você indicou para a reunião de alinhamento.</p>
+        <p class="success-text">Sua solicitação chegou até nós. Vamos analisar o seu cenário e retornar por e-mail. Antes disso, marque a reunião de alinhamento no horário que preferir.</p>
         <div class="protocol-card">
             <div class="protocol-label">Protocolo</div>
             <div class="protocol-number" id="protocolNumber">OR-2026-0001</div>
+        </div>
+        <div class="success-cta">
+            <p class="success-cta-label">Agora marque o seu horário</p>
+            <a class="success-cta-btn" href="https://calendly.com/modobim/propos_bim" target="_blank" rel="noopener">agende sua reunião <span class="arrow">→</span></a>
+            <p class="success-cta-note">Descubra o próximo passo a partir de onde você está.</p>
         </div>
         <div class="success-footer">_modo_bim</div>
     </section>
@@ -1176,15 +1205,6 @@
         if (reveal) {
             const campo = reveal.querySelector('input');
             if (campo && !campo.value.trim()) marcarErro(reveal, 'Campo obrigatório');
-        }
-
-        // As duas opções de reunião não podem ser a mesma
-        if (step === 4) {
-            const r1 = stage.querySelector('[name="reuniao1"]');
-            const r2 = stage.querySelector('[name="reuniao2"]');
-            if (r1.value && r2.value && r1.value === r2.value) {
-                marcarErro(r2.closest('.field'), 'Indique um horário diferente da 1ª opção');
-            }
         }
 
         if (banner) banner.classList.toggle('visible', !isValid);
