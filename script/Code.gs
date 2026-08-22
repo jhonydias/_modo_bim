@@ -64,6 +64,21 @@ const NOTION = {
 };
 
 /* ============================================================
+ *  LOG DE ERROS
+ * ============================================================
+ *  Toda falha de envio (validação, rate limit, JSON inválido,
+ *  exceção) grava uma linha durável na aba "Log de Erros" da
+ *  própria planilha. É o rastro que faltava: rejeições dão
+ *  `return` normal, não lançam exceção, então não apareciam em
+ *  lugar nenhum. Cada envio também é ecoado no Cloud Logging
+ *  (console.*), visível no painel Execuções do editor.
+ * ============================================================ */
+const LOG = {
+    SHEET_NAME: 'Log de Erros',
+    MAX_DETAIL: 4000    // trava o tamanho do detalhe por célula
+};
+
+/* ============================================================
  *  SCHEMAS — configuração por tipo de formulário
  * ============================================================ */
 const FORMS = {
@@ -158,6 +173,7 @@ const FORMS = {
 function doPost(e) {
     try {
         if (!e || !e.postData || !e.postData.contents) {
+            logEvent_('ERRO', '', '', 'Payload vazio', null);
             return jsonResponse_({ success: false, error: 'Payload vazio' });
         }
 
@@ -165,6 +181,7 @@ function doPost(e) {
         try {
             data = JSON.parse(e.postData.contents);
         } catch (err) {
+            logEvent_('ERRO', '', '', 'JSON inválido', String(e.postData.contents).substring(0, 500));
             return jsonResponse_({ success: false, error: 'JSON inválido' });
         }
 
@@ -172,6 +189,7 @@ function doPost(e) {
         const tipo = (data.tipo || 'cadastro').toString().trim();
         const formConfig = FORMS[tipo];
         if (!formConfig) {
+            logEvent_('ERRO', tipo, '', 'Tipo de formulário inválido', { tipoRecebido: tipo });
             return jsonResponse_({ success: false, error: 'Tipo de formulário inválido' });
         }
 
@@ -181,6 +199,7 @@ function doPost(e) {
         // Rate limiting
         const rateCheck = checkRateLimit_(data, tipo);
         if (!rateCheck.ok) {
+            logEvent_('BLOQUEIO', tipo, '', 'Rate limit excedido', { email: data.email || '' });
             return jsonResponse_({
                 success: false,
                 error: 'Muitas tentativas. Aguarde alguns minutos.'
@@ -190,6 +209,11 @@ function doPost(e) {
         // Validação server-side
         const validation = validatePayload_(data, formConfig);
         if (!validation.valid) {
+            logEvent_('VALIDAÇÃO', tipo, '', 'Dados inválidos', {
+                email: data.email || '',
+                errors: validation.errors,
+                camposRecebidos: Object.keys(data)
+            });
             return jsonResponse_({
                 success: false,
                 error: 'Dados inválidos',
@@ -216,7 +240,7 @@ function doPost(e) {
             if (CONFIG.SEND_ADMIN_EMAIL) sendAdminEmail_(data, protocolo, formConfig);
             if (CONFIG.SEND_CLIENT_EMAIL) sendClientEmail_(data, protocolo, formConfig);
         } catch (mailErr) {
-            Logger.log('Falha no envio de e-mail: ' + mailErr);
+            logEvent_('AVISO', tipo, protocolo, 'Falha no envio de e-mail', String(mailErr));
         }
 
         return jsonResponse_({
@@ -227,7 +251,7 @@ function doPost(e) {
         });
 
     } catch (err) {
-        Logger.log('Erro em doPost: ' + err + '\n' + err.stack);
+        logEvent_('EXCEÇÃO', '', '', String(err), err && err.stack ? err.stack.substring(0, 1500) : '');
         return jsonResponse_({
             success: false,
             error: 'Erro interno. Tente novamente.'
@@ -966,6 +990,49 @@ function jsonResponse_(obj) {
     return ContentService
         .createTextOutput(JSON.stringify(obj))
         .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Registra um evento na aba "Log de Erros" (durável) e no Cloud Logging.
+ * Nunca lança: um problema ao logar jamais pode derrubar o envio.
+ *
+ *   level   — 'ERRO' | 'VALIDAÇÃO' | 'BLOQUEIO' | 'EXCEÇÃO' | 'AVISO'
+ *   tipo    — tipo do formulário, quando conhecido
+ *   proto   — protocolo, quando já gerado
+ *   message — resumo curto
+ *   detail  — objeto/string com o contexto (errors, e-mail, stack...)
+ */
+function logEvent_(level, tipo, proto, message, detail) {
+    try {
+        let det = detail == null ? ''
+            : (typeof detail === 'string' ? detail : JSON.stringify(detail));
+        if (det.length > LOG.MAX_DETAIL) det = det.substring(0, LOG.MAX_DETAIL);
+
+        // Cloud Logging (painel Execuções do editor) — sempre, mesmo se a aba falhar
+        console.error('[' + level + '] ' + (tipo || '-') + ' ' + message + ' ' + det);
+
+        const ss = SpreadsheetApp.getActiveSpreadsheet();
+        let sheet = ss.getSheetByName(LOG.SHEET_NAME);
+        if (!sheet) {
+            sheet = ss.insertSheet(LOG.SHEET_NAME);
+            sheet.getRange(1, 1, 1, 6)
+                .setValues([['Timestamp', 'Nível', 'Tipo', 'Protocolo', 'Mensagem', 'Detalhe']])
+                .setFontWeight('bold');
+            sheet.setFrozenRows(1);
+            sheet.setColumnWidth(1, 150);
+            sheet.setColumnWidth(5, 240);
+            sheet.setColumnWidth(6, 480);
+        }
+        const tz = Session.getScriptTimeZone() || 'America/Belem';
+        sheet.appendRow([
+            Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm:ss'),
+            level || '', tipo || '', proto || '',
+            String(message).substring(0, 500), det
+        ]);
+    } catch (err) {
+        // último recurso: registro de execução
+        Logger.log('Falha ao registrar log (' + message + '): ' + err);
+    }
 }
 
 function renderRow_(label, value) {

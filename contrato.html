@@ -1221,9 +1221,17 @@
                     body: JSON.stringify(payload)
                 });
                 const result = await res.json();
-                if (result.success) {
-                    document.getElementById('protocolNumber').textContent = result.protocolo || 'MB-2026-0001';
+                if (!result.success) {
+                    // Sem este tratamento, um envio recusado caía direto na tela
+                    // de sucesso com protocolo em branco (falha silenciosa).
+                    const detalhe = (result.errors && result.errors.length)
+                        ? result.errors.join(' · ')
+                        : (result.error || 'Envio recusado pelo servidor');
+                    const erroServidor = new Error(detalhe);
+                    erroServidor.fromServer = true;
+                    throw erroServidor;
                 }
+                document.getElementById('protocolNumber').textContent = result.protocolo || 'MB-2026-0001';
             } else {
                 // DEV mode — sem endpoint
                 console.log('📤 Payload (modo dev):', payload);
@@ -1235,7 +1243,9 @@
         } catch (err) {
             console.error('Erro ao enviar:', err);
             const banner = document.getElementById('error-4');
-            banner.textContent = 'Erro ao enviar. Tente novamente em instantes.';
+            banner.textContent = err.fromServer
+                ? err.message
+                : 'Erro ao enviar. Verifique sua conexão e tente novamente.';
             banner.classList.add('visible');
         } finally {
             app.classList.remove('submitting');
