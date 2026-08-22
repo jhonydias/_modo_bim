@@ -8,7 +8,7 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 ## 2026-08-22
 
 ### Produtos: Diagnóstico BIM + E-book viram um único card — `produtos.html`
-- Os dois cards "Em breve" (Diagnóstico BIM e E-book) eram, na verdade, **um único produto gratuito**. Fundidos em um card só: nome "Diagnóstico BIM + E-book" e a descrição que o cliente enviou — "O GPS e o mapa da _modo_bim: descubra o próximo passo a partir de onde você está." Tag e estado mantidos em "Em breve · gratuito" (ainda sem link de destino).
+- Os dois cards "Em breve" (Diagnóstico BIM e E-book) eram, na verdade, **um único produto gratuito**. Fundidos em um card só: nome "Diagnóstico BIM + E-book" e a descrição que o cliente enviou — "O GPS e o mapa da _modo_bim: descubra o próximo passo a partir de onde você está." O card foi publicado: virou `<a>` apontando para o formulário do Tally (`https://tally.so/r/7RYDZ0`, nova aba, `rel="noopener"`), com tag "Gratuito" e ação "acessar →" — saiu do estado `.is-soon`.
 - Com um card só, o grid de 2 colunas deixaria o card torto na metade esquerda. Adicionado o modificador `.prod-grid--single` (`grid-template-columns: minmax(0, 620px)`), que mantém o card alinhado à esquerda com o título e com largura controlada. Para voltar a ter dois ou mais produtos, é só remover o modificador — o grid volta a `repeat(2, 1fr)`. O template comentado do `<a>` de destino foi mantido acima do card, agora único.
 
 ### Ajustes de CTA, Calendly e copy (task 18) — `index.html`, `produtos.html`, `cadastro.html`, `lista-espera.html`
