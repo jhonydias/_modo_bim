@@ -878,6 +878,9 @@
             background: var(--cream-2);
         }
         .vmarquee figure.mq-wide { aspect-ratio: 16 / 9; }
+        /* <picture> nasce inline e vira o filho direto do <figure>: sem isto o
+           height:100% do <img> não teria contra o que resolver. Mesmo motivo do hero. */
+        .vmarquee picture { display: block; width: 100%; height: 100%; }
         .vmarquee img,
         .vmarquee video {
             display: block;
@@ -1549,7 +1552,11 @@
                  são, ao mesmo tempo, legenda da foto e seletor das bios. -->
             <div class="team-panel team-panel--photo">
                 <div class="team-photo">
-                    <img id="teamImg" src="img/founders.jpg" loading="lazy" decoding="async" alt="Joene Louchard e Dayana Ramos, fundadoras da _modo_bim" />
+                    <img id="teamImg" src="img/opt/founders-1200.webp"
+                         srcset="img/opt/founders-800.webp 800w, img/opt/founders-1200.webp 1200w"
+                         sizes="(max-width: 900px) 88vw, 40vw"
+                         width="1200" height="800" loading="lazy" decoding="async"
+                         alt="Joene Louchard e Dayana Ramos, fundadoras da _modo_bim" />
                     <div class="team-names" id="teamPicker" aria-label="Conheça as fundadoras">
                         <button class="team-name team-name--a" type="button" data-slot="a" aria-pressed="false">
                             <span class="name-label"></span>
@@ -1626,19 +1633,55 @@
         <div class="proof-band">
             <div class="vmarquee">
                 <div class="vmarquee-track">
-                    <figure><img src="img/real/foto-01.jpg" alt="Slide da _modo_bim projetado em uma parede de madeira, com o wordmark e a assinatura “Um novo modo de projetar”" loading="lazy" /></figure>
-                    <figure><video src="img/real/clip-07.mp4" poster="img/real/clip-07.jpg" muted loop playsinline preload="none" aria-label="Estação de trabalho com dois monitores durante o expediente"></video></figure>
-                    <figure><img src="img/real/foto-03.jpg" alt="Turma acompanhando uma apresentação em uma sala clara, com bandeirinhas de festa junina no teto" loading="lazy" /></figure>
-                    <figure><video src="img/real/clip-09.mp4" poster="img/real/clip-09.jpg" muted loop playsinline preload="none" aria-label="Pessoa trabalhando em um notebook à mesa, com luz de janela"></video></figure>
-                    <figure><img src="img/real/foto-12.jpg" alt="Aluna sorrindo à mesa, com o notebook coberto de adesivos da _modo_bim e uma tela de projeto BIM projetada na parede atrás" loading="lazy" /></figure>
-                    <figure><video src="img/real/clip-11.mp4" poster="img/real/clip-11.jpg" muted loop playsinline preload="none" aria-label="Modelo BIM sendo manipulado na tela de um notebook"></video></figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-01-680.avif 680w, img/opt/real/foto-01-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-01-680.webp 680w, img/opt/real/foto-01-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-01-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="Slide da _modo_bim projetado em uma parede de madeira, com o wordmark e a assinatura “Um novo modo de projetar”" />
+                        </picture>
+                    </figure>
+                    <figure><video src="img/real/clip-07.mp4" poster="img/opt/real/clip-07-640.webp" muted loop playsinline preload="none" aria-label="Estação de trabalho com dois monitores durante o expediente"></video></figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-03-680.avif 680w, img/opt/real/foto-03-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-03-680.webp 680w, img/opt/real/foto-03-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-03-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="Turma acompanhando uma apresentação em uma sala clara, com bandeirinhas de festa junina no teto" />
+                        </picture>
+                    </figure>
+                    <figure><video src="img/real/clip-09.mp4" poster="img/opt/real/clip-09-640.webp" muted loop playsinline preload="none" aria-label="Pessoa trabalhando em um notebook à mesa, com luz de janela"></video></figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-12-680.avif 680w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-12-680.webp 680w" sizes="340px" />
+                            <img src="img/opt/real/foto-12-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="Aluna sorrindo à mesa, com o notebook coberto de adesivos da _modo_bim e uma tela de projeto BIM projetada na parede atrás" />
+                        </picture>
+                    </figure>
+                    <figure><video src="img/real/clip-11.mp4" poster="img/opt/real/clip-11-640.webp" muted loop playsinline preload="none" aria-label="Modelo BIM sendo manipulado na tela de um notebook"></video></figure>
 
-                    <figure aria-hidden="true"><img src="img/real/foto-01.jpg" alt="" loading="lazy" /></figure>
-                    <figure aria-hidden="true"><video src="img/real/clip-07.mp4" poster="img/real/clip-07.jpg" muted loop playsinline preload="none"></video></figure>
-                    <figure aria-hidden="true"><img src="img/real/foto-03.jpg" alt="" loading="lazy" /></figure>
-                    <figure aria-hidden="true"><video src="img/real/clip-09.mp4" poster="img/real/clip-09.jpg" muted loop playsinline preload="none"></video></figure>
-                    <figure aria-hidden="true"><img src="img/real/foto-12.jpg" alt="" loading="lazy" /></figure>
-                    <figure aria-hidden="true"><video src="img/real/clip-11.mp4" poster="img/real/clip-11.jpg" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true">
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-01-680.avif 680w, img/opt/real/foto-01-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-01-680.webp 680w, img/opt/real/foto-01-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-01-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="" />
+                        </picture>
+                    </figure>
+                    <figure aria-hidden="true"><video src="img/real/clip-07.mp4" poster="img/opt/real/clip-07-640.webp" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true">
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-03-680.avif 680w, img/opt/real/foto-03-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-03-680.webp 680w, img/opt/real/foto-03-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-03-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="" />
+                        </picture>
+                    </figure>
+                    <figure aria-hidden="true"><video src="img/real/clip-09.mp4" poster="img/opt/real/clip-09-640.webp" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true">
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-12-680.avif 680w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-12-680.webp 680w" sizes="340px" />
+                            <img src="img/opt/real/foto-12-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="" />
+                        </picture>
+                    </figure>
+                    <figure aria-hidden="true"><video src="img/real/clip-11.mp4" poster="img/opt/real/clip-11-640.webp" muted loop playsinline preload="none"></video></figure>
                 </div>
             </div>
 
@@ -1674,19 +1717,43 @@
 
             <div class="vmarquee vmarquee--up">
                 <div class="vmarquee-track">
-                    <figure class="mq-wide"><video src="img/real/clip-06.mp4" poster="img/real/clip-06.jpg" muted loop playsinline preload="none" aria-label="Equipe reunida à mesa acompanhando um modelo BIM na tela"></video></figure>
-                    <figure><img src="img/real/foto-02.jpg" alt="Mesa de trabalho com notebooks e um tablet, telas mostrando o material da _modo_bim" loading="lazy" /></figure>
-                    <figure><video src="img/real/clip-08.mp4" poster="img/real/clip-08.jpg" muted loop playsinline preload="none" aria-label="Mãos manuseando um projeto em um tablet, junto à janela"></video></figure>
-                    <figure><img src="img/real/foto-04.jpg" alt="Dois notebooks lado a lado exibindo um relatório de clash detection" loading="lazy" /></figure>
-                    <figure><video src="img/real/clip-10.mp4" poster="img/real/clip-10.jpg" muted loop playsinline preload="none" aria-label="Duas pessoas trabalhando lado a lado em computadores"></video></figure>
-                    <figure><video src="img/real/clip-13.mp4" poster="img/real/clip-13.jpg" muted loop playsinline preload="none" aria-label="Arquiteta desenhando em um tablet à mesa, com café na mão e a vidraça do escritório ao fundo"></video></figure>
+                    <figure class="mq-wide"><video src="img/real/clip-06.mp4" poster="img/opt/real/clip-06-680.webp" muted loop playsinline preload="none" aria-label="Equipe reunida à mesa acompanhando um modelo BIM na tela"></video></figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-02-680.avif 680w, img/opt/real/foto-02-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-02-680.webp 680w, img/opt/real/foto-02-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-02-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="Mesa de trabalho com notebooks e um tablet, telas mostrando o material da _modo_bim" />
+                        </picture>
+                    </figure>
+                    <figure><video src="img/real/clip-08.mp4" poster="img/opt/real/clip-08-640.webp" muted loop playsinline preload="none" aria-label="Mãos manuseando um projeto em um tablet, junto à janela"></video></figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-04-680.avif 680w, img/opt/real/foto-04-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-04-680.webp 680w, img/opt/real/foto-04-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-04-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="Dois notebooks lado a lado exibindo um relatório de clash detection" />
+                        </picture>
+                    </figure>
+                    <figure><video src="img/real/clip-10.mp4" poster="img/opt/real/clip-10-640.webp" muted loop playsinline preload="none" aria-label="Duas pessoas trabalhando lado a lado em computadores"></video></figure>
+                    <figure><video src="img/real/clip-13.mp4" poster="img/opt/real/clip-13-576.webp" muted loop playsinline preload="none" aria-label="Arquiteta desenhando em um tablet à mesa, com café na mão e a vidraça do escritório ao fundo"></video></figure>
 
-                    <figure class="mq-wide" aria-hidden="true"><video src="img/real/clip-06.mp4" poster="img/real/clip-06.jpg" muted loop playsinline preload="none"></video></figure>
-                    <figure aria-hidden="true"><img src="img/real/foto-02.jpg" alt="" loading="lazy" /></figure>
-                    <figure aria-hidden="true"><video src="img/real/clip-08.mp4" poster="img/real/clip-08.jpg" muted loop playsinline preload="none"></video></figure>
-                    <figure aria-hidden="true"><img src="img/real/foto-04.jpg" alt="" loading="lazy" /></figure>
-                    <figure aria-hidden="true"><video src="img/real/clip-10.mp4" poster="img/real/clip-10.jpg" muted loop playsinline preload="none"></video></figure>
-                    <figure aria-hidden="true"><video src="img/real/clip-13.mp4" poster="img/real/clip-13.jpg" muted loop playsinline preload="none"></video></figure>
+                    <figure class="mq-wide" aria-hidden="true"><video src="img/real/clip-06.mp4" poster="img/opt/real/clip-06-680.webp" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true">
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-02-680.avif 680w, img/opt/real/foto-02-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-02-680.webp 680w, img/opt/real/foto-02-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-02-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="" />
+                        </picture>
+                    </figure>
+                    <figure aria-hidden="true"><video src="img/real/clip-08.mp4" poster="img/opt/real/clip-08-640.webp" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true">
+                        <picture>
+                            <source type="image/avif" srcset="img/opt/real/foto-04-680.avif 680w, img/opt/real/foto-04-1020.avif 1020w" sizes="340px" />
+                            <source type="image/webp" srcset="img/opt/real/foto-04-680.webp 680w, img/opt/real/foto-04-1020.webp 1020w" sizes="340px" />
+                            <img src="img/opt/real/foto-04-680.webp" width="680" height="1209" loading="lazy" decoding="async" alt="" />
+                        </picture>
+                    </figure>
+                    <figure aria-hidden="true"><video src="img/real/clip-10.mp4" poster="img/opt/real/clip-10-640.webp" muted loop playsinline preload="none"></video></figure>
+                    <figure aria-hidden="true"><video src="img/real/clip-13.mp4" poster="img/opt/real/clip-13-576.webp" muted loop playsinline preload="none"></video></figure>
                 </div>
             </div>
         </div>
@@ -2021,7 +2088,8 @@
 
         const TEAM = {
             default: {
-                img: 'img/founders.jpg',
+                img: 'img/opt/founders-1200.webp',
+                srcset: 'img/opt/founders-800.webp 800w, img/opt/founders-1200.webp 1200w',
                 alt: 'Joene Louchard e Dayana Ramos, fundadoras da _modo_bim',
                 // corte do cartão: a horizontal é centrada nas duas; nas verticais o corte
                 // é vertical e ancora embaixo, onde elas estão sentadas.
@@ -2033,7 +2101,8 @@
                     + '<p>Porque <span class="hl">BIM não é uma ferramenta a ser aprendida, é um modo de operar.</span> Um modo de pensar o projeto, a equipe, o processo e a entrega. Por isso o nome. Por isso começamos no diagnóstico e só terminamos quando o escritório anda sozinho.</p>'
             },
             joene: {
-                img: 'img/joene.jpg',
+                img: 'img/opt/joene-1200.webp',
+                srcset: 'img/opt/joene-800.webp 800w, img/opt/joene-1200.webp 1200w',
                 alt: 'Joene Louchard',
                 pos: 'center 88%',
                 title: 'Joene Louchard',
@@ -2041,7 +2110,8 @@
                 body: '<p>A <strong>vivência de mercado</strong> da _modo_bim. Experiência em projetos reais de grande e pequeno porte, do design de mobiliário em BIM a edificações hospitalares. É quem conhece a dor do escritório por dentro, porque já esteve lá.</p>'
             },
             dayana: {
-                img: 'img/dayana.jpg',
+                img: 'img/opt/dayana-1200.webp',
+                srcset: 'img/opt/dayana-800.webp 800w, img/opt/dayana-1200.webp 1200w',
                 alt: 'Dayana Ramos',
                 pos: 'center 92%',
                 title: 'Dayana Ramos',
@@ -2060,6 +2130,9 @@
 
         function paint(state) {
             const d = TEAM[state];
+            /* srcset antes de src: trocar só o src deixaria o srcset antigo mandando
+               na escolha e a foto não mudaria. */
+            teamImg.srcset = d.srcset;
             teamImg.src = d.img;
             teamImg.alt = d.alt;
             teamImg.style.objectPosition = d.pos;

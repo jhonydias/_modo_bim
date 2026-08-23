@@ -22,7 +22,7 @@
  * no repositório nem em img/modobimreal/.
  */
 import sharp from 'sharp';
-import { mkdir, stat } from 'node:fs/promises';
+import { mkdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 /**
@@ -57,9 +57,13 @@ const FONTES = [
   ['img/real/clip-11.jpg', [640]],
   ['img/real/clip-13.jpg', [576]],
 
-  // Logo das três páginas de formulário (usado como background-image em caixa
-  // de 132x32 e 84x21, com background-size de 320 e 205 px de largura).
-  ['img/logo.png', [320, 640]],
+  // Logo das três páginas de formulário. Não é um <img>: entra como background-image
+  // em caixas de 132x32 (header) e 84x21 (footer), com background-size de 320 e 205 px.
+  // Fundo de background não negocia formato nem densidade sem image-set(), então o CSS
+  // usa uma única saída — a de 500 px, que é o nativo e cobre 1,5x no header e 2,4x no
+  // footer. O PNG original fica: é ele que o JSON-LD declara como logo da organização,
+  // e crawler de schema não negocia formato.
+  ['img/logo.png', [320, 500]],
 ];
 
 const QUALIDADE = { avif: 52, webp: 78 };
@@ -95,6 +99,24 @@ for (const [origem, larguras] of FONTES) {
       if (marca) avisos.push(`${saida} (${(info.size / 1024).toFixed(1)} KB) ficou maior que ${origem} (${(bytesOrigem / 1024).toFixed(1)} KB) — baixar a qualidade ou manter em JPEG`);
       console.log(`    ${path.basename(saida).padEnd(28)} ${(info.size / 1024).toFixed(1).padStart(7)} KB${marca}`);
     }
+  }
+}
+
+/**
+ * og-image.png fica em PNG, de propósito. O WhatsApp e vários crawlers de preview não
+ * negociam formato: um og:image em AVIF quebra a prévia do link, que é justamente o
+ * canal de aquisição do site. Aqui só se aperta a compressão, sem trocar de formato.
+ */
+{
+  const antes = (await stat('og-image.png')).size;
+  const buf = await sharp('og-image.png').png({ compressionLevel: 9, palette: true }).toBuffer();
+  if (buf.length < antes) {
+    // writeFile, e NÃO sharp(buf).toFile(): passar o buffer de volta pelo sharp o
+    // reencoda com as opções padrão e joga fora o ganho da compressão acima.
+    await writeFile('og-image.png', buf);
+    console.log(`\nog-image.png  ${(antes / 1024).toFixed(1)} KB → ${(buf.length / 1024).toFixed(1)} KB (−${Math.round((1 - buf.length / antes) * 100)}%, continua PNG)`);
+  } else {
+    console.log(`\nog-image.png  já está no melhor tamanho (${(antes / 1024).toFixed(1)} KB) — não mexido`);
   }
 }
 
