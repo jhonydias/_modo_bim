@@ -42,15 +42,19 @@
     }
     </script>
 
-    <!-- Fonts -->
-    <!-- Sentient (títulos / fonte principal) — Fontshare -->
-    <link href="https://api.fontshare.com/v2/css?f[]=sentient@300,400,500,700,301,401,501,701&display=swap" rel="stylesheet" />
-    <!-- Inter (textos / fonte secundária) — Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet" />
-    <!-- Neue Haas Grotesk (detalhe) — fonte licenciada, sem CDN gratuito.
-         Mesmo fallback do restante do site: Helvetica Neue / Arial. -->
+    <!-- Fontes self-hosted (task 21 · T4): nenhuma origem de terceiro no caminho crítico.
+         Antes daqui saíam duas requisições bloqueantes de render, uma para o CDN do
+         Fontshare e outra para o do Google Fonts, que o Lighthouse mediu em 2.622 ms
+         de atraso no mobile.
+         Os .woff2 são subsets gerados por scripts/build-fonts.mjs (npm run build:fonts).
+         Só os dois pesos do primeiro paint são pré-carregados; os outros quatro chegam
+         sob demanda, sem bloquear, graças ao font-display: swap.
+         crossorigin é obrigatório no preload de fonte MESMO em mesma origem: sem ele o
+         navegador baixa o arquivo duas vezes. -->
+    <link rel="preload" as="font" type="font/woff2" href="fonts/sentient-400.subset.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin-wght-normal.subset.woff2" crossorigin />
+    <!-- Neue Haas Grotesk (detalhe) é fonte licenciada e não é baixada: --detail cai no
+         fallback Helvetica Neue / Arial, que é do sistema e custa zero byte. -->
 
     <style>
         /* ============================================
