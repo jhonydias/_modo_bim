@@ -7,6 +7,12 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-08-23
 
+### CI: os unitários rodam a cada push na master e a cada PR — `.github/workflows/testes.yml` (novo)
+- Workflow do GitHub Actions com um job (`unitários`): `npm ci`, `npm run check:endpoint` e `npm run test:unit`. Roda em `ubuntu-latest`, Node 24, com cache do npm — os mesmos comandos foram executados localmente antes de subir.
+- **Só os unitários, de propósito.** São determinísticos, não precisam de browser e terminam em segundos. O E2E ficaria caro (baixar Chromium e WebKit a cada execução) e o smoke faz um GET no endpoint de produção; o job dele está pronto, comentado no fim do arquivo, com o aviso de que os specs `@live` **nunca** podem entrar numa pipe — eles gravam na planilha real.
+- **O lockfile gerado no Windows funciona no Linux:** conferido que `@rolldown/binding-linux-x64-gnu` e `lightningcss-linux-x64-gnu` estão no `package-lock.json`. O único ausente é o `fsevents`, que é exclusivo do macOS e opcional. Um `npm ci` limpo foi rodado para confirmar.
+- `concurrency` com `cancel-in-progress`: um push logo depois do outro cancela a execução anterior do mesmo ref. `permissions: contents: read` — o workflow não escreve no repo nem publica nada. O GitHub Pages ignora a pasta `.github`, então o arquivo não vai para o ar.
+
 ### Suíte de testes automatizados (task 19) — `tests/` (nova), `package.json`, `vitest.config.js`, `playwright.config.js`, `.gitignore`
 - **Primeira infraestrutura de teste do repo.** Unitários em **Vitest + jsdom** (12 arquivos) e E2E em **Playwright** (6 specs), rodando em **Chromium e WebKit**. Nenhum arquivo do site foi alterado por esta task: a suíte lê as páginas como elas estão.
 - **Testar o JS que vive dentro do HTML, sem refatorar nada.** `tests/unit/helpers/loadPage.js` carrega o HTML real no jsdom, injeta os stubs que faltam (`IntersectionObserver`, `matchMedia`, `scrollTo`, `HTMLMediaElement.play`) e **só então** avalia os scripts — primeiro `js/config.js`, depois o inline, na ordem do navegador. Duas descobertas viraram parte do harness: `const` declarado dentro de um `eval` **não** sobrevive a ele (`ENDPOINT_URL`, `totalSteps` e `formData` são lidos por uma janela para o escopo, deixada no mesmo `eval`), e no `node:vm` do backend vale o mesmo — `FORMS` e `CONFIG` do `Code.gs` precisam ser extraídos por avaliação, enquanto as `function` já chegam no sandbox.
