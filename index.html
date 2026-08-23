@@ -856,10 +856,17 @@
             flex-direction: column;
             gap: var(--mq-gap);
             animation: mqScrollY var(--mq-dur) linear infinite;
+            /* nasce parada: animação infinite rodando fora da viewport é CPU queimada de
+               graça, e no celular é bateria. O JS acende .is-live quando a faixa entra. */
+            animation-play-state: paused;
         }
         /* a segunda coluna sobe, para as duas não andarem em bloco */
         .vmarquee--up .vmarquee-track { animation-direction: reverse; }
-        /* pausa ao passar o mouse, para dar tempo de olhar (e de colorir) a peça */
+        .vmarquee.is-live .vmarquee-track { animation-play-state: running; }
+        /* pausa ao passar o mouse, para dar tempo de olhar (e de colorir) a peça.
+           Esta regra tem a MESMA especificidade da .is-live acima e vence por vir depois
+           na folha — é o que faz o hover continuar pausando com a faixa em cena.
+           Trocar a ordem destas duas linhas quebra o hover. */
         .vmarquee:hover .vmarquee-track, .vmarquee:focus-within .vmarquee-track { animation-play-state: paused; }
         @keyframes mqScrollY { to { transform: translateY(calc(-50% - var(--mq-gap) / 2)); } }
 
@@ -2070,7 +2077,15 @@
         spyTick = true;
         requestAnimationFrame(() => { onScroll(); spyTick = false; });
     }, { passive: true });
-    window.addEventListener('resize', setupMode);
+    /* setupMode() chama measureH(), que lê scrollWidth, clientHeight e
+       getBoundingClientRect() e depois ESCREVE hsections.style.height. Leitura e escrita
+       alternadas a cada evento de resize — que no desktop dispara dezenas de vezes por
+       arrasto — é layout thrashing. Coalescido por rAF: uma passada por quadro. */
+    let resizeRaf = null;
+    window.addEventListener('resize', () => {
+        if (resizeRaf) cancelAnimationFrame(resizeRaf);
+        resizeRaf = requestAnimationFrame(() => { resizeRaf = null; setupMode(); });
+    });
     window.addEventListener('load', setupMode);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(setupMode);
     setupMode();
@@ -2299,19 +2314,47 @@
        tocam os que estão visíveis, e pausam ao sair — sem isso seriam catorze vídeos
        decodificando ao mesmo tempo. Com prefers-reduced-motion nenhum toca: fica o pôster,
        coerente com a faixa, que também para de rolar nesse modo. */
+    /* A faixa só anda quando está em cena. Fica fora do teste de prefers-reduced-motion
+       de propósito: sob movimento reduzido o CSS já zera a animação, e aí .is-live não
+       tem efeito nenhum — mas quem não pediu movimento reduzido ganha a pausa. */
+    document.querySelectorAll('.vmarquee').forEach(faixa => {
+        new IntersectionObserver(entradas => {
+            entradas.forEach(e => faixa.classList.toggle('is-live', e.isIntersecting));
+        }, { threshold: 0 }).observe(faixa);
+    });
+
     const mqVideos = document.querySelectorAll('.vmarquee video');
     if (mqVideos.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        /* A faixa tem clamp(460px, 70vh, 740px) de altura: com o limiar antigo de 0.2 dava
+           para ter uns seis vídeos decodificando ao mesmo tempo. Acima de três o custo de
+           decodificação aparece, e no celular vira bateria. */
+        const MAX_SIMULTANEOS = 3;
+        const tocando = new Set();
+
         const mqIO = new IntersectionObserver((entries) => {
+            // primeiro pausa quem saiu, para abrir vaga antes de decidir quem entra
             entries.forEach(e => {
-                if (e.isIntersecting) {
-                    const p = e.target.play();
-                    // navegadores podem recusar o autoplay; o pôster segue no lugar
-                    if (p) p.catch(() => {});
-                } else {
+                if (!e.isIntersecting && tocando.has(e.target)) {
                     e.target.pause();
+                    tocando.delete(e.target);
                 }
             });
-        }, { threshold: 0.2 });
+            // depois entram os mais visíveis, respeitando o teto
+            entries
+                .filter(e => e.isIntersecting && !tocando.has(e.target))
+                .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+                .forEach(e => {
+                    if (tocando.size >= MAX_SIMULTANEOS) return;
+                    // reserva a vaga antes do await implícito: sem isso duas entradas do
+                    // mesmo lote passariam pelo teto antes de qualquer promise resolver
+                    tocando.add(e.target);
+                    const p = e.target.play();
+                    // navegadores podem recusar o autoplay; o pôster segue no lugar
+                    if (p) p.catch(() => { tocando.delete(e.target); });
+                });
+        }, { threshold: [0, 0.2, 0.6] });
+        /* threshold vira lista porque o observer agora precisa de intersectionRatio para
+           ordenar: com um limiar só, o ratio é reportado apenas no cruzamento. */
         mqVideos.forEach(v => mqIO.observe(v));
     }
 
