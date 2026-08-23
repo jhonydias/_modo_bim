@@ -58,6 +58,45 @@
 
     <style>
         /* ============================================
+           FONTES SELF-HOSTED  (task 21 · T4)
+           Subsets em fonts/, gerados por scripts/build-fonts.mjs.
+           Pesos declarados = os cinco que o site realmente renderiza, medidos nas
+           requisições reais do Lighthouse: Sentient 300i/400/400i/500/700 e Inter
+           variável. Declarar peso que ninguém usa não custa byte, mas mente sobre
+           o design; declarar de menos faz o navegador sintetizar itálico/negrito.
+           ============================================ */
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-400.subset.woff2') format('woff2');
+            font-weight: 400; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-500.subset.woff2') format('woff2');
+            font-weight: 500; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-700.subset.woff2') format('woff2');
+            font-weight: 700; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-300-italic.subset.woff2') format('woff2');
+            font-weight: 300; font-style: italic; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-400-italic.subset.woff2') format('woff2');
+            font-weight: 400; font-style: italic; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/inter-latin-wght-normal.subset.woff2') format('woff2');
+            font-weight: 100 900; font-style: normal; font-display: swap;
+        }
+
+        /* ============================================
            DESIGN TOKENS — mesmos do index.html
            ============================================ */
         :root {
