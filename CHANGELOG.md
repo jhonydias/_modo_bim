@@ -5,6 +5,16 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ---
 
+## 2026-08-23
+
+### CTA secundário do hero vira o diagnóstico — `index.html`
+- O link "Saiba mais" ao lado de "Solicite uma proposta" (hero) virou **"Faça o seu diagnóstico agora"**, apontando para o formulário externo `https://tally.so/r/7RYDZ0` em nova aba (`target="_blank" rel="noopener"`). O "Saiba mais" da seção *nosso modo* continua como estava, levando para `#nossos-servicos`.
+- **Mesma pílula do "Solicite uma proposta", em contorno** (`.btn-olive-outline`): fundo transparente, texto militar e traço de 1px feito com `box-shadow: inset` — não `border`, para o botão manter exatamente a mesma altura e o mesmo padding do sólido ao lado. No hover preenche de militar e sobe os 2px de sempre, como o `.btn-olive`. Contorno em vez de sólido para não haver dois CTAs primários disputando o mesmo espaço.
+- **Os dois lado a lado, com a fonte cedendo.** A coluna de texto do hero trava em **~494px** (`--maxw` 1180 menos gutter e gap, fatia 1.05fr) e não cresce mais — mesmo em 1920. Nos 13px padrão os dois botões somam **535px**, então o segundo caía para a linha de baixo em *toda* largura de desktop. Acima de 901px fonte, padding e respiro passaram a acompanhar a viewport (`font-size: clamp(10.5px, 1.05vw, 12.5px)`, padding lateral `clamp(12px, 1.35vw, 22px)`, gap do container `clamp(9px, 1.2vw, 16px)`) e o rótulo ganhou `white-space: nowrap` — quem cede é o tamanho, nunca a linha. Folga medida em iframe nas larguras 901/960/1024/1180/1366/1440/1920: **11, 31, 46, 56, 38, 32 e 22px**, lado a lado em todas. O `:hover` cresce o gap só até `clamp(10px, 1vw, 13px)`, que cabe na folga mais apertada.
+- Abaixo de 901px a coluna vira largura cheia e os botões voltam aos 13px; empilham sozinhos abaixo de ~690px, que é o comportamento esperado no celular.
+
+---
+
 ## 2026-08-22
 
 ### Seção "quem somos" em tablets: fim da barra vermelha e volta no canto — `index.html`

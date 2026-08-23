@@ -153,6 +153,9 @@
         .btn:hover .arr { transform: translateX(4px); }
         .btn-olive { background: var(--olive); color: var(--cloud); }
         .btn-olive:hover { background: var(--olive-deep); transform: translateY(-2px); gap: 16px; }
+        /* Mesma pílula do .btn-olive, em contorno: secundário sem competir com o CTA principal */
+        .btn-olive-outline { background: transparent; color: var(--olive); box-shadow: inset 0 0 0 1px var(--olive); }
+        .btn-olive-outline:hover { background: var(--olive); color: var(--cloud); transform: translateY(-2px); gap: 16px; }
         .btn-cream { background: var(--cream); color: var(--ink); }
         .btn-cream:hover { transform: translateY(-2px); gap: 16px; }
         .btn-ghost-light {
@@ -387,6 +390,8 @@
         .hero-copy .display { margin: 22px 0 26px; max-width: 11ch; }
         .hero-copy .lead { margin-bottom: 40px; }
         .hero-actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+        /* o rótulo nunca quebra dentro da pílula: quem cede é o tamanho, não a linha */
+        .hero-actions .btn { white-space: nowrap; }
 
         .hero-media {
             position: relative;
@@ -1032,6 +1037,22 @@
         /* ============================================
            RESPONSIVE
            ============================================ */
+        /* Hero em duas colunas: os dois CTAs dividem a coluna de texto, que trava em ~494px
+           (`--maxw` 1180 menos gutter e gap, fatia 1.05fr) e nunca cresce além disso. Nos 13px
+           padrão os dois somam 535px e o segundo cai para a linha de baixo, então fonte, padding
+           e respiro encolhem junto com a viewport — folga medida de 11px em 901 a 54px em 1180.
+           Abaixo de 901 a coluna vira largura cheia e os botões voltam ao tamanho padrão. */
+        @media (min-width: 901px) {
+            .hero-actions { gap: clamp(9px, 1.2vw, 16px); }
+            .hero-actions .btn {
+                font-size: clamp(10.5px, 1.05vw, 12.5px);
+                letter-spacing: 0.02em;
+                padding: 14px clamp(12px, 1.35vw, 22px);
+                gap: clamp(8px, 0.8vw, 10px);
+            }
+            .hero-actions .btn:hover { gap: clamp(10px, 1vw, 13px); }
+        }
+
         @media (max-width: 900px) {
             .hero-grid { grid-template-columns: 1fr; min-height: 0; gap: 40px; }
             .hero-media { order: -1; aspect-ratio: 4/3.4; }
@@ -1175,7 +1196,7 @@
                 <p class="lead">Somos uma consultoria de implementação BIM que estrutura processo, equipe e cultura, até seu escritório operar com autonomia real.</p>
                 <div class="hero-actions">
                     <a href="cadastro.html" class="btn btn-olive">Solicite uma proposta <span class="arr">→</span></a>
-                    <a href="#nossos-servicos" class="tlink">Saiba mais <span class="arr">→</span></a>
+                    <a href="https://tally.so/r/7RYDZ0" class="btn btn-olive-outline" target="_blank" rel="noopener">Faça o seu diagnóstico agora <span class="arr">→</span></a>
                 </div>
             </div>
             <div class="hero-media reveal bw">
@@ -1238,7 +1259,7 @@
 
             <div class="services-foot reveal">
                 <a href="cadastro.html" class="btn btn-olive">Solicite sua proposta <span class="arr">→</span></a>
-                <a href="#implementacoes" class="tlink">Nosso carro-chefe é a Implementação BIM <span class="arr">→</span></a>
+                <a href="#implementacoes" class="tlink">Conheça nossa Implementação BIM <span class="arr">→</span></a>
             </div>
         </div>
     </section>
