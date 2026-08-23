@@ -597,7 +597,9 @@
             margin-bottom: 40px;
             max-width: 16ch;
         }
-        .statement .big .soft { color: var(--ink-muted); }
+        /* 0.68, mesmo motivo do .us: aqui o texto tem 66px no desktop e nem o mínimo
+           de 3:1 para texto grande era atingido com --ink-muted (2,73). Task 21 · T11. */
+        .statement .big .soft { color: rgba(76, 79, 55, 0.68); }
         .statement .para {
             font-size: clamp(15px, 1.6vw, 18px);
             color: var(--ink-soft);
