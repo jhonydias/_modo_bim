@@ -21,3 +21,12 @@
 
 # Credenciais do clasp, se o npm as gerar localmente. Nunca versionar.
 .clasprc.json
+
+# Originais de câmera nunca vão para o ar — só as derivadas de img/opt/ (task 21 · T8).
+# img/day.jpg (24 MB, 4000x6000) e img/joe.jpg (20 MB, 3875x5813) estão na árvore, não
+# rastreados: um `git add .` distraído publicaria 44 MB, e o que entra no histórico do
+# git fica lá para sempre, no clone de todo mundo. As fotos da seção "quem somos" que o
+# site usa continuam sendo img/dayana.jpg e img/joene.jpg.
+/img/*-original.*
+/img/day.jpg
+/img/joe.jpg
