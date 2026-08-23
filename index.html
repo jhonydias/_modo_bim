@@ -2279,11 +2279,22 @@
         if (window.ResizeObserver) {
             // só a mudança de largura importa; observar altura realimentaria o próprio lock
             let lastWidth = -1;
+            let lockRaf = null;
             new ResizeObserver(entries => {
                 const w = Math.round(entries[0].contentRect.width);
                 if (w === lastWidth) return;
                 lastWidth = w;
-                lockHeight();
+                /* lockHeight() escreve layout (min-height, display, position). Chamá-lo
+                   AQUI DENTRO obriga o navegador a reentregar a observação, e quando a
+                   reentrega não cabe no mesmo quadro ele dispara
+                   "ResizeObserver loop completed with undelivered notifications" — um
+                   erro de console de verdade, que derrubava o smoke do WebKit em metade
+                   das rodadas. O guarda de largura acima evita o loop infinito, não o
+                   aviso: a mutação já aconteceu dentro do callback.
+                   Adiando para o quadro seguinte, o callback retorna sem tocar em
+                   layout e a escrita acontece fora do ciclo de entrega. */
+                if (lockRaf) cancelAnimationFrame(lockRaf);
+                lockRaf = requestAnimationFrame(() => { lockRaf = null; lockHeight(); });
             }).observe(copyPanel);
         } else window.addEventListener('resize', lockHeight);
 
