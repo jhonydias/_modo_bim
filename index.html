@@ -25,6 +25,112 @@
     <title>Consultoria de Implementação BIM em escritórios | _modo_bim</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
+    <!-- Identidade da empresa e do site. Alimenta o Knowledge Graph e e o que os buscadores
+         com IA leem para saber o que a _modo_bim e. sameAs fica de fora ate termos as URLs
+         reais de Instagram e LinkedIn — perfil inventado e pior que perfil ausente. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://modobim.com.br/#organizacao",
+          "name": "_modo_bim",
+          "alternateName": "modo bim",
+          "description": "Consultoria de implementação BIM para escritórios de arquitetura e engenharia.",
+          "url": "https://modobim.com.br/",
+          "logo": "https://modobim.com.br/img/logo.png",
+          "image": "https://modobim.com.br/og-image.png",
+          "areaServed": {
+            "@type": "Country",
+            "name": "Brasil"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Belém",
+            "addressRegion": "PA",
+            "addressCountry": "BR"
+          },
+          "founder": [
+            {
+              "@type": "Person",
+              "name": "Joene Louchard",
+              "jobTitle": "Co-fundadora · Arquiteta e Designer"
+            },
+            {
+              "@type": "Person",
+              "name": "Dayana Ramos",
+              "jobTitle": "Co-fundadora · Arquiteta, especialista em BIM"
+            }
+          ],
+          "knowsAbout": [
+            "BIM",
+            "Building Information Modeling",
+            "Implementação BIM",
+            "Gestão de projetos",
+            "Revit",
+            "Archicad"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://modobim.com.br/#site",
+          "url": "https://modobim.com.br/",
+          "name": "_modo_bim",
+          "inLanguage": "pt-BR",
+          "publisher": {
+            "@id": "https://modobim.com.br/#organizacao"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- FAQPage com as perguntas e respostas COPIADAS do markup abaixo, sem parafrase:
+         texto de schema que nao bate com o da pagina e violacao de politica. Desde 2023 o
+         Google so mostra o rich result de FAQ para governo e saude — aqui o valor e de
+         entendimento da entidade, nao de acordeao no resultado de busca. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Preciso ter uma equipe grande?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Não precisa ser grande, mas precisa existir. Fazemos implementação em escritórios com equipes a partir de 3 pessoas, é o tamanho mínimo para que o método seja da empresa e não da cabeça de uma pessoa só. Abaixo disso, o caminho que mais rende são os Treinamentos."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qual software vocês implementam?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Trabalhamos principalmente com Revit e Archicad. Mais importante que a ferramenta é o método: implementamos o BIM na ordem certa para o seu fluxo, não o contrário."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanto tempo dura a implementação?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A jornada completa, do diagnóstico à autonomia, leva em média 6 meses de parceria real, com acompanhamento durante todo o processo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Onde vocês atendem?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Somos de Belém, Pará, e atendemos escritórios em todo o Brasil de forma remota, com encontros e acompanhamento à distância."
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- Fonts -->
     <!-- Sentient (títulos / fonte principal) — Fontshare -->
     <link href="https://api.fontshare.com/v2/css?f[]=sentient@300,400,500,700,301,401,501,701&display=swap" rel="stylesheet" />
