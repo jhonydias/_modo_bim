@@ -21,3 +21,9 @@
 
 # Credenciais do clasp, se o npm as gerar localmente. Nunca versionar.
 .clasprc.json
+
+# Artefatos da suíte de testes (task 19). test-results/ guarda protocolos e
+# e-mails de QA da rodada @live — registro operacional, não artefato de repo.
+/test-results/
+/playwright-report/
+/coverage/
