@@ -9,12 +9,21 @@
     "pull": "clasp pull",
     "check:endpoint": "node scripts/check-endpoint.mjs",
     "build:fonts": "node scripts/build-fonts.mjs",
-    "build:images": "node scripts/build-images.mjs"
+    "build:images": "node scripts/build-images.mjs",
+    "serve": "http-server . -p 4173 -c-1 --silent",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test --grep-invert @live --retries=1",
+    "test:e2e:live": "playwright test --grep @live",
+    "test": "npm run check:endpoint && npm run test:unit && npm run test:e2e"
   },
   "devDependencies": {
     "@fontsource-variable/inter": "^5.3.0",
     "@google/clasp": "2.4.2",
     "sharp": "^0.35.3",
-    "subset-font": "^2.5.0"
+    "subset-font": "^2.5.0",
+    "@playwright/test": "^1.62.1",
+    "http-server": "^14.1.1",
+    "jsdom": "^30.0.1",
+    "vitest": "^4.1.11"
   }
 }

@@ -1,0 +1,87 @@
+# Testes automatizados da task 19.
+#
+# Roda a cada push na master e a cada PR aberto (ou atualizado) contra a master.
+# Só os UNITÁRIOS: são determinísticos, não precisam de browser e terminam em
+# segundos. O E2E fica de fora de propósito — exige baixar Chromium e WebKit
+# (centenas de MB por execução) e o smoke faz um GET no endpoint de produção.
+# Para rodá-lo aqui um dia, ver o bloco comentado no fim deste arquivo.
+#
+# O site é servido pelo GitHub Pages a partir da raiz do repositório; o Pages
+# ignora a pasta .github, então este arquivo não vai para o ar.
+
+name: testes
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Só leitura: o workflow não escreve no repo nem publica nada.
+permissions:
+  contents: read
+
+# Um push logo depois do outro cancela a execução anterior do mesmo ref —
+# o que vale é sempre o último commit.
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unitarios:
+    name: unitários
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Mesma major usada no desenvolvimento (Node 24).
+          node-version: '24'
+          cache: npm
+
+      # `npm ci` instala exatamente o que está no package-lock.json. Os binários
+      # nativos de Linux (@rolldown/binding-linux-x64-gnu, lightningcss-linux-x64-gnu)
+      # estão no lock, então o lockfile gerado no Windows funciona aqui.
+      # Nenhum browser do Playwright é baixado: o pacote @google/clasp e o
+      # @playwright/test entram, mas sem `npx playwright install` não há download.
+      - name: Instalar dependências
+        run: npm ci
+
+      # Guarda de regressão da task 20: falha se a URL do Apps Script voltar a
+      # ficar hardcoded em algum HTML, ou se js/config.js sumir. Custa
+      # milissegundos. Se preferir a pipe só com os testes, é só apagar este passo.
+      - name: Conferir a fonte única do endpoint
+        run: npm run check:endpoint
+
+      # O reporter github-actions anota a falha na própria linha do arquivo,
+      # visível no diff do PR; o default mantém a saída legível no log.
+      - name: Testes unitários
+        run: npm run test:unit -- --reporter=github-actions --reporter=default
+
+# ----------------------------------------------------------------------------
+# Para rodar o E2E aqui no futuro, acrescente um job próprio. Duas advertências
+# antes: o `smoke.spec.js` faz um GET no endpoint de produção (leitura, não
+# grava nada), e os specs @live NUNCA podem entrar — eles gravam na planilha
+# real. O `npm run test:e2e` já os exclui por `--grep-invert @live`.
+#
+#  e2e:
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 30
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-node@v4
+#        with:
+#          node-version: '24'
+#          cache: npm
+#      - run: npm ci
+#      - run: npx playwright install --with-deps chromium webkit
+#      - run: npm run test:e2e
+#      - uses: actions/upload-artifact@v4
+#        if: ${{ !cancelled() }}
+#        with:
+#          name: playwright-report
+#          path: playwright-report/
+#          retention-days: 7

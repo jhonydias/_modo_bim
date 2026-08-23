@@ -30,3 +30,9 @@
 /img/*-original.*
 /img/day.jpg
 /img/joe.jpg
+
+# Artefatos da suíte de testes (task 19). test-results/ guarda protocolos e
+# e-mails de QA da rodada @live — registro operacional, não artefato de repo.
+/test-results/
+/playwright-report/
+/coverage/
