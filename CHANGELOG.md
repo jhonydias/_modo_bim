@@ -7,6 +7,11 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-08-23
 
+### Logo do topo leva para a home em todas as páginas — `cadastro.html`, `contrato.html`, `lista-espera.html`
+- Nas três telas de formulário o wordmark do canto superior esquerdo era `<a href="#">` com um handler que dava `e.preventDefault()` e chamava `showStage(0)`: **não saía da página**, só resetava o fluxo para a tela de abertura. Virou `href="index.html"`, e o handler foi removido — sem isso o `preventDefault()` continuaria bloqueando a navegação. O `aria-label` passou de "_modo_bim, início" para "_modo_bim, ir para a página inicial", que é o que o link faz agora.
+- **Efeito colateral assumido:** quem estiver no meio do formulário e clicar na logo sai da página em vez de voltar para a abertura — comportamento padrão de logo em site. As setas de voltar por etapa (`[data-back]`) continuam intactas e são o caminho para andar dentro do fluxo.
+- `produtos.html` já apontava para `index.html` e `index.html` usa `#top` (é a própria home) — nenhum dos dois precisou de mudança. Verificado no navegador: clicando na logo já dentro da etapa 01 do `cadastro.html`, a URL vai para `/index.html`; as três páginas carregam sem erro de console.
+
 ### CTA secundário do hero vira o diagnóstico — `index.html`
 - O link "Saiba mais" ao lado de "Solicite uma proposta" (hero) virou **"Faça o seu diagnóstico agora"**, apontando para o formulário externo `https://tally.so/r/7RYDZ0` em nova aba (`target="_blank" rel="noopener"`). O "Saiba mais" da seção *nosso modo* continua como estava, levando para `#nossos-servicos`.
 - **Mesma pílula do "Solicite uma proposta", em contorno** (`.btn-olive-outline`): fundo transparente, texto militar e traço de 1px feito com `box-shadow: inset` — não `border`, para o botão manter exatamente a mesma altura e o mesmo padding do sólido ao lado. No hover preenche de militar e sobe os 2px de sempre, como o `.btn-olive`. Contorno em vez de sólido para não haver dois CTAs primários disputando o mesmo espaço.

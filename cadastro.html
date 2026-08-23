@@ -759,7 +759,7 @@
          HEADER (always visible)
          ============================================ -->
     <header class="header">
-        <a href="#" class="brand-logo header-logo" id="wordmark" aria-label="_modo_bim, início">_modo_bim</a>
+        <a href="index.html" class="brand-logo header-logo" id="wordmark" aria-label="_modo_bim, ir para a página inicial">_modo_bim</a>
         <span class="header-meta" id="headerMeta">2026</span>
     </header>
 
@@ -1055,11 +1055,6 @@
             else if (segStep === step) seg.classList.add('active');
         });
     }
-
-    document.getElementById('wordmark').addEventListener('click', (e) => {
-        e.preventDefault();
-        showStage(0);
-    });
 
     startBtn.addEventListener('click', (e) => {
         e.preventDefault();
