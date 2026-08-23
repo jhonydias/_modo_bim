@@ -72,11 +72,34 @@ for (const pagina of PAGINAS) {
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
         await page.waitForTimeout(800);
 
-        const semSrc = await page.$$eval('img, video, source', (els) =>
-            els.filter((el) => !el.getAttribute('src')).length);
+        /* Desde a task 21 o site usa <picture>. Dentro dele o <source> declara a
+           mídia em `srcset` — `src` ali não é só desnecessário, é proibido pela
+           especificação, e o validador do W3C reprova. Por isso a checagem é
+           "tem fonte declarada", não "tem atributo src". */
+        const semFonte = await page.$$eval('img, video, source', (els) =>
+            els.filter((el) => !el.getAttribute('src') && !el.getAttribute('srcset'))
+                .map((el) => el.tagName.toLowerCase() + (el.className ? '.' + el.className : '')));
+
+        /* E o inverso, para o filtro acima não virar frouxidão: quem está dentro
+           de <picture> tem de usar srcset e NÃO src; <img> e <video> continuam
+           obrigados a ter src. */
+        const fonteErrada = await page.$$eval('img, video, source', (els) => {
+            const erros = [];
+            for (const el of els) {
+                const dentroDePicture = el.parentElement?.tagName === 'PICTURE';
+                if (el.tagName === 'SOURCE' && dentroDePicture) {
+                    if (!el.getAttribute('srcset')) erros.push('<source> em <picture> sem srcset');
+                    if (el.getAttribute('src')) erros.push('<source> em <picture> com src (proibido pela spec)');
+                } else if (el.tagName !== 'SOURCE' && !el.getAttribute('src') && !el.getAttribute('srcset')) {
+                    erros.push(`<${el.tagName.toLowerCase()}> sem src`);
+                }
+            }
+            return erros;
+        });
 
         expect(quebrados, 'mídias com 404').toEqual([]);
-        expect(semSrc, 'mídias sem src').toBe(0);
+        expect(semFonte, 'mídias sem src nem srcset').toEqual([]);
+        expect(fonteErrada, 'mídias com o atributo de fonte errado').toEqual([]);
     });
 }
 
