@@ -145,6 +145,13 @@
     <!-- Neue Haas Grotesk (detalhe) é fonte licenciada e não é baixada: --detail cai no
          fallback Helvetica Neue / Arial, que é do sistema e custa zero byte. -->
 
+    <!-- Imagem do hero, no primeiro viewport do celular (o CSS lhe dá order:-1 abaixo
+         de 900px). O type= faz o navegador que não entende AVIF ignorar este preload em
+         vez de baixar um arquivo que não vai usar. -->
+    <link rel="preload" as="image" href="img/opt/hero-793.avif" type="image/avif"
+          imagesrcset="img/opt/hero-400.avif 400w, img/opt/hero-793.avif 793w"
+          imagesizes="(max-width: 900px) 88vw, 33vw" fetchpriority="high" />
+
     <style>
         /* ============================================
            DESIGN TOKENS
@@ -521,6 +528,10 @@
             aspect-ratio: 4 / 3.7;
             box-shadow: 0 30px 80px -40px rgba(71, 0, 0, 0.5);
         }
+        /* <picture> é um elemento a mais entre .hero-media e o <img>, e nasce inline:
+           sem isto o height:100% do img não teria contra o que resolver e o object-fit
+           deixaria de recortar. Vale o mesmo para a faixa e para a foto da equipe. */
+        .hero-media picture { display: block; width: 100%; height: 100%; }
         .hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
         /* ============================================
@@ -1320,7 +1331,17 @@
                 </div>
             </div>
             <div class="hero-media reveal bw">
-                <img src="img/hero.jpg" alt="Equipe da _modo_bim instalando uma cultura BIM" />
+                <!-- Único elemento da página com fetchpriority="high" (regra 4 do §2.5 da
+                     task 21). width/height são os do arquivo e servem só de proporção
+                     intrínseca: quem manda no enquadramento é o object-fit do CSS.
+                     O original tem 793 px de largura e o desktop retina pediria 940 —
+                     não há versão maior no repositório, então o desktop 2x fica macio.
+                     Dívida registrada; some no dia em que houver o arquivo de origem. -->
+                <picture>
+                    <source type="image/avif" srcset="img/opt/hero-400.avif 400w, img/opt/hero-793.avif 793w" sizes="(max-width: 900px) 88vw, 33vw" />
+                    <source type="image/webp" srcset="img/opt/hero-400.webp 400w, img/opt/hero-793.webp 793w" sizes="(max-width: 900px) 88vw, 33vw" />
+                    <img src="img/opt/hero-793.webp" width="793" height="706" fetchpriority="high" decoding="async" alt="Equipe da _modo_bim instalando uma cultura BIM" />
+                </picture>
             </div>
         </div>
     </section>
