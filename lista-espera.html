@@ -105,6 +105,9 @@
             --cloud: #EFEEE9;
             --cloud-soft: rgba(239, 238, 233, 0.7);
             --cloud-muted: rgba(239, 238, 233, 0.45);
+            /* Mínimo de opacidade que passa em AA 4,5:1 sobre --cereja. A 0.45,
+               --cloud-muted dá 2,82 — reprovado. Task 21 · T11. */
+            --cloud-aa: rgba(239, 238, 233, 0.68);
             --cloud-faint: rgba(239, 238, 233, 0.18);
             --cloud-line: rgba(239, 238, 233, 0.35);
             --sage: #C7BDB5;
@@ -675,7 +678,7 @@
             font-family: var(--detail);
             font-size: 11px;
             letter-spacing: 0.18em;
-            color: var(--cloud-muted);
+            color: var(--cloud-aa);
             font-weight: 500;
             margin-top: auto;
         }
