@@ -3,27 +3,99 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Lista de espera Modo BIM. Garanta sua vaga na próxima turma." />
-    <meta property="og:url" content="https://jhonydias.github.io/_modo_bim/lista-espera.html" />
-    <meta property="og:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
-    <meta name="twitter:image" content="https://jhonydias.github.io/_modo_bim/og-image.png" />
-    <title>_modo_bim · lista de espera</title>
+    <meta name="description" content="Entre na lista de espera do treinamento BIM na Prática da _modo_bim e seja avisado em primeiro lugar quando a próxima turma abrir inscrições." />
+    <link rel="canonical" href="https://modobim.com.br/lista-espera.html" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#81161E" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="_modo_bim" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content="Treinamento BIM na Prática — lista de espera | _modo_bim" />
+    <meta property="og:description" content="Seja avisado em primeiro lugar quando a próxima turma do treinamento BIM na Prática abrir inscrições." />
+    <meta property="og:url" content="https://modobim.com.br/lista-espera.html" />
+    <meta property="og:image" content="https://modobim.com.br/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Cartão da _modo_bim em fundo vermelho com a frase “Ative seu modo BIM”" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Treinamento BIM na Prática — lista de espera | _modo_bim" />
+    <meta name="twitter:description" content="Seja avisado quando a próxima turma abrir inscrições." />
+    <meta name="twitter:image" content="https://modobim.com.br/og-image.png" />
+    <title>Treinamento BIM na Prática — lista de espera | _modo_bim</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
-    <!-- Fonts -->
-    <!-- Sentient (títulos / fonte principal) — Fontshare -->
-    <link href="https://api.fontshare.com/v2/css?f[]=sentient@300,400,500,700,301,401,501,701&display=swap" rel="stylesheet" />
-    <!-- Inter (textos / fonte secundária) — Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet" />
-    <!-- Neue Haas Grotesk (detalhe) — fonte licenciada, sem CDN gratuito.
-         Para usá-la de verdade, hospede os arquivos com um @font-face próprio
-         ou inclua aqui o kit do Adobe Fonts, por exemplo:
-         <link rel="stylesheet" href="https://use.typekit.net/SEU_KIT.css" />
-         Sem isso, o fallback Helvetica Neue / Arial é aplicado (visualmente próximo). -->
+    <!-- WebPage ligada a organizacao e ao site declarados no index.html. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "url": "https://modobim.com.br/lista-espera.html",
+      "name": "Treinamento BIM na Prática — lista de espera",
+      "inLanguage": "pt-BR",
+      "isPartOf": {
+        "@id": "https://modobim.com.br/#site"
+      },
+      "about": {
+        "@id": "https://modobim.com.br/#organizacao"
+      }
+    }
+    </script>
+
+    <!-- Fontes self-hosted (task 21 · T4): nenhuma origem de terceiro no caminho crítico.
+         Antes daqui saíam duas requisições bloqueantes de render, uma para o CDN do
+         Fontshare e outra para o do Google Fonts, que o Lighthouse mediu em 2.622 ms
+         de atraso no mobile.
+         Os .woff2 são subsets gerados por scripts/build-fonts.mjs (npm run build:fonts).
+         Só os dois pesos do primeiro paint são pré-carregados; os outros quatro chegam
+         sob demanda, sem bloquear, graças ao font-display: swap.
+         crossorigin é obrigatório no preload de fonte MESMO em mesma origem: sem ele o
+         navegador baixa o arquivo duas vezes. -->
+    <link rel="preload" as="font" type="font/woff2" href="fonts/sentient-400.subset.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin-wght-normal.subset.woff2" crossorigin />
+    <!-- Neue Haas Grotesk (detalhe) é fonte licenciada e não é baixada: --detail cai no
+         fallback Helvetica Neue / Arial, que é do sistema e custa zero byte. -->
 
     <style>
+        /* ============================================
+           FONTES SELF-HOSTED  (task 21 · T4)
+           Subsets em fonts/, gerados por scripts/build-fonts.mjs.
+           Pesos declarados = os cinco que o site realmente renderiza, medidos nas
+           requisições reais do Lighthouse: Sentient 300i/400/400i/500/700 e Inter
+           variável. Declarar peso que ninguém usa não custa byte, mas mente sobre
+           o design; declarar de menos faz o navegador sintetizar itálico/negrito.
+           ============================================ */
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-400.subset.woff2') format('woff2');
+            font-weight: 400; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-500.subset.woff2') format('woff2');
+            font-weight: 500; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-700.subset.woff2') format('woff2');
+            font-weight: 700; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-300-italic.subset.woff2') format('woff2');
+            font-weight: 300; font-style: italic; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-400-italic.subset.woff2') format('woff2');
+            font-weight: 400; font-style: italic; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/inter-latin-wght-normal.subset.woff2') format('woff2');
+            font-weight: 100 900; font-style: normal; font-display: swap;
+        }
+
         /* ============================================
            DESIGN TOKENS
            ============================================ */
@@ -33,6 +105,9 @@
             --cloud: #EFEEE9;
             --cloud-soft: rgba(239, 238, 233, 0.7);
             --cloud-muted: rgba(239, 238, 233, 0.45);
+            /* Mínimo de opacidade que passa em AA 4,5:1 sobre --cereja. A 0.45,
+               --cloud-muted dá 2,82 — reprovado. Task 21 · T11. */
+            --cloud-aa: rgba(239, 238, 233, 0.68);
             --cloud-faint: rgba(239, 238, 233, 0.18);
             --cloud-line: rgba(239, 238, 233, 0.35);
             --sage: #C7BDB5;
@@ -117,7 +192,7 @@
            the image as a centered, non-repeating background). */
         .brand-logo {
             display: block;
-            background-image: url("img/logo.png");
+            background-image: url("img/opt/logo-500.webp");
             background-repeat: no-repeat;
             background-position: center;
             text-indent: -9999px;
@@ -603,7 +678,7 @@
             font-family: var(--detail);
             font-size: 11px;
             letter-spacing: 0.18em;
-            color: var(--cloud-muted);
+            color: var(--cloud-aa);
             font-weight: 500;
             margin-top: auto;
         }

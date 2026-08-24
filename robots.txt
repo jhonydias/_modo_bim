@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /contrato.html
+
+Sitemap: https://modobim.com.br/sitemap.xml

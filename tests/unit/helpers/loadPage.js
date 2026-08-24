@@ -15,6 +15,32 @@ import { vi } from 'vitest';
 
 const raiz = (p) => new URL(`../../../${p}`, import.meta.url);
 
+/* Um <script> com `type` que não é de JavaScript é um *data block*: o navegador
+ * carrega o conteúdo no DOM e NUNCA o executa. É o caso do
+ * `application/ld+json` que a task 21 acrescentou em index, cadastro,
+ * lista-espera e produtos. Sem este filtro, o eval abaixo recebia o JSON-LD
+ * concatenado com o JS da página e morria no primeiro `:` do JSON
+ * (`SyntaxError: Unexpected token ':'`), derrubando todo teste que carregasse
+ * uma dessas páginas.
+ *
+ * A lista é a do HTML Standard: type ausente ou vazio = JavaScript clássico;
+ * "module" = módulo; os MIME types legados continuam valendo. Qualquer outro
+ * valor (importmap, speculationrules, ld+json, text/template…) é dado.
+ */
+const TIPOS_JS = new Set([
+    '',
+    'module',
+    'text/javascript',
+    'application/javascript',
+    'text/ecmascript',
+    'application/ecmascript',
+    'text/jscript',
+]);
+
+function ehJavaScript(script) {
+    return TIPOS_JS.has((script.getAttribute('type') || '').toLowerCase().trim());
+}
+
 export function lerArquivo(caminhoRelativo) {
     return readFileSync(raiz(caminhoRelativo), 'utf8');
 }
@@ -54,6 +80,7 @@ export function loadPage(file, opts = {}) {
 
     // 2) só então os scripts inline
     const inline = [...w.document.querySelectorAll('script:not([src])')]
+        .filter(ehJavaScript)
         .map((s) => s.textContent)
         .join('\n');
 
