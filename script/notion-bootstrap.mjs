@@ -3,10 +3,13 @@
  *  notion-bootstrap.mjs — setup dos databases do Notion (task 08)
  * ============================================================
  *  Faz por API o que os passos 2, 4 e 6 de tasks/08/notion-integracao.md
- *  descrevem na mão: cria os três databases com os nomes e tipos de
- *  coluna que buildNotionProps_() (script/Code.gs) espera, grava uma
- *  página [TESTE] em cada um e devolve os IDs para as Propriedades
- *  do script do Apps Script.
+ *  descrevem na mão: cria os databases com os nomes e tipos de coluna
+ *  que buildNotionProps_() (script/Code.gs) espera, grava uma página
+ *  [TESTE] em cada um e devolve os IDs para as Propriedades do script
+ *  do Apps Script.
+ *
+ *  Os schemas moram em script/notion-schema.mjs (task 22) — este
+ *  arquivo é só a linha de comando em volta deles.
  *
  *  Só é preciso rodar de novo se os databases forem recriados —
  *  trocar o token da integração NÃO exige nada disto.
@@ -21,223 +24,27 @@
  *  Comandos:
  *
  *    node script/notion-bootstrap.mjs check     # token + acesso às páginas
- *    node script/notion-bootstrap.mjs create    # cria os três databases
+ *    node script/notion-bootstrap.mjs create    # cria os databases
+ *    node script/notion-bootstrap.mjs verify    # confere colunas/tipos/opções do que já existe
  *    node script/notion-bootstrap.mjs seed      # grava uma página [TESTE] em cada
  *    node script/notion-bootstrap.mjs cleanup   # arquiva as páginas [TESTE]
- *    node script/notion-bootstrap.mjs all       # check + create + seed
+ *    node script/notion-bootstrap.mjs all       # check + create + verify + seed
  *
  *  Todos aceitam um alvo opcional — `orcamentos`, `cadastros` ou
  *  `listaEspera` — para agir em um só database. Sem ele, agem nos três:
  *
  *    node script/notion-bootstrap.mjs all orcamentos
  *
- *  Antes de qualquer coisa: conecte a integração às três páginas
+ *  Antes de qualquer coisa: conecte a integração às páginas
  *  (••• › Connections › Connect to). Sem isso a API responde
  *  404 object_not_found mesmo para páginas que existem.
  * ============================================================ */
 
+import { DBS, ENV_DB, SCHEMAS, SEEDS } from './notion-schema.mjs';
+
 const TOKEN = process.env.NOTION_TOKEN;
 const API = 'https://api.notion.com/v1/';
 const VERSION = '2022-06-28';   // mesma de NOTION.VERSION em Code.gs
-
-/* Páginas-mãe onde os databases vivem. Sobrescreva por ambiente se
- * o workspace mudar: NOTION_PAGE_ORCAMENTOS / NOTION_PAGE_CADASTROS /
- * NOTION_PAGE_LISTA_ESPERA. */
-const PAGES = {
-    orcamentos:  process.env.NOTION_PAGE_ORCAMENTOS   || '3b05a5ea5c9d80f59024ddcf166bf571',  // "Cadastro de Orçamentos"
-    cadastros:   process.env.NOTION_PAGE_CADASTROS    || '3b05a5ea5c9d808ab2a9dd725fa8164b',  // "Cadastro de Clientes"
-    listaEspera: process.env.NOTION_PAGE_LISTA_ESPERA || '3b05a5ea5c9d80f093dec884cc2221b6',  // "Lista de Espera"
-};
-
-/* Databases já criados (Cadastros e Lista de Espera em 02/08/2026;
- * Orçamentos no mesmo dia, task 10). Usados por `seed` e `cleanup`
- * quando rodam sem um `create` antes. */
-const DBS = {
-    orcamentos:  process.env.NOTION_DB_ORCAMENTOS   || '3b05a5ea5c9d81cda679c6c9210f0de2',
-    cadastros:   process.env.NOTION_DB_CADASTROS    || '3b05a5ea5c9d81bfa3f1c11b72552833',
-    listaEspera: process.env.NOTION_DB_LISTA_ESPERA || '3b05a5ea5c9d813abeb9d8bc6e573d11',
-};
-
-/* Nome da variável de ambiente de cada alvo — só para a mensagem de erro
- * apontar a variável certa (listaEspera ≠ LISTAESPERA). */
-const ENV_DB = {
-    orcamentos:  'NOTION_DB_ORCAMENTOS',
-    cadastros:   'NOTION_DB_CADASTROS',
-    listaEspera: 'NOTION_DB_LISTA_ESPERA',
-};
-
-/* ============================================================
- *  SCHEMAS
- * ============================================================
- *  Os nomes precisam bater EXATAMENTE com os de buildNotionProps_()
- *  em script/Code.gs — acentos incluídos. Mudou lá, muda aqui.
- * ============================================================ */
-
-const text = () => ({ rich_text: {} });
-const select = (options = []) => ({ select: { options: options.map(name => ({ name })) } });
-const multiSelect = (options = []) => ({ multi_select: { options: options.map(name => ({ name })) } });
-const number = () => ({ number: { format: 'number' } });
-const date = () => ({ date: {} });
-
-const UF = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
-const STATUS = ['Novo', 'Contato feito', 'Proposta', 'Fechado', 'Perdido'];
-const NIVEL_EQUIPE = ['Já possui conhecimento', 'Partirão do zero', 'Equipe mista'];
-
-/* Selects sem opções pré-carregadas são intencionais: a API cria a
- * opção sozinha no primeiro lead que chegar, então listar aqui só
- * criaria divergência com o que o formulário de fato manda. */
-const SCHEMAS = {
-    orcamentos: {
-        title: 'Orçamentos',
-        page: PAGES.orcamentos,
-        properties: {
-            'Nome Completo':          { title: {} },
-            'Protocolo':              text(),
-            'Recebido em':            date(),
-            'Empresa':                text(),
-            'E-mail':                 { email: {} },
-            'Telefone':               { phone_number: {} },
-            'Produtos e Serviços':    text(),
-            'Gargalo Atual':          text(),
-            'Expectativa com BIM':    text(),
-            'Pessoas no Treinamento': number(),
-            // multi-select: "Qual(is) software(s)" aceita mais de um
-            'Software de Interesse':  multiSelect(['Revit', 'Archicad', 'Navisworks']),
-            'Nível da Equipe':        select(NIVEL_EQUIPE),
-            'Reunião (1ª opção)':     date(),
-            'Reunião (2ª opção)':     date(),
-            'Observações':            text(),
-            'Status':                 select(STATUS),
-            'User Agent':             text(),
-        },
-    },
-    cadastros: {
-        title: 'Cadastros',
-        page: PAGES.cadastros,
-        properties: {
-            'Razão Social':       { title: {} },
-            'Protocolo':          text(),
-            'Recebido em':        { date: {} },
-            'Nome Fantasia':      text(),
-            'CNPJ':               text(),
-            'Inscrição Estadual': text(),
-            'Ramo de Atividade':  select(['Arquitetura', 'Engenharia', 'Construtora', 'Incorporadora', 'Instalações', 'Consultoria', 'Outro']),
-            'CPF Representante':  text(),
-            'Cargo':              text(),
-            'E-mail':             { email: {} },
-            'Telefone':           { phone_number: {} },
-            'Site':               { url: {} },
-            'CEP':                text(),
-            'Endereço':           text(),
-            'Cidade':             text(),
-            'Estado':             select(UF),
-            'Status':             select(STATUS),
-            'User Agent':         text(),
-        },
-    },
-    listaEspera: {
-        title: 'Lista de Espera',
-        page: PAGES.listaEspera,
-        properties: {
-            'Nome Completo':         { title: {} },
-            'Protocolo':             text(),
-            'Recebido em':           { date: {} },
-            'E-mail':                { email: {} },
-            'Telefone':              { phone_number: {} },
-            'Cidade':                text(),
-            'Estado':                select(UF),
-            'Empresa':               text(),
-            'Cargo':                 text(),
-            'Software Atual':        select(),
-            'Nível BIM':             select(),
-            'Software de Interesse': select(),
-            'Objetivo':              text(),
-            'Como Conheceu':         select(),
-            'BIMClub':               select(['Sim', 'Não']),
-            'Status':                select(STATUS),
-            'User Agent':            text(),
-        },
-    },
-};
-
-/* ============================================================
- *  PÁGINAS DE TESTE
- * ============================================================
- *  Mesmo formato de payload de buildNotionProps_(). É este envio
- *  que valida a integração de verdade: nome de coluna, acentuação
- *  e os tipos email / phone_number / url / date.
- * ============================================================ */
-
-const nTitle  = v => ({ title: [{ text: { content: v } }] });
-const nText   = v => ({ rich_text: v ? [{ text: { content: String(v).substring(0, 2000) } }] : [] });
-// vírgula quebra o "select" do Notion em duas opções; troca por barra (igual a nSelect_ do Code.gs)
-const nSelect = v => ({ select: v ? { name: String(v).replace(/,/g, ' /').substring(0, 100) } : null });
-// no multi-select a vírgula É o separador (igual a nMultiSelect_ do Code.gs)
-const nMultiSelect = v => ({ multi_select: String(v || '').split(',').map(s => s.trim()).filter(Boolean).map(name => ({ name })) });
-const nNumber = v => ({ number: v === '' || v === undefined ? null : Number(v) });
-
-const SEEDS = {
-    orcamentos: hoje => ({
-        'Nome Completo':          nTitle('[TESTE] Maria das Graças'),
-        'Protocolo':              nText('OR-2026-9999'),
-        'Recebido em':            { date: { start: hoje } },
-        'Empresa':                nText('Glimmerock Arquitetura'),
-        'E-mail':                 { email: 'teste@exemplo.com.br' },
-        'Telefone':               { phone_number: '(91) 99999-0000' },
-        'Produtos e Serviços':    nText('Projetos de arquitetura residencial e gerenciamento de obras.'),
-        'Gargalo Atual':          nText('Retrabalho e incompatibilidade entre os complementares.'),
-        'Expectativa com BIM':    nText('Reduzir erros em obra e padronizar as entregas.'),
-        'Pessoas no Treinamento': nNumber(8),
-        // com vírgula de propósito: exercita a quebra em duas opções
-        'Software de Interesse':  nMultiSelect('Revit, Navisworks'),
-        'Nível da Equipe':        nSelect('Equipe mista'),
-        'Reunião (1ª opção)':     { date: { start: '2026-09-10T14:30:00-03:00' } },
-        'Reunião (2ª opção)':     { date: { start: '2026-09-12T09:00:00-03:00' } },
-        'Observações':            nText('Preferência por reunião online.'),
-        'Status':                 nSelect('Novo'),
-        'User Agent':             nText('notion-bootstrap/1.0'),
-    }),
-    cadastros: hoje => ({
-        'Razão Social':       nTitle('[TESTE] Construtora Exemplo LTDA'),
-        'Protocolo':          nText('MB-2026-9999'),
-        'Recebido em':        { date: { start: hoje } },
-        'Nome Fantasia':      nText('Exemplo Engenharia'),
-        'CNPJ':               nText('12.345.678/0001-90'),
-        'Inscrição Estadual': nText('ISENTO'),
-        'Ramo de Atividade':  nSelect('Construtora'),
-        'CPF Representante':  nText('123.456.789-00'),
-        'Cargo':              nText('Diretor Técnico'),
-        'E-mail':             { email: 'teste@exemplo.com.br' },
-        'Telefone':           { phone_number: '(11) 99999-0000' },
-        'Site':               { url: 'https://exemplo.com.br' },
-        'CEP':                nText('01310-100'),
-        'Endereço':           nText('Av. Paulista, 1000, Sala 12 - Bela Vista'),
-        'Cidade':             nText('São Paulo'),
-        'Estado':             nSelect('SP'),
-        'Status':             nSelect('Novo'),
-        'User Agent':         nText('notion-bootstrap/1.0'),
-    }),
-    listaEspera: hoje => ({
-        'Nome Completo':         nTitle('[TESTE] Fulano de Tal'),
-        'Protocolo':             nText('LE-2026-9999'),
-        'Recebido em':           { date: { start: hoje } },
-        'E-mail':                { email: 'fulano@exemplo.com.br' },
-        'Telefone':              { phone_number: '(31) 98888-0000' },
-        'Cidade':                nText('Belo Horizonte'),
-        'Estado':                nSelect('MG'),
-        'Empresa':               nText('Escritório Exemplo'),
-        'Cargo':                 nText('Arquiteta'),
-        'Software Atual':        nSelect('AutoCAD'),
-        'Nível BIM':             nSelect('Iniciante'),
-        // com vírgula de propósito: exercita a troca por barra do nSelect_()
-        'Software de Interesse': nSelect('Revit, Navisworks'),
-        'Objetivo':              nText('Migrar o escritório para BIM.'),
-        'Como Conheceu':         nSelect('Instagram'),
-        'BIMClub':               nSelect('Sim'),
-        'Status':                nSelect('Novo'),
-        'User Agent':            nText('notion-bootstrap/1.0'),
-    }),
-};
 
 /* ============================================================
  *  API
@@ -275,6 +82,14 @@ async function step(label, fn) {
     return r;
 }
 
+/* Tipo que o schema local pede para uma propriedade: a chave única do
+ * objeto ({ rich_text: {} } → 'rich_text'). É o mesmo vocabulário que a
+ * API devolve em `property.type`, então dá para comparar direto. */
+const tipoLocal = def => Object.keys(def)[0];
+
+const opcoesLocais = def => (def.select?.options || def.multi_select?.options || []).map(o => o.name);
+const opcoesRemotas = prop => (prop.select?.options || prop.multi_select?.options || []).map(o => o.name);
+
 /* ============================================================
  *  COMANDOS
  * ============================================================ */
@@ -311,7 +126,66 @@ async function create() {
             DBS[key] = r.json.id;
             console.log(`         id:  ${r.json.id.replace(/-/g, '')}`);
             console.log(`         url: ${r.json.url}`);
+            console.log(`         → cole este id em ${ENV_DB[key]} (Propriedades do Apps Script)`);
+            console.log(`           e no DBS de script/notion-schema.mjs`);
         }
+    }
+}
+
+/* Compara o database que está no ar com o schema local. Existe porque
+ * `create` só prova que a criação passou naquele dia: quem edita uma
+ * coluna pela interface do Notion (renomear, trocar Text por Select)
+ * quebra a gravação silenciosamente — o lead vai para a "Fila Notion" e
+ * fica lá. `verify` é o que transforma isso em uma mensagem legível. */
+async function verify() {
+    console.log('\n· Conferindo os databases contra o schema local');
+
+    for (const [key, schema] of alvos()) {
+        if (!DBS[key]) {
+            falhas++;
+            console.log(`  [ERRO] "${schema.title}" — sem ID de database; rode \`create ${key}\` antes ou defina ${ENV_DB[key]}`);
+            continue;
+        }
+
+        const r = await notion('databases/' + DBS[key]);
+        if (!r.ok) {
+            falhas++;
+            console.log(`  [ERRO] "${schema.title}" — HTTP ${r.status} ${r.json.code || ''}`);
+            if (r.status === 404) console.log('         → ID errado ou integração sem acesso (••• › Connections).');
+            continue;
+        }
+
+        const remoto = r.json.properties || {};
+        const problemas = [];
+
+        for (const [nome, def] of Object.entries(schema.properties)) {
+            const prop = remoto[nome];
+            if (!prop) {
+                problemas.push(`falta a coluna "${nome}" (${tipoLocal(def)})`);
+                continue;
+            }
+            if (prop.type !== tipoLocal(def)) {
+                problemas.push(`"${nome}" é ${prop.type} no Notion, deveria ser ${tipoLocal(def)}`);
+                continue;
+            }
+            // Opção faltando não quebra a gravação (a API cria a opção sozinha),
+            // mas quebra filtro e agrupamento salvos — por isso avisa, sem falhar.
+            const faltando = opcoesLocais(def).filter(o => !opcoesRemotas(prop).includes(o));
+            if (faltando.length) console.log(`  [aviso] "${schema.title}" · "${nome}" sem as opções: ${faltando.join(', ')}`);
+        }
+
+        const sobrando = Object.keys(remoto).filter(n => !schema.properties[n]);
+
+        if (problemas.length) {
+            falhas++;
+            console.log(`  [ERRO] "${schema.title}" — ${problemas.length} divergência(s):`);
+            problemas.forEach(p => console.log(`         · ${p}`));
+        } else {
+            console.log(`  [OK]   "${schema.title}" — ${Object.keys(schema.properties).length} colunas conferem`);
+        }
+        // Coluna a mais é inofensiva para a gravação: só aparece para o caso de
+        // ter sido criada por engano (ou de o schema local estar desatualizado).
+        if (sobrando.length) console.log(`  [aviso] "${schema.title}" tem colunas fora do schema: ${sobrando.join(', ')}`);
     }
 }
 
@@ -378,7 +252,7 @@ async function cleanup() {
 
 /* ============================================================ */
 
-const COMANDOS = { check, create, seed, cleanup };
+const COMANDOS = { check, create, verify, seed, cleanup };
 
 (async () => {
     if (!TOKEN) {
@@ -396,12 +270,12 @@ const COMANDOS = { check, create, seed, cleanup };
     if (ALVO) console.log(`(agindo só em "${SCHEMAS[ALVO].title}")`);
 
     if (cmd === 'all') {
-        if (await check()) { await create(); await seed(); }
+        if (await check()) { await create(); await verify(); await seed(); }
         else console.log('\n  Acesso falhou — nada foi criado.');
     } else if (COMANDOS[cmd]) {
         await COMANDOS[cmd]();
     } else {
-        console.error(`Comando desconhecido: ${cmd}. Use check | create | seed | cleanup | all.`);
+        console.error(`Comando desconhecido: ${cmd}. Use ${Object.keys(COMANDOS).join(' | ')} | all.`);
         process.exit(1);
     }
 

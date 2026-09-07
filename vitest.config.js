@@ -8,6 +8,13 @@ export default defineConfig({
         environment: 'node',
         include: ['tests/unit/**/*.test.js'],
         globals: false,
-        restoreMocks: true
+        restoreMocks: true,
+        /* O default do vitest é 5s, e não cabe aqui: os testes de paridade
+           carregam cadastro.html (53KB) inteiro no jsdom e avaliam o script
+           inline dentro do próprio caso de teste. Com os arquivos rodando em
+           paralelo, o primeiro deles passava dos 5s por contenção — falhava
+           sozinho, na suíte cheia, e passava quando rodado isolado. O trabalho
+           é real, não é travamento; o teto é que estava baixo. (task 22) */
+        testTimeout: 20000
     }
 });
