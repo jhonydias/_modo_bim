@@ -353,6 +353,35 @@
         .prod-go .arr { font-style: normal; transition: transform 0.35s var(--ease-out); }
         a.prod-card:hover .prod-go { gap: 16px; }
         a.prod-card:hover .prod-go .arr { transform: translateX(4px); }
+        /* Card com imagem (task 23): ocupa a linha inteira da grade, com a capa à
+           esquerda sangrando até a borda do card e o texto à direita. A capa fica na
+           proporção real (1080×1350), então nada é cortado. */
+        .prod-card--media {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+            gap: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .prod-media { overflow: hidden; aspect-ratio: 4 / 5; background: var(--cereja); }
+        .prod-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.9s var(--ease-out);
+        }
+        a.prod-card--media:hover .prod-media img { transform: scale(1.04); }
+        .prod-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+            padding: clamp(26px, 4.4vw, 64px);
+        }
+        .prod-card--media .prod-name { font-size: clamp(28px, 3.6vw, 44px); }
+        .prod-card--media .prod-go { margin-top: 0; }
+
         /* Produto anunciado, ainda sem página de destino */
         .prod-card.is-soon { opacity: 0.72; }
         .prod-card.is-soon .prod-tag,
@@ -427,6 +456,12 @@
            ============================================ */
         @media (max-width: 760px) {
             .prod-grid { grid-template-columns: 1fr; }
+            /* a capa sobe e o texto desce */
+            .prod-card--media { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .prod-media img { transition: none; }
+            a.prod-card--media:hover .prod-media img { transform: none; }
         }
         @media (max-width: 520px) {
             .nav-links { left: var(--gutter); right: var(--gutter); min-width: 0; }
@@ -507,7 +542,22 @@
                 <p class="lead">Materiais diretos, tirados do mesmo método que aplicamos dentro dos escritórios. Comece pelos gratuitos e vá no seu ritmo.</p>
             </div>
 
-            <div class="prod-grid prod-grid--single">
+            <div class="prod-grid">
+                <!-- Kit de Projeto BIM (task 23): o único card com imagem. Ocupa a linha
+                     inteira e leva para a página do kit (kit.html), na mesma aba — o
+                     checkout da Kiwify fica nos CTAs de lá. -->
+                <a class="prod-card prod-card--media reveal" href="kit.html">
+                    <figure class="prod-media">
+                        <img src="img/capa-kit.png" width="1080" height="1350" alt="Capa do Kit de Projeto BIM" loading="lazy" decoding="async" />
+                    </figure>
+                    <div class="prod-body">
+                        <span class="prod-tag">Kit digital · R$ 97</span>
+                        <h2 class="prod-name">Kit de Projeto BIM</h2>
+                        <p class="prod-desc">O que todo projeto em BIM precisa definir antes mesmo de começar a modelar. Guias, modelo de PEB editável e Glossário BIM.</p>
+                        <span class="prod-go">conhecer o kit <span class="arr">→</span></span>
+                    </div>
+                </a>
+
                 <!-- Diagnóstico BIM + E-book: um único produto gratuito.
                      Destino: formulário do Tally. Para despublicar, volte à
                      <div class="prod-card is-soon"> com a tag "Em breve · gratuito". -->

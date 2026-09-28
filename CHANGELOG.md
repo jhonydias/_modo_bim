@@ -5,6 +5,18 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ---
 
+## 2026-09-28
+
+### Kit de Projeto BIM no padrão do site + card com capa na vitrine (task 23) — `kit.html`, `produtos.html`, `img/`, `tests/e2e/`
+- **`kit.html` reconstruído sobre o sistema visual do site.** Chegou com Source Serif 4, vermelho aproximado `#7F1620`, texto quase preto `#3A3330`, topo e rodapé próprios e nenhum movimento. Agora usa o `:root` de `produtos.html` sem nenhum token novo (Sentient / Inter / `--detail`, `--cereja #81161E`, Cloud Dancer, `--ink` militar), a mesma nav com hambúrguer, `.btn` com seta, `.label`, `.h-sec` + `em.it`, `.step`, acordeão `.faq-*`, balões `.quote` cereja da galeria, `.cta-final` e `.footer`. **Todo o texto do cliente foi preservado**; só marcação e estilo mudaram.
+- **O detalhe cereja com efeito:** seção "o problema" em cereja com o `#modoPattern` e o brilho `patShimmer`, e a `.cta-final` com os dois patterns emoldurando os cantos, como nas outras páginas. Títulos `.rt` montam palavra a palavra, blocos `.reveal` sobem ao entrar em cena, a foto das autoras entra em P&B e ganha cor (`.bw`). Tudo desligado em `prefers-reduced-motion`.
+- **Checkout:** os três CTAs de compra (hero, cartão de preço, CTA final) levam a `https://pay.kiwify.com.br/omXmzfG` em nova aba com `rel="noopener"` e marcados com `data-checkout`. O placeholder `LINK_CHECKOUT_KIWIFY` — que levava a um 404 — não existe mais. O "Quero o Kit" do hero deixou de rolar até a oferta; quem quer ver o conteúdo antes usa o link de texto "ver o que vem no kit", que leva a `#materiais`.
+- **Imagens:** `img/guia-papeis.png` não existe — o guia ganhou uma capa desenhada em CSS na linguagem das outras (com o `<img>` pronto, comentado, para quando a arte chegar). `img/dayana-e-joene.jpg.jpeg` → `img/dayana-e-joene.jpg`, o nome que o HTML pedia (antes o `onerror` sumia com a foto sem ninguém notar). `img/capa-kit.PNG` → `img/capa-kit.png`: o GitHub Pages diferencia maiúsculas e o resto de `img/` é minúsculo.
+- **`produtos.html`:** card novo `.prod-card--media` para o kit, primeiro da grade e ocupando a linha inteira, com a capa (`img/capa-kit.png`, proporção real 4:5, sem corte) à esquerda e o texto à direita; no hover a capa aproxima 4% além do que o card já faz. O card inteiro — capa incluída — leva a `kit.html`. Abaixo de 760px a capa sobe e o texto desce. Saiu o `.prod-grid--single`.
+- **Testes:** `kit.html` entrou em `PAGINAS` (smoke + responsivo de 390 a 1440px). `tests/e2e/kit.spec.js` (novo, 8 casos): os três CTAs no checkout, nenhum botão de compra fora dele, fontes e cores **medidas no browser**, pattern animado, acordeão, revelação, imagens carregando. `produtos.spec.js`: dois cards, a capa carrega e clicar nela abre `kit.html`; o teste de revelação passou a rolar em passos, porque com a página mais alta o salto direto para o fim pulava os cards.
+
+---
+
 ## 2026-09-07
 
 ### Lista de espera apontando para a página nova do Notion (task 22) — `script/notion-schema.mjs` (novo), `script/notion-bootstrap.mjs`, `tests/unit/notion.schema.test.js` (novo), `vitest.config.js`

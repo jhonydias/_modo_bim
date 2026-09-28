@@ -24,15 +24,48 @@ test('o menu abre, fecha no Escape e marca a página atual', async ({ page }) =>
 });
 
 test('os blocos revelam ao entrar em cena', async ({ page }) => {
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    /* rola aos poucos: com o card do kit (task 23) a página ficou mais alta, e um
+       salto direto para o fim passa por cima dos cards sem eles cruzarem a tela */
+    const altura = await page.evaluate(() => document.body.scrollHeight);
+    for (let y = 0; y <= altura; y += 400) {
+        await page.evaluate((v) => window.scrollTo(0, v), y);
+        await page.waitForTimeout(60);
+    }
     await page.waitForTimeout(800);
 
     const total = await page.locator('.reveal').count();
     await expect(page.locator('.reveal.in')).toHaveCount(total);
 });
 
+test('a vitrine tem dois produtos, o kit primeiro', async ({ page }) => {
+    await expect(page.locator('.prod-card')).toHaveCount(2);
+    await expect(page.locator('.prod-card').first()).toHaveClass(/prod-card--media/);
+});
+
+/* Task 23 — o card do kit é o único com imagem, e a imagem é a capa. */
+test('o card do kit mostra a capa e aponta para kit.html, na mesma aba', async ({ page }) => {
+    const card = page.locator('a.prod-card--media');
+    await expect(card).toHaveCount(1);
+    await expect(card).toHaveAttribute('href', 'kit.html');
+    await expect(card).not.toHaveAttribute('target', /.+/);
+
+    const capa = card.locator('img');
+    await expect(capa).toHaveAttribute('src', 'img/capa-kit.png');
+    await expect(capa).toHaveAttribute('alt', /Kit de Projeto BIM/);
+    await capa.scrollIntoViewIfNeeded();
+    await expect.poll(() => capa.evaluate((img) => img.complete && img.naturalWidth)).toBe(1080);
+});
+
+test('clicar na capa abre a página do kit', async ({ page }) => {
+    const capa = page.locator('a.prod-card--media img');
+    await capa.scrollIntoViewIfNeeded();
+    await capa.click();
+    await page.waitForURL('**/kit.html');
+    await expect(page.locator('h1')).toContainText('Os erros de um projeto BIM');
+});
+
 test('o card do diagnóstico aponta para o Tally, em nova aba', async ({ page }) => {
-    const card = page.locator('.prod-card');
+    const card = page.locator('a.prod-card[href^="https://tally.so"]');
     await expect(card).toHaveCount(1);
     await expect(card).toHaveAttribute('href', 'https://tally.so/r/7RYDZ0');
     await expect(card).toHaveAttribute('target', '_blank');
