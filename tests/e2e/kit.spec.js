@@ -106,6 +106,7 @@ test('as imagens do kit e a foto das autoras carregam de verdade', async ({ page
             { message: await img.getAttribute('src') }).toBe(true);
     }
     await expect(page.locator('img[src="img/dayana-e-joene.jpg"]')).toHaveCount(1);
+    await expect(page.locator('img[src="img/guia-papeis.png"]')).toHaveCount(1);
 });
 
 test('o link secundário do hero leva à lista de materiais', async ({ page }) => {

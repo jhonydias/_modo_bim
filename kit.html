@@ -416,37 +416,6 @@
         .kit-item h3 { font-size: clamp(26px, 3.2vw, 40px); line-height: 1.08; margin-bottom: 18px; }
         .kit-item p { color: var(--ink-soft); font-weight: 300; font-size: clamp(15px, 1.6vw, 17.5px); max-width: 48ch; }
 
-        /* Capa desenhada em CSS para o guia que ainda não tem arte (img/guia-papeis.png).
-           Mesma linguagem das outras: fundo verde claro, "tela" militar com o Pattern
-           em Cloud Dancer e o título em Sentient. Troque pelo <img> comentado no HTML. */
-        .kit-cover--draw {
-            position: relative;
-            display: grid;
-            place-items: center;
-            background: #ACAF9A;   /* Verde, auxiliar da paleta oficial — fundo das capas */
-        }
-        .kit-cover--draw .screen {
-            position: relative;
-            overflow: hidden;
-            width: 68%;
-            aspect-ratio: 3 / 4;
-            border-radius: 14px;
-            background: var(--olive);
-            border: 8px solid #1d1d1b;
-            box-shadow: 0 30px 50px -28px rgba(0, 0, 0, 0.55);
-            color: var(--cloud);
-            padding: 14% 10%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .kit-cover--draw .screen svg { position: absolute; right: -12%; top: -4%; width: 90%; height: auto; color: var(--cloud); opacity: 0.16; }
-        .kit-cover--draw .screen .wm { position: relative; font-family: var(--serif); font-size: clamp(11px, 1.2vw, 14px); }
-        .kit-cover--draw .screen .wm .b { font-style: italic; }
-        .kit-cover--draw .screen .tt { position: relative; font-family: var(--serif); font-size: clamp(17px, 2vw, 25px); line-height: 1.05; }
-        .kit-cover--draw .screen .tt em { display: block; font-weight: 300; }
-        .kit-cover--draw .screen .tt b { font-weight: 500; }
-
         /* Bônus: sai do fluxo de divisores e vira um cartão claro */
         .kit-item--bonus {
             background: var(--cream);
@@ -876,15 +845,7 @@
             </article>
 
             <article class="kit-item">
-                <!-- Arte ainda não entregue. Quando existir img/guia-papeis.png, troque o <div> abaixo por:
-                     <figure class="kit-cover reveal"><img src="img/guia-papeis.png" width="1080" height="1350" alt="Capa do Guia de Papéis e Responsabilidades em um tablet" loading="lazy" decoding="async" /></figure> -->
-                <div class="kit-cover kit-cover--draw reveal" role="img" aria-label="Capa do Guia de Papéis e Responsabilidades">
-                    <div class="screen">
-                        <svg viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
-                        <span class="wm">_modo_<span class="b">b</span>im</span>
-                        <span class="tt"><em>Guia de</em><b>Papéis e Responsabilidades</b></span>
-                    </div>
-                </div>
+                <figure class="kit-cover reveal"><img src="img/guia-papeis.png" width="1080" height="1350" alt="Capa do Guia de Papéis e Responsabilidades em um tablet" loading="lazy" decoding="async" /></figure>
                 <div class="reveal">
                     <span class="label muted">Guia em PDF</span>
                     <h3>Guia de Papéis e Responsabilidades</h3>

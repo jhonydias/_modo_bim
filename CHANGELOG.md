@@ -5,6 +5,15 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ---
 
+## 2026-09-30
+
+### Capa real do Guia de Papéis e Responsabilidades — `kit.html`, `img/guia-papeis.png` (novo), `tests/e2e/kit.spec.js`
+- **A arte chegou:** `img/guia-papeis.png` (1080×1350, mesmo formato e mockup de tablet das outras capas) substitui a capa desenhada em CSS. O `<figure class="kit-cover">` agora é igual ao dos outros guias, com `width`/`height`, `alt`, `loading="lazy"` e `decoding="async"`.
+- **Saiu o CSS provisório** `.kit-cover--draw` e `.screen`, que não tinham mais uso.
+- **Teste:** `kit.spec.js` passou a exigir `img[src="img/guia-papeis.png"]`, para a capa não voltar a ser o placeholder sem ninguém ver. Kit, smoke, responsivo e produtos: 172 casos verdes.
+
+---
+
 ## 2026-09-28
 
 ### Kit de Projeto BIM no padrão do site + card com capa na vitrine (task 23) — `kit.html`, `produtos.html`, `img/`, `tests/e2e/`
