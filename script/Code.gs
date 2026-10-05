@@ -1255,7 +1255,7 @@ function sendBcfPdfEmail_(data, pdf, protocolo) {
                 <div style="font-family: Georgia, serif; font-size: 22px; color: #81161E;">${escapeHtml_(protocolo)}</div>
             </div>
             <p style="font-size: 15px; line-height: 1.6; color: #470000; max-width: 420px; margin: 0 auto 8px;">
-                Issue boa começa num projeto bem combinado. O <a href="https://modobim.com.br/kit.html" style="color: #81161E;">Kit de Projeto BIM</a> reúne o que precisa ser definido antes de modelar — e no <a href="https://chat.whatsapp.com/DPEoInYVkh6J0Af3Xw2A3Q" style="color: #81161E;">BIM Club</a> a conversa continua.
+                Issue boa começa num projeto bem combinado. O <a href="https://modobim.com.br/kit.html" style="color: #81161E;">Kit de Projeto BIM</a> reúne o que precisa ser definido antes de modelar. E no <a href="https://chat.whatsapp.com/DPEoInYVkh6J0Af3Xw2A3Q" style="color: #81161E;">BIM Club</a> a conversa continua.
             </p>
         </div>
         <div style="padding: 0 40px 32px; color: #470000; text-align: center; font-size: 12px; line-height: 1.6; opacity: 0.75;">
@@ -1462,7 +1462,7 @@ function testeBcfPdf() {
     ensureSheetExists_(formConfig);
     const protocolo = generateProtocol_(formConfig);
     const r = finalizarBcfPdf_(fakeData, { ok: true, bytes: pdf.getBytes() }, protocolo, formConfig, 'bcf-pdf');
-    Logger.log((r.success ? '✅ ' : '❌ ') + 'BCF → PDF — ' + JSON.stringify(r));
+    Logger.log((r.success ? '✅ ' : '❌ ') + 'BCF → PDF: ' + JSON.stringify(r));
 }
 
 /**

@@ -796,7 +796,7 @@
             <div class="hero-copy">
                 <span class="label">Ferramenta gratuita</span>
                 <h1 class="display rt">Issues do BCF em um PDF <em class="it">pronto para enviar.</em></h1>
-                <p class="lead">Abra o arquivo .bcf, escolha as issues e receba no seu e-mail um relatório com capa, índice, imagens e comentários — para levar à reunião de coordenação ou mandar para quem não abre software BIM.</p>
+                <p class="lead">Abra o arquivo .bcf, escolha as issues e receba no seu e-mail um relatório com capa, índice, imagens e comentários, para levar à reunião de coordenação ou mandar para quem não abre software BIM.</p>
                 <div class="hero-actions">
                     <a href="#conversor" class="btn btn-olive">Converter meu BCF <span class="arr">→</span></a>
                     <a href="#como-funciona" class="tlink">como funciona <span class="arr">→</span></a>
@@ -819,7 +819,7 @@
             <div class="sec-head reveal">
                 <span class="label">_conversor</span>
                 <h2 class="h-sec rt">Solte o arquivo. <em class="it">O relatório sai pronto.</em></h2>
-                <p class="lead">Funciona com .bcf e .bcfzip nas versões 2.1 e 3.0 — o formato aberto de issues da buildingSMART.</p>
+                <p class="lead">Funciona com .bcf e .bcfzip nas versões 2.1 e 3.0, o formato aberto de issues da buildingSMART.</p>
             </div>
 
             <div class="conv reveal" id="conv">
@@ -833,7 +833,7 @@
                         <span class="drop-sub">ou arraste e solte aqui · .bcf ou .bcfzip</span>
                     </label>
                     <p class="status" id="status" role="status" aria-live="polite"></p>
-                    <p class="privacidade">Seu arquivo .bcf é lido aqui, <strong>no seu navegador</strong>, e não é enviado a lugar nenhum. Só o PDF gerado passa pelo nosso servidor, para ser anexado ao e-mail — ele não fica salvo na nossa base de contatos.</p>
+                    <p class="privacidade">Seu arquivo .bcf é lido aqui, <strong>no seu navegador</strong>, e não é enviado a lugar nenhum. Só o PDF gerado passa pelo nosso servidor, para ser anexado ao e-mail. Ele não fica salvo na nossa base de contatos.</p>
 
                     <div id="panel" hidden>
                         <div class="conv-kick"><span class="label">_relatório</span></div>
@@ -881,7 +881,7 @@
                             <label for="email">E-mail <span class="req">*</span></label>
                             <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="voce@escritorio.com.br" maxlength="254" />
                             <span class="field-bar"></span>
-                            <span class="field-error">Informe um e-mail válido — é para ele que o PDF vai.</span>
+                            <span class="field-error">Informe um e-mail válido: é para ele que o PDF vai.</span>
                         </div>
                         <div class="field">
                             <label for="nome">Nome <span class="opt">opcional</span></label>
@@ -962,7 +962,7 @@
                 </div>
                 <div class="faq-item">
                     <button class="faq-q" aria-expanded="false">Meu arquivo BCF vai para algum servidor? <span class="faq-icon"></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">Não. O .bcf é aberto e lido no seu navegador. O que viaja é só o PDF pronto, para ser anexado ao e-mail — e ele não fica salvo na nossa base de contatos.</div></div>
+                    <div class="faq-a"><div class="faq-a-inner">Não. O .bcf é aberto e lido no seu navegador. O que viaja é só o PDF pronto, para ser anexado ao e-mail, e ele não fica salvo na nossa base de contatos.</div></div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-q" aria-expanded="false">Quais arquivos funcionam? <span class="faq-icon"></span></button>
@@ -974,7 +974,7 @@
                 </div>
                 <div class="faq-item">
                     <button class="faq-q" aria-expanded="false">O e-mail não chegou. E agora? <span class="faq-icon"></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">Confira as pastas de spam e promoções — o remetente é _modo_bim. Se não estiver lá em alguns minutos, gere de novo conferindo o endereço digitado.</div></div>
+                    <div class="faq-a"><div class="faq-a-inner">Confira as pastas de spam e promoções. O remetente é _modo_bim. Se não estiver lá em alguns minutos, gere de novo conferindo o endereço digitado.</div></div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-q" aria-expanded="false">Tem limite de tamanho? <span class="faq-icon"></span></button>
@@ -1366,7 +1366,7 @@
         const n = doc.getNumberOfPages();
         for (let p = 2; p <= n; p++) {
             doc.setPage(p); doc.setDrawColor(...C.line); doc.line(M, H - 12, M + CW, H - 12);
-            font('helvetica', 8, C.gray); doc.text(title + (proj ? ' — ' + proj : ''), M, H - 9, { baseline: 'top' });
+            font('helvetica', 8, C.gray); doc.text(title + (proj ? ' · ' + proj : ''), M, H - 9, { baseline: 'top' });
             doc.text(p + ' / ' + n, W / 2, H - 9, { baseline: 'top', align: 'center' });
             font('times', 9, C.wine, 'italic'); if (foot) doc.text(foot, M + CW, H - 9, { baseline: 'top', align: 'right' });
         }
@@ -1424,7 +1424,8 @@
         } else {
             texto.textContent = 'Seu pedido foi registrado, mas o e-mail não saiu agora. Seu PDF está pronto: baixe aqui mesmo.';
         }
-        $('#okProtocolo').textContent = protocolo || '—';
+        $('#okProtocolo').textContent = protocolo || '';
+        passos.ok.querySelector('.protocolo').hidden = !protocolo;
         $('#baixar').hidden = ok;
         $('#outro').hidden = !ok;
         mostrar('ok');
@@ -1475,7 +1476,7 @@
             const blob = doc.output('blob');
             ultimoPdf = { blob, nome: nomeDoPdf() };
             if (blob.size > PDF_MAX_BYTES) {
-                throw erroNosso('O PDF ficou com ' + mb(blob.size) + ' MB e o limite por e-mail é 15 MB. Volte e desmarque algumas issues — ou gere o relatório em partes.');
+                throw erroNosso('O PDF ficou com ' + mb(blob.size) + ' MB e o limite por e-mail é 15 MB. Volte e desmarque algumas issues ou gere o relatório em partes.');
             }
 
             ocupado(true, 'Enviando…');
