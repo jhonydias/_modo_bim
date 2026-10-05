@@ -84,7 +84,6 @@ describe('bcf-pdf — o PDF não fica guardado', () => {
     });
 
     it('nem na Fila Notion quando o Notion falha', () => {
-        gas.__props.set('NOTION_DB_LEADS_BCF', 'db-leads');
         gas.__notion.lancar = 'timeout';
         postar(payloadBcfPdf());
 
@@ -170,29 +169,52 @@ describe('bcf-pdf — e-mail que não sai', () => {
     });
 });
 
-describe('bcf-pdf — Notion opcional', () => {
-    it('sem database configurado, pula o Notion e não enfileira', () => {
-        postar(payloadBcfPdf());
-        expect(gas.__chamadas.notion).toHaveLength(0);
-        expect(gas.__planilha.getSheetByName('Fila Notion')).toBeNull();
-    });
+/* O lead do conversor cai na MESMA tabela do Notion da lista de espera,
+   marcado em "Como Conheceu". Colunas que o conversor não pergunta vão vazias. */
+describe('bcf-pdf — Notion (tabela da lista de espera)', () => {
+    const notion = () => gas.__chamadas.notion[0].payload;
 
-    it('com database configurado, espelha com o status do envio', () => {
-        gas.__props.set('NOTION_DB_LEADS_BCF', 'db-leads');
+    it('grava no database da lista de espera', () => {
         postar(payloadBcfPdf());
-
         expect(gas.__chamadas.notion).toHaveLength(1);
-        const { payload } = gas.__chamadas.notion[0];
-        expect(payload.parent.database_id).toBe('db-leads');
-        expect(payload.properties['Envio']).toEqual({ select: { name: 'Enviado' } });
-        expect(payload.properties['Lead'].title[0].text.content).toBe('Beltrana de Teste');
+        expect(notion().parent.database_id).toBe('db-lista-espera');
     });
 
-    /* Os outros formulários continuam enfileirando sem database: lá a falta de
-       configuração é erro, não escolha. */
-    it('não muda o comportamento dos outros formulários', () => {
-        gas.__props.delete('NOTION_DB_LISTA_ESPERA');
-        expect(gas.notionAtivo_(gas.FORMS['lista-espera'])).toBe(true);
+    it('marca a origem em "Como Conheceu"', () => {
+        postar(payloadBcfPdf());
+        expect(notion().properties['Como Conheceu']).toEqual({ select: { name: 'Conversor BCF' } });
+        expect(notion().properties['Status']).toEqual({ select: { name: 'Novo' } });
+    });
+
+    it('preenche o que sabe e deixa o resto vazio', () => {
+        postar(payloadBcfPdf());
+        const p = notion().properties;
+        expect(p['Nome Completo'].title[0].text.content).toBe('Beltrana de Teste');
+        expect(p['E-mail']).toEqual({ email: 'beltrana@teste.com.br' });
+        expect(p['Protocolo'].rich_text[0].text.content).toMatch(/^BP-/);
+        for (const vazio of ['Telefone', 'Cidade', 'Empresa', 'Cargo']) {
+            expect(Object.values(p[vazio])[0], vazio).toEqual(vazio === 'Telefone' ? null : []);
+        }
+        for (const vazio of ['Estado', 'Software Atual', 'Nível BIM', 'Software de Interesse', 'BIMClub']) {
+            expect(p[vazio], vazio).toEqual({ select: null });
+        }
+    });
+
+    it('resume issues, projeto, opt-in e envio em "Objetivo"', () => {
+        postar(payloadBcfPdf({ optin: false }));
+        expect(notion().properties['Objetivo'].rich_text[0].text.content).toBe(
+            'Converteu um BCF em PDF (3 issues) · Projeto: Residencial Teste · Aceita conteúdos: Não · E-mail: Enviado');
+    });
+
+    it('sem nome, o título da página é o e-mail', () => {
+        postar(payloadBcfPdf({ nome: '' }));
+        expect(notion().properties['Nome Completo'].title[0].text.content).toBe('beltrana@teste.com.br');
+    });
+
+    it('o envio que falhou também aparece no resumo', () => {
+        gas.__mail.cota = 0;
+        postar(payloadBcfPdf());
+        expect(notion().properties['Objetivo'].rich_text[0].text.content).toContain('E-mail: Cota esgotada');
     });
 });
 

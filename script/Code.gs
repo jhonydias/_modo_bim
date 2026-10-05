@@ -72,8 +72,7 @@ const CONFIG = {
  *    NOTION_DB_ORCAMENTOS    → ID do database "Orçamentos"
  *    NOTION_DB_CADASTROS     → ID do database "Cadastros"
  *    NOTION_DB_LISTA_ESPERA  → ID do database "Lista de Espera"
- *    NOTION_DB_LEADS_BCF     → ID do database "Leads · BCF → PDF"
- *                              (opcional: sem ele o lead fica só na planilha)
+ *                              (também recebe os leads do conversor BCF)
  *
  *  Passo a passo completo em tasks/08/notion-integracao.md
  * ============================================================ */
@@ -187,11 +186,10 @@ const FORMS = {
     },
     'bcf-pdf': {
         SHEET_NAME: 'BCF → PDF',
-        NOTION_DB_KEY: 'NOTION_DB_LEADS_BCF',
-        // Sem database configurado, pula o Notion em vez de enfileirar: a
-        // fila receberia um item por lead, tentado 5 vezes cada. Configurar
-        // a Propriedade do script liga o espelhamento sem deploy.
-        NOTION_OPCIONAL: true,
+        // No Notion, o lead do conversor vai para a MESMA tabela da lista de
+        // espera, marcado em "Como Conheceu" (ver buildNotionProps_). A
+        // planilha continua com aba própria: as colunas são outras.
+        NOTION_DB_KEY: 'NOTION_DB_LISTA_ESPERA',
         PROTOCOL_PREFIX: 'BP',
         LABEL: 'Conversor BCF → PDF',
         // Fluxo próprio: e-mail com o PDF anexado, sem aviso ao admin
@@ -294,7 +292,7 @@ function doPost(e) {
         appendToSheet_(data, protocolo, formConfig);
 
         // Notion (não bloqueante: falha vai para a fila de reenvio)
-        if (notionAtivo_(formConfig)) {
+        if (CONFIG.SEND_TO_NOTION) {
             sendToNotion_(data, protocolo, formConfig);
         }
 
@@ -454,16 +452,6 @@ function sendToNotion_(data, protocolo, formConfig) {
 }
 
 /**
- * Espelhar no Notion? Sempre, exceto quando o formulário é NOTION_OPCIONAL e
- * o database dele ainda não foi configurado nas Propriedades do script.
- */
-function notionAtivo_(formConfig) {
-    if (!CONFIG.SEND_TO_NOTION) return false;
-    if (!formConfig.NOTION_OPCIONAL) return true;
-    return Boolean(PropertiesService.getScriptProperties().getProperty(formConfig.NOTION_DB_KEY));
-}
-
-/**
  * Faz a chamada real à API do Notion. Retorna { ok, error?, pageId? }.
  */
 function pushNotionPage_(data, protocolo, formConfig) {
@@ -556,19 +544,30 @@ function buildNotionProps_(d, protocolo, formConfig) {
         };
     }
 
+    // Conversor BCF (task 24): grava na tabela da LISTA DE ESPERA, com as
+    // mesmas colunas dela. O que o conversor não pergunta fica vazio; o que
+    // ele sabe e não tem coluna própria (issues, projeto, opt-in, envio) vai
+    // resumido em "Objetivo", o único campo de texto livre.
     if (formConfig.PROTOCOL_PREFIX === 'BP') {
         return {
             // nome é opcional no formulário: sem ele, o título da página é o e-mail
-            'Lead':               nTitle_(d.nome || d.email),
-            'Protocolo':          nText_(protocolo),
-            'Recebido em':        nDate_(recebidoEm),
-            'E-mail':             nEmail_(d.email),
-            'Aceita Conteúdos':   nSelect_(simNao_(d.optin)),
-            'Projeto':            nText_(d.projeto),
-            'Issues':             nNumber_(d.qtdIssues),
-            'Envio':              nSelect_(d.envio),
-            'Status':             nSelect_('Novo'),
-            'User Agent':         nText_(d.userAgent)
+            'Nome Completo':          nTitle_(d.nome || d.email),
+            'Protocolo':              nText_(protocolo),
+            'Recebido em':            nDate_(recebidoEm),
+            'E-mail':                 nEmail_(d.email),
+            'Telefone':               nPhone_(''),
+            'Cidade':                 nText_(''),
+            'Estado':                 nSelect_(''),
+            'Empresa':                nText_(''),
+            'Cargo':                  nText_(''),
+            'Software Atual':         nSelect_(''),
+            'Nível BIM':              nSelect_(''),
+            'Software de Interesse':  nSelect_(''),
+            'Objetivo':               nText_(resumoBcf_(d)),
+            'Como Conheceu':          nSelect_(BCF_COMO_CONHECEU),
+            'BIMClub':                nSelect_(''),
+            'Status':                 nSelect_('Novo'),
+            'User Agent':             nText_(d.userAgent)
         };
     }
 
@@ -1154,6 +1153,21 @@ function nomeArquivoPdf_(nome) {
     return (base || 'issues_BCF') + '.pdf';
 }
 
+/* Valor de "Como Conheceu" que separa, na tabela da lista de espera, quem
+ * chegou pelo conversor. Opção só do backend: tem de estar também em
+ * LE_COMO_CONHECEU_BACKEND (script/notion-schema.mjs). */
+const BCF_COMO_CONHECEU = 'Conversor BCF';
+
+/** O que o conversor sabe do lead, numa linha para a coluna "Objetivo". */
+function resumoBcf_(d) {
+    const n = Number(d.qtdIssues) || 0;
+    const partes = ['Converteu um BCF em PDF' + (n ? ' (' + n + (n === 1 ? ' issue' : ' issues') + ')' : '')];
+    if (d.projeto) partes.push('Projeto: ' + d.projeto);
+    partes.push('Aceita conteúdos: ' + simNao_(d.optin));
+    if (d.envio) partes.push('E-mail: ' + d.envio);
+    return partes.join(' · ');
+}
+
 /** Checkbox do front → texto legível na planilha e no Notion. */
 function simNao_(v) {
     return (v === true || v === 'true' || v === 'Sim' || v === 'sim') ? 'Sim' : 'Não';
@@ -1190,7 +1204,7 @@ function finalizarBcfPdf_(data, pdf, protocolo, formConfig, tipo) {
             { email: data.email, erro: detalhe });
     }
 
-    if (notionAtivo_(formConfig)) {
+    if (CONFIG.SEND_TO_NOTION) {
         sendToNotion_(data, protocolo, formConfig);
     }
 

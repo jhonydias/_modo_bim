@@ -15,7 +15,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { loadGas } from './helpers/loadGas.js';
-import { SCHEMAS, ENV_DB } from '../../script/notion-schema.mjs';
+import { SCHEMAS, ENV_DB, LE_COMO_CONHECEU_BACKEND } from '../../script/notion-schema.mjs';
 import { PAYLOAD_POR_TIPO } from './helpers/fixtures.js';
 
 /* Alvo do notion-schema.mjs → tipo do FORMS no Code.gs. */
@@ -23,7 +23,7 @@ const PARES = [
     ['orcamentos',  'orcamento'],
     ['cadastros',   'cadastro'],
     ['listaEspera', 'lista-espera'],
-    ['leadsBcf',    'bcf-pdf'],      // task 24
+    ['listaEspera', 'bcf-pdf'],      // task 24: o conversor grava na tabela da lista de espera
 ];
 
 /* A chave única do objeto é o tipo: { rich_text: {} } → 'rich_text'.
@@ -95,9 +95,25 @@ describe('opções de select × lista-espera.html', () => {
         expect(doForm.filter(o => !noSchema.includes(o))).toEqual([]);
     });
 
+    /* Exceção declarada: opções que só o backend grava (o 'Conversor BCF' da
+       task 24). Ficam numa lista própria para a sobra continuar sendo pega. */
+    const SO_BACKEND = { 'Como Conheceu': LE_COMO_CONHECEU_BACKEND };
+
     it.each(CAMPOS)('"%s" não tem no schema opção que o formulário não oferece', (coluna, doForm) => {
         const noSchema = SCHEMAS.listaEspera.properties[coluna].select.options.map(o => o.name);
+        const permitidas = doForm.concat(SO_BACKEND[coluna] || []);
 
-        expect(noSchema.filter(o => !doForm.includes(o))).toEqual([]);
+        expect(noSchema.filter(o => !permitidas.includes(o))).toEqual([]);
+    });
+});
+
+/* Task 24 — o valor que o Code.gs grava em "Como Conheceu" para o conversor
+   precisa existir no schema, senão nasce sem cor e fora dos filtros salvos. */
+describe('Conversor BCF × tabela da lista de espera', () => {
+    it('o "Como Conheceu" do conversor é uma opção do schema', () => {
+        const props = gas.buildNotionProps_(PAYLOAD_POR_TIPO['bcf-pdf'](), 'BP-2026-0001', gas.FORMS['bcf-pdf']);
+        const valor = props['Como Conheceu'].select.name;
+        expect(LE_COMO_CONHECEU_BACKEND).toContain(valor);
+        expect(SCHEMAS.listaEspera.properties['Como Conheceu'].select.options.map(o => o.name)).toContain(valor);
     });
 });

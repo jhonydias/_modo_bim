@@ -30,9 +30,8 @@
  *    node script/notion-bootstrap.mjs cleanup   # arquiva as páginas [TESTE]
  *    node script/notion-bootstrap.mjs all       # check + create + verify + seed
  *
- *  Todos aceitam um alvo opcional — `orcamentos`, `cadastros`,
- *  `listaEspera` ou `leadsBcf` — para agir em um só database. Sem ele,
- *  agem em todos que têm página-mãe definida:
+ *  Todos aceitam um alvo opcional — `orcamentos`, `cadastros` ou
+ *  `listaEspera` — para agir em um só database. Sem ele, agem nos três:
  *
  *    node script/notion-bootstrap.mjs all orcamentos
  *
@@ -69,18 +68,7 @@ let falhas = 0;
 
 /* Alvo opcional na linha de comando: age em um database só. */
 let ALVO = null;
-/* Alvo sem página-mãe (hoje: leadsBcf, task 24) fica de fora com um aviso, em vez
- * de derrubar o `all` dos outros três com um 404 em `pages/`. */
-const avisadosSemPagina = new Set();
-const alvos = () => Object.entries(SCHEMAS).filter(([key, schema]) => {
-    if (ALVO && key !== ALVO) return false;
-    if (schema.page) return true;
-    if (!avisadosSemPagina.has(key)) {
-        avisadosSemPagina.add(key);
-        console.log(`  [PULA] "${schema.title}" — sem página-mãe; defina NOTION_PAGE_${ENV_DB[key].replace(/^NOTION_DB_/, '')} ou PAGES.${key}`);
-    }
-    return false;
-});
+const alvos = () => Object.entries(SCHEMAS).filter(([key]) => !ALVO || key === ALVO);
 
 async function step(label, fn) {
     const r = await fn();

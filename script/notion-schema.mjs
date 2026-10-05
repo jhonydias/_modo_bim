@@ -29,10 +29,6 @@ export const PAGES = {
     // Página nova, criada pelo cliente em 07/09/2026 (task 22). A anterior era
     // 3b05a5ea5c9d80f093dec884cc2221b6 — ver §02 de tasks/22/task_text.md.
     listaEspera: process.env.NOTION_PAGE_LISTA_ESPERA || '3d45a5ea5c9d809595a2d31dec9d5d30',  // "Lista de Espera"
-    // Conversor BCF → PDF (task 24). Ainda sem página: o cliente cria uma e o id
-    // entra aqui (ou em NOTION_PAGE_LEADS_BCF). Enquanto vazio, o bootstrap pula
-    // este alvo e o Code.gs não espelha nada (FORMS['bcf-pdf'].NOTION_OPCIONAL).
-    leadsBcf:    process.env.NOTION_PAGE_LEADS_BCF    || '',
 };
 
 /* ============================================================
@@ -50,7 +46,6 @@ export const DBS = {
     orcamentos:  process.env.NOTION_DB_ORCAMENTOS   || '3b05a5ea5c9d81cda679c6c9210f0de2',
     cadastros:   process.env.NOTION_DB_CADASTROS    || '3b05a5ea5c9d81bfa3f1c11b72552833',
     listaEspera: process.env.NOTION_DB_LISTA_ESPERA || '',
-    leadsBcf:    process.env.NOTION_DB_LEADS_BCF    || '',
 };
 
 /* Nome da variável de ambiente de cada alvo — só para a mensagem de erro
@@ -59,7 +54,6 @@ export const ENV_DB = {
     orcamentos:  'NOTION_DB_ORCAMENTOS',
     cadastros:   'NOTION_DB_CADASTROS',
     listaEspera: 'NOTION_DB_LISTA_ESPERA',
-    leadsBcf:    'NOTION_DB_LEADS_BCF',
 };
 
 /* ============================================================
@@ -85,12 +79,11 @@ const LE_SOFTWARE_ATUAL     = ['Revit', 'Archicad', 'SketchUp', 'AutoCAD', 'Outr
 const LE_NIVEL_BIM          = ['Iniciante', 'Intermediário', 'Avançado'];
 const LE_SOFTWARE_INTERESSE = ['Archicad', 'Revit'];          // pílulas, escolha única
 const LE_COMO_CONHECEU      = ['Instagram', 'Indicação', 'Google', 'Outro'];
+/* Opções que só o backend grava — não aparecem em nenhum <select> do HTML.
+ * 'Conversor BCF': leads do bcf-para-pdf.html caem na mesma tabela da lista
+ * de espera (task 24), marcados por aqui. Ver BCF_COMO_CONHECEU no Code.gs. */
+export const LE_COMO_CONHECEU_BACKEND = ['Conversor BCF'];
 const LE_BIMCLUB            = ['Sim', 'Não'];                 // pílulas, escolha única
-
-/* Conversor BCF: exatamente os valores que finalizarBcfPdf_() e simNao_()
- * escrevem no Code.gs (BCF_ENVIO). */
-const BCF_ENVIO = ['Pendente', 'Enviado', 'Cota esgotada', 'Falhou'];
-const SIM_NAO   = ['Sim', 'Não'];
 
 export const SCHEMAS = {
     orcamentos: {
@@ -158,26 +151,10 @@ export const SCHEMAS = {
             'Nível BIM':             select(LE_NIVEL_BIM),
             'Software de Interesse': select(LE_SOFTWARE_INTERESSE),
             'Objetivo':              text(),
-            'Como Conheceu':         select(LE_COMO_CONHECEU),
+            'Como Conheceu':         select([...LE_COMO_CONHECEU, ...LE_COMO_CONHECEU_BACKEND]),
             'BIMClub':               select(LE_BIMCLUB),
             'Status':                select(STATUS),
             'User Agent':            text(),
-        },
-    },
-    leadsBcf: {
-        title: 'Leads · BCF → PDF',
-        page: PAGES.leadsBcf,
-        properties: {
-            'Lead':             { title: {} },
-            'Protocolo':        text(),
-            'Recebido em':      date(),
-            'E-mail':           { email: {} },
-            'Aceita Conteúdos': select(SIM_NAO),
-            'Projeto':          text(),
-            'Issues':           number(),
-            'Envio':            select(BCF_ENVIO),
-            'Status':           select(STATUS),
-            'User Agent':       text(),
         },
     },
 };
@@ -265,17 +242,5 @@ export const SEEDS = {
         'BIMClub':               nSelect('Sim'),
         'Status':                nSelect('Novo'),
         'User Agent':            nText('notion-bootstrap/1.0'),
-    }),
-    leadsBcf: hoje => ({
-        'Lead':             nTitle('[TESTE] Beltrana de Tal'),
-        'Protocolo':        nText('BP-2026-9999'),
-        'Recebido em':      { date: { start: hoje } },
-        'E-mail':           { email: 'beltrana@exemplo.com.br' },
-        'Aceita Conteúdos': nSelect('Sim'),
-        'Projeto':          nText('Residencial Exemplo'),
-        'Issues':           nNumber(12),
-        'Envio':            nSelect('Enviado'),
-        'Status':           nSelect('Novo'),
-        'User Agent':       nText('notion-bootstrap/1.0'),
     }),
 };
