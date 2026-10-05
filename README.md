@@ -81,7 +81,10 @@ Pré-requisitos (uma vez por máquina):
 
 1. `npm install`
 2. Habilitar a Apps Script API em <https://script.google.com/home/usersettings>
-3. `npx clasp login`
+3. `npm run login`, entrando com **modobimcontato@gmail.com** (a conta dona do script). O token fica em
+   `.clasprc.json` na raiz do repo (ignorado pelo git), não no login global do clasp. Assim, outra conta
+   logada na máquina não derruba o deploy com `403 The caller does not have permission`.
+   `npm run whoami` mostra com qual conta o projeto está logado.
 
 > ⚠️ **Nunca use "Implantar → Nova implantação" no editor.** O trecho `AKfyc...` da URL é o **ID da
 > implantação**, não o da versão: criar uma implantação nova gera uma **URL nova** e quebra os três
@@ -96,6 +99,7 @@ Pré-requisitos (uma vez por máquina):
 | comando | o que faz |
 |---|---|
 | `npm run deploy` | publica `script/Code.gs` na implantação fixa (URL estável) |
+| `npm run login` / `npm run whoami` | login do clasp **deste projeto** / qual conta está logada |
 | `npm run pull` | traz do Apps Script o código que está no ar, para comparar com o repo |
 | `npm run check:endpoint` | falha se alguma página HTML voltar a ter a URL escrita dentro |
 
