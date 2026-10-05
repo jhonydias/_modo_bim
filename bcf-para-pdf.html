@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BCF → PDF · _modo_bim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--wine:#6B1F2A;--cream:#F5EFE6;--olive:#6B7043;--coffee:#3B2A22;--ink:#2a1f1a;--muted:#7a6a60;--line:#e2d8cb;--card:#fffdf9;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cream:#221915;--ink:#f2e9df;--muted:#b9a99c;--line:#44352d;--card:#2d221d;--wine:#b8566a;--olive:#a4a86f}}
+:root[data-theme="dark"]{--cream:#221915;--ink:#f2e9df;--muted:#b9a99c;--line:#44352d;--card:#2d221d;--wine:#b8566a;--olive:#a4a86f}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 "Work Sans",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.brand{font-family:Newsreader,Georgia,serif;font-size:15px;color:var(--wine)}
+.brand i{font-style:italic}
+h1{font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,8vw,52px);line-height:1.05;margin:18px 0 10px}
+h1 em{color:var(--wine)}
+.lead{color:var(--muted);max-width:56ch;margin:0 0 28px}
+.drop{display:block;border:1.5px dashed var(--wine);border-radius:14px;padding:34px 20px;text-align:center;cursor:pointer;background:var(--card)}
+.drop:focus-within{outline:3px solid var(--olive);outline-offset:3px}
+.drop strong{display:block;font-family:Newsreader,serif;font-size:22px;font-weight:600;color:var(--wine)}
+.drop span{color:var(--muted);font-size:14px}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.status{margin:14px 0;color:var(--muted);font-size:14px;min-height:1.4em}
+.status.err{color:var(--wine)}
+#panel{display:none}
+.kick{font-family:Newsreader,serif;font-style:italic;color:var(--olive);font-size:17px;margin:32px 0 10px}
+.opts{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=text]{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px}
+.list{border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:22px 56px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.row img{width:56px;height:40px;object-fit:cover;border-radius:4px;background:var(--line)}
+.row .t{font-weight:500;line-height:1.3}
+.row .m{font-size:12.5px;color:var(--muted)}
+.tools{display:flex;gap:14px;font-size:13px;margin-bottom:6px}
+.tools button{background:none;border:0;color:var(--wine);font:inherit;cursor:pointer;padding:0;text-decoration:underline}
+.go{margin-top:26px;width:100%;font:600 16px "Work Sans",sans-serif;background:var(--wine);color:#fff;border:0;border-radius:10px;padding:15px;cursor:pointer}
+.go:disabled{opacity:.5;cursor:wait}
+button:focus-visible,input:focus-visible{outline:3px solid var(--olive);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+ <div class="brand">_modo_<i>b</i>im</div>
+ <h1>Issues do BCF, <em>em PDF</em></h1>
+ <p class="lead">Abra um arquivo .bcf ou .bcfzip (BCF 2.1 ou 3.0). Tudo é processado no seu navegador — o arquivo não é enviado para lugar nenhum.</p>
+
+ <label class="drop" id="drop">
+  <input type="file" id="file" accept=".bcf,.bcfzip,.zip">
+  <strong>Escolher arquivo BCF</strong>
+  <span>ou arraste e solte aqui</span>
+ </label>
+ <div class="status" id="status"></div>
+
+ <section id="panel">
+  <div class="kick">_relatório</div>
+  <div class="opts">
+   <label class="f">Título<input type="text" id="rtitle" value="Relatório de issues"></label>
+   <label class="f">Projeto<input type="text" id="rproj"></label>
+   <label class="f">Rodapé (direita)<input type="text" id="rfoot" value="_modo_bim"></label>
+   <div style="display:flex;flex-direction:column;gap:8px;justify-content:flex-end">
+    <label class="chk"><input type="checkbox" id="perpage" checked> Uma issue por página</label>
+    <label class="chk"><input type="checkbox" id="incc" checked> Incluir comentários</label>
+   </div>
+  </div>
+
+  <div class="kick">_issues</div>
+  <div class="tools"><button id="all">Marcar todas</button><button id="none">Desmarcar todas</button></div>
+  <div class="list" id="list"></div>
+  <button class="go" id="go">Gerar PDF</button>
+ </section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+let topics=[];
+const kids=(el,n)=>el?[...el.children].filter(c=>c.localName===n):[];
+const kid=(el,n)=>kids(el,n)[0];
+const txt=(el,n)=>{const k=kid(el,n);return k?k.textContent.trim():''};
+const deep=(el,n)=>[...el.getElementsByTagName('*')].filter(e=>e.localName===n);
+const parseX=s=>new DOMParser().parseFromString(s,'application/xml');
+const fdate=s=>{if(!s)return'';const d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('pt-BR')};
+const fdt=s=>{if(!s)return'';const d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
+const size=url=>new Promise(r=>{const i=new Image();i.onload=()=>r({w:i.naturalWidth,h:i.naturalHeight});i.onerror=()=>r(null);i.src=url});
+function status(m,err){const s=$('#status');s.textContent=m;s.className='status'+(err?' err':'')}
+
+async function load(file){
+ status('Lendo '+file.name+'…');$('#panel').style.display='none';
+ let zip;
+ try{zip=await JSZip.loadAsync(file)}catch(e){status('Não foi possível abrir: o arquivo não parece ser um BCF (zip).',true);return}
+ const names=Object.keys(zip.files);
+ const pf=names.find(p=>/project\.bcfp$/i.test(p));
+ let proj='';
+ if(pf){const d=parseX(await zip.file(pf).async('string'));const n=deep(d,'Name')[0];proj=n?n.textContent.trim():''}
+ $('#rproj').value=proj;
+ topics=[];
+ for(const p of names.filter(p=>/(^|\/)markup\.bcf$/i.test(p))){
+  const folder=p.replace(/markup\.bcf$/i,'');
+  const d=parseX(await zip.file(p).async('string'));
+  const t=deep(d,'Topic')[0]; if(!t)continue;
+  const labels=kids(t,'Labels').flatMap(l=>{const i=kids(l,'Label');return i.length?i.map(x=>x.textContent.trim()):[l.textContent.trim()]}).filter(Boolean);
+  const assigned=kids(t,'AssignedTo').map(a=>a.textContent.trim()).filter(Boolean).join(', ');
+  const comments=deep(d,'Comment').filter(c=>kid(c,'Date')).map(c=>({date:txt(c,'Date'),author:txt(c,'Author'),text:txt(c,'Comment')})).filter(c=>c.text).sort((a,b)=>a.date.localeCompare(b.date));
+  let snaps=deep(d,'Snapshot').map(s=>s.textContent.trim()).filter(Boolean);
+  if(!snaps.length){const f=names.find(k=>k.startsWith(folder)&&/snapshot\.(png|jpe?g)$/i.test(k));if(f)snaps=[f.slice(folder.length)]}
+  const images=[];
+  for(const s of [...new Set(snaps)]){
+   const f=zip.file(folder+s)||zip.file(s); if(!f)continue;
+   const jpg=/\.jpe?g$/i.test(s);
+   const url='data:image/'+(jpg?'jpeg':'png')+';base64,'+await f.async('base64');
+   const dim=await size(url); if(dim)images.push({url,fmt:jpg?'JPEG':'PNG',...dim});
+  }
+  topics.push({type:t.getAttribute('TopicType')||'',status:t.getAttribute('TopicStatus')||'',title:txt(t,'Title')||'(sem título)',
+   priority:txt(t,'Priority'),index:txt(t,'Index'),labels:labels.join(', '),created:txt(t,'CreationDate'),author:txt(t,'CreationAuthor'),
+   modified:txt(t,'ModifiedDate'),assigned,due:txt(t,'DueDate'),stage:txt(t,'Stage'),desc:txt(t,'Description'),comments,images,on:true});
+ }
+ if(!topics.length){status('Nenhuma issue encontrada neste arquivo.',true);return}
+ topics.sort((a,b)=>((+a.index||1e9)-(+b.index||1e9))||a.created.localeCompare(b.created));
+ render();
+ status(topics.length+' issue'+(topics.length>1?'s':'')+' encontrada'+(topics.length>1?'s':'')+'.');
+ $('#panel').style.display='block';
+}
+
+function render(){
+ const L=$('#list');L.innerHTML='';
+ topics.forEach((t,i)=>{
+  const r=document.createElement('label');r.className='row';
+  const c=document.createElement('input');c.type='checkbox';c.checked=t.on;c.onchange=()=>t.on=c.checked;
+  const im=document.createElement(t.images[0]?'img':'div');if(t.images[0]){im.src=t.images[0].url;im.alt=''}else im.style.cssText='width:56px;height:40px;border-radius:4px;background:var(--line)';
+  const tx=document.createElement('div');
+  const a=document.createElement('div');a.className='t';a.textContent='#'+(t.index||i+1)+'  '+t.title;
+  const b=document.createElement('div');b.className='m';b.textContent=[t.status,t.priority,t.assigned,fdate(t.created)].filter(Boolean).join(' / ');
+  tx.append(a,b);r.append(c,im,tx);L.append(r);
+ });
+}
+
+function buildPDF(){
+ const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
+ const W=210,H=297,M=16,CW=W-2*M,BOT=H-18;
+ const C={wine:[107,31,42],cream:[245,239,230],olive:[107,112,67],coffee:[59,42,34],gray:[120,108,100],line:[226,216,203],ink:[40,30,26]};
+ const sel=topics.filter(t=>t.on);
+ const title=$('#rtitle').value.trim()||'Relatório de issues';
+ const proj=$('#rproj').value.trim(), foot=$('#rfoot').value.trim(), perPage=$('#perpage').checked, incC=$('#incc').checked;
+ let y=M;
+ const font=(f,s,c,st='normal')=>{doc.setFont(f,st);doc.setFontSize(s);doc.setTextColor(...c)};
+ const newPage=()=>{doc.addPage();y=M};
+ const need=h=>{if(y+h>BOT)newPage()};
+ const para=(text,x,w,lh)=>{for(const l of doc.splitTextToSize(text,w)){need(lh);doc.text(l,x,y,{baseline:'top'});y+=lh}};
+
+ // capa
+ doc.setFillColor(...C.wine);doc.rect(0,0,W,120,'F');
+ font('times',11,C.cream,'italic');doc.text('_relatório BCF',M,22,{baseline:'top'});
+ font('times',30,C.cream);let ty=48;
+ for(const l of doc.splitTextToSize(title,CW)){doc.text(l,M,ty,{baseline:'top'});ty+=12}
+ if(proj){font('helvetica',12,C.cream);doc.text(proj,M,ty+4,{baseline:'top'})}
+ font('helvetica',10,C.cream);doc.text('Gerado em '+new Date().toLocaleDateString('pt-BR')+'  |  '+sel.length+' issue'+(sel.length>1?'s':''),M,106,{baseline:'top'});
+ y=134;
+ const counts={};sel.forEach(t=>{const k=t.status||'Sem status';counts[k]=(counts[k]||0)+1});
+ font('times',15,C.olive,'italic');doc.text('_resumo por status',M,y,{baseline:'top'});y+=9;
+ Object.entries(counts).forEach(([k,v])=>{font('helvetica',10.5,C.ink);doc.text(k,M,y,{baseline:'top'});doc.text(String(v),M+CW,y,{baseline:'top',align:'right'});y+=6;doc.setDrawColor(...C.line);doc.line(M,y-1.5,M+CW,y-1.5)});
+ y+=8;font('times',15,C.olive,'italic');need(12);doc.text('_índice',M,y,{baseline:'top'});y+=9;
+ sel.forEach((t,i)=>{
+  font('helvetica',9.5,C.ink);const lines=doc.splitTextToSize(t.title,CW-62);need(lines.length*4.6+2);
+  doc.setTextColor(...C.wine);doc.text('#'+(t.index||i+1),M,y,{baseline:'top'});
+  doc.setTextColor(...C.ink);doc.text(lines,M+12,y,{baseline:'top'});
+  doc.setTextColor(...C.gray);doc.text([t.status,t.priority].filter(Boolean).join(' / '),M+CW,y,{baseline:'top',align:'right'});
+  y+=lines.length*4.6+2;
+ });
+
+ // issues
+ sel.forEach((t,i)=>{
+  if(i===0||perPage)newPage();else{need(60);y+=8}
+  font('times',16,C.cream);const tl=doc.splitTextToSize(t.title,CW-26);const hh=8+tl.length*6.5;
+  need(hh+20);doc.setFillColor(...C.wine);doc.rect(M,y,CW,hh,'F');
+  font('helvetica',10,C.cream,'bold');doc.text('#'+(t.index||i+1),M+5,y+5,{baseline:'top'});
+  font('times',16,C.cream);doc.text(tl,M+21,y+4,{baseline:'top'});y+=hh+6;
+  const meta=[['Status',t.status],['Prioridade',t.priority],['Tipo',t.type],['Responsável',t.assigned],['Criado por',t.author],['Criado em',fdate(t.created)],['Prazo',fdate(t.due)],['Etapa',t.stage],['Rótulos',t.labels]].filter(m=>m[1]);
+  const cw=CW/3;
+  for(let k=0;k<meta.length;k+=3){
+   let rh=0;const row=meta.slice(k,k+3).map(m=>{font('helvetica',9.5,C.ink);const v=doc.splitTextToSize(m[1],cw-4);rh=Math.max(rh,4+v.length*4.4);return[m[0],v]});
+   need(rh+2);
+   row.forEach(([lab,v],j)=>{const x=M+j*cw;font('helvetica',7.5,C.gray);doc.text(lab,x,y,{baseline:'top'});font('helvetica',9.5,C.ink);doc.text(v,x,y+3.6,{baseline:'top'})});
+   y+=rh+3;
+  }
+  doc.setDrawColor(...C.line);doc.line(M,y,M+CW,y);y+=5;
+  t.images.forEach(im=>{
+   const maxH=perPage?110:95;let w=CW,h=w*im.h/im.w;if(h>maxH){h=maxH;w=h*im.w/im.h}
+   need(h+5);const x=M+(CW-w)/2;
+   try{doc.addImage(im.url,im.fmt,x,y,w,h,undefined,'FAST');doc.setDrawColor(...C.line);doc.rect(x,y,w,h)}catch(e){}
+   y+=h+6;
+  });
+  if(t.desc){need(14);font('times',12,C.olive,'italic');doc.text('_descrição',M,y,{baseline:'top'});y+=6;font('helvetica',10,C.ink);para(t.desc,M,CW,4.8);y+=4}
+  if(incC&&t.comments.length){
+   need(14);font('times',12,C.olive,'italic');doc.text('_comentários ('+t.comments.length+')',M,y,{baseline:'top'});y+=7;
+   t.comments.forEach(c=>{
+    need(12);const y0=y;
+    font('helvetica',8.5,C.wine,'bold');doc.text([c.author,fdt(c.date)].filter(Boolean).join('  |  '),M+4,y,{baseline:'top'});y+=4.6;
+    font('helvetica',9.5,C.ink);para(c.text,M+4,CW-4,4.5);
+    doc.setDrawColor(...C.olive);doc.setLineWidth(.6);if(y>y0)doc.line(M,y0,M,y-1);doc.setLineWidth(.2);y+=3;
+   });
+  }
+ });
+
+ const n=doc.getNumberOfPages();
+ for(let p=2;p<=n;p++){doc.setPage(p);doc.setDrawColor(...C.line);doc.line(M,H-12,M+CW,H-12);
+  font('helvetica',8,C.gray);doc.text(title+(proj?' — '+proj:''),M,H-9,{baseline:'top'});
+  doc.text(p+' / '+n,W/2,H-9,{baseline:'top',align:'center'});
+  font('times',9,C.wine,'italic');if(foot)doc.text(foot,M+CW,H-9,{baseline:'top',align:'right'})}
+ return doc;
+}
+
+let downloads=null;
+(async()=>{try{if(window.claude&&claude.use)downloads=await claude.use('downloads')}catch(e){}})();
+
+$('#go').onclick=async()=>{
+ if(!topics.some(t=>t.on)){status('Marque ao menos uma issue.',true);return}
+ const b=$('#go');b.disabled=true;b.textContent='Gerando…';
+ try{
+  await new Promise(r=>setTimeout(r,30));
+  const doc=buildPDF();
+  const name=(($('#rproj').value.trim()||'issues')+'_BCF').replace(/[^\w\-]+/g,'_')+'.pdf';
+  if(downloads){
+   try{await downloads.save({filename:name,data:doc.output('blob')});status('PDF salvo.')}
+   catch(e){status(e&&e.code==='declined'?'Download cancelado.':'Não foi possível salvar o PDF aqui.',e&&e.code!=='declined')}
+  }else{doc.save(name);status('PDF gerado.')}
+ }catch(e){status('Erro ao gerar o PDF: '+e.message,true)}
+ b.disabled=false;b.textContent='Gerar PDF';
+};
+$('#file').onchange=e=>{const f=e.target.files[0];if(f)load(f)};
+const dz=$('#drop');
+dz.ondragover=e=>{e.preventDefault()};
+dz.ondrop=e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f)load(f)};
+$('#all').onclick=()=>{topics.forEach(t=>t.on=true);render()};
+$('#none').onclick=()=>{topics.forEach(t=>t.on=false);render()};
+</script>
+</body>
+</html>
