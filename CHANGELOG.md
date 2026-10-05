@@ -7,6 +7,24 @@ Formato: data (mais recente no topo) → o que mudou e em quais arquivos.
 
 ## 2026-10-05
 
+### Leads do conversor BCF na tabela da lista de espera do Notion (task 24) · `script/Code.gs`, `script/notion-schema.mjs`, `script/notion-bootstrap.mjs`, `tests/unit/`
+- **Saiu o database próprio "Leads · BCF → PDF"**, que nunca chegou a existir. O lead do conversor agora vai para a **mesma tabela do Notion da lista de espera**: `FORMS['bcf-pdf'].NOTION_DB_KEY` passou a ser `NOTION_DB_LISTA_ESPERA`, a mesma Propriedade do script da lista de espera. Os dois gravam sempre no mesmo lugar, sem ID escrito no código. A planilha continua com a aba "BCF → PDF", porque as colunas são outras.
+- **Como o lead aparece no Notion:**
+  - "Como Conheceu" = **Conversor BCF**, e Status "Novo".
+  - "Nome Completo" = o nome, ou o e-mail quando a pessoa não informou o nome.
+  - E-mail, protocolo `BP-` e data preenchidos.
+  - Em "Objetivo", um resumo do que o conversor sabe e não tem coluna própria: `Converteu um BCF em PDF (3 issues) · Projeto: … · Aceita conteúdos: Sim/Não · E-mail: Enviado`.
+  - Telefone, cidade, estado, empresa, cargo, softwares, nível e BIMClub ficam vazios.
+- **Atenção ao "Aceita conteúdos":** quem só converteu um arquivo fica na mesma tabela de quem pediu para entrar na lista. Só mande conteúdo para quem tem "Aceita conteúdos: Sim".
+- **"Conversor BCF" entrou no schema** como opção de "Como Conheceu" que só o backend grava (`LE_COMO_CONHECEU_BACKEND`). O teste de paridade com `lista-espera.html` aceita essa exceção declarada e continua acusando qualquer outra opção sobrando. Caso novo: o valor gravado pelo `Code.gs` precisa existir no schema. Mudar o texto num lado só derruba 2 casos.
+- **Removidos** `notionAtivo_()`, `NOTION_OPCIONAL` e o alvo `leadsBcf` do bootstrap, que só existiam para o database separado. Testes unitários: 325 → **329**.
+
+### Conversor BCF: textos sem travessão (task 24) · `bcf-para-pdf.html`, `script/Code.gs`
+- Os travessões dos textos novos viraram vírgula, ponto ou dois-pontos: texto do topo, introdução do conversor, nota de privacidade, erro de e-mail inválido, duas respostas do FAQ, aviso de PDF acima de 15 MB e o e-mail com o anexo.
+- No rodapé do PDF, título e projeto passaram a ser separados por ` · `.
+- Quando a resposta vem sem protocolo, a tela final esconde o bloco do protocolo em vez de mostrar `—`.
+- Comentários de código e textos que já existiam antes da task não mudaram.
+
 ### Conversor BCF → PDF no padrão do site, com o PDF entregue por e-mail (task 24) — `bcf-para-pdf.html`, `script/Code.gs`, `script/notion-schema.mjs`, `script/notion-bootstrap.mjs`, `produtos.html`, `sitemap.xml`, `js/vendor/` (novo), `img/capa-bcf.png` (novo), `tests/`
 - **O fluxo mudou: clicar em gerar não baixa mais nada.** "Gerar PDF e receber por e-mail" abre um cartão cereja que pede o e-mail (obrigatório), o nome (opcional) e um opt-in de conteúdo (desmarcado). Ao enviar, o PDF é gerado no navegador e vai em base64 para o backend, que o **anexa num e-mail** para quem pediu e grava o lead. A tela final mostra "Enviado.", o e-mail e o protocolo `BP-AAAA-NNNN`, com "converter outro arquivo" (que mantém o e-mail digitado) e um convite para o Kit. O único download que sobrou é o **plano B**: se o backend responder `ENVIO_FALHOU` (cota de e-mail ou falha do Gmail), o lead já está gravado e a pessoa baixa o PDF ali mesmo, em vez de ficar sem nada.
 - **Página reconstruída sobre o sistema visual do site.** Chegou com Newsreader + Work Sans do Google Fonts, vinho `#6B1F2A`, texto quase preto e um tema escuro que a marca não tem. Agora usa o `:root` de `kit.html` sem nenhum token novo, a nav e o rodapé do site, hero com a capa nova, `.btn` com seta, campos sublinhados em Sentient iguais aos dos formulários, `.step`, acordeão `.faq-*`, `.cta-final` e o `#modoPattern` brilhando no cartão do e-mail. `<head>` completo: canonical, Open Graph com `img/capa-bcf.png`, JSON-LD `WebApplication` com `offers` de preço zero. O PDF gerado trocou as cores pelas oficiais.
