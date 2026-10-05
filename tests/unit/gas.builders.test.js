@@ -66,7 +66,7 @@ describe('generateProtocol_', () => {
     });
 
     it('cada tipo tem o seu prefixo', () => {
-        for (const [tipo, prefixo] of [['orcamento', 'OR'], ['cadastro', 'MB'], ['lista-espera', 'LE']]) {
+        for (const [tipo, prefixo] of [['orcamento', 'OR'], ['cadastro', 'MB'], ['lista-espera', 'LE'], ['bcf-pdf', 'BP']]) {
             gas.__planilha.semear(gas.FORMS[tipo].SHEET_NAME, [gas.FORMS[tipo].COLUMNS]);
             expect(gas.generateProtocol_(gas.FORMS[tipo])).toBe(`${prefixo}-${ano}-0001`);
         }
@@ -74,7 +74,7 @@ describe('generateProtocol_', () => {
 });
 
 describe('buildRow_', () => {
-    it.each(['orcamento', 'cadastro', 'lista-espera'])(
+    it.each(['orcamento', 'cadastro', 'lista-espera', 'bcf-pdf'])(
         'a linha de %s tem o tamanho do COLUMNS', (tipo) => {
             const config = gas.FORMS[tipo];
             const linha = gas.buildRow_(PAYLOAD_POR_TIPO[tipo](), 'ts', 'X-2026-0001', config);
@@ -130,7 +130,7 @@ describe('buildNotionProps_', () => {
         expect(() => JSON.stringify(props)).not.toThrow();
     });
 
-    it.each(['orcamento', 'cadastro', 'lista-espera'])('não quebra para %s', (tipo) => {
+    it.each(['orcamento', 'cadastro', 'lista-espera', 'bcf-pdf'])('não quebra para %s', (tipo) => {
         expect(() => gas.buildNotionProps_(PAYLOAD_POR_TIPO[tipo](), 'X-2026-0001', gas.FORMS[tipo]))
             .not.toThrow();
     });

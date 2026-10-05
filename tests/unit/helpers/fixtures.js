@@ -87,10 +87,35 @@ export function payloadCadastro(extra = {}) {
     };
 }
 
+/* Menor PDF que passa na checagem do backend: começa com "%PDF-". Não precisa
+   abrir num leitor — o Code.gs confere assinatura e tamanho, não o conteúdo. */
+export const PDF_MINIMO = '%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\n%%EOF\n';
+export const PDF_MINIMO_B64 = Buffer.from(PDF_MINIMO).toString('base64');
+
+/* Espelha o que bcf-para-pdf.html monta no envio (task 24). */
+export function payloadBcfPdf(extra = {}) {
+    return {
+        email: 'beltrana@teste.com.br',
+        nome: 'Beltrana de Teste',
+        optin: true,
+        projeto: 'Residencial Teste',
+        titulo: 'Relatório de issues',
+        qtdIssues: '3',
+        arquivoBcf: 'exemplo.bcfzip',
+        pdfNome: 'Residencial_Teste_BCF.pdf',
+        pdfBase64: PDF_MINIMO_B64,
+        tipo: 'bcf-pdf',
+        timestamp: new Date('2026-10-05T12:00:00Z').toISOString(),
+        userAgent: 'vitest',
+        ...extra
+    };
+}
+
 export const PAYLOAD_POR_TIPO = {
     orcamento: payloadOrcamento,
     'lista-espera': payloadListaEspera,
-    cadastro: payloadCadastro
+    cadastro: payloadCadastro,
+    'bcf-pdf': payloadBcfPdf
 };
 
 /* Valores que preenchem cada etapa do formulário no DOM (jsdom e Playwright

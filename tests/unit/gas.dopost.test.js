@@ -191,9 +191,9 @@ describe('doPost — rate limit', () => {
 });
 
 describe('doGet', () => {
-    it('responde ok com os três formulários', () => {
+    it('responde ok com os quatro formulários', () => {
         const r = respostaJson(gas.doGet({}));
         expect(r.status).toBe('ok');
-        expect(r.forms).toEqual(['orcamento', 'cadastro', 'lista-espera']);
+        expect(r.forms).toEqual(['orcamento', 'cadastro', 'lista-espera', 'bcf-pdf']);
     });
 });

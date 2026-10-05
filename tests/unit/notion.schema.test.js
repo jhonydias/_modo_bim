@@ -23,6 +23,7 @@ const PARES = [
     ['orcamentos',  'orcamento'],
     ['cadastros',   'cadastro'],
     ['listaEspera', 'lista-espera'],
+    ['leadsBcf',    'bcf-pdf'],      // task 24
 ];
 
 /* A chave única do objeto é o tipo: { rich_text: {} } → 'rich_text'.

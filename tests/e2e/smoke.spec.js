@@ -17,13 +17,16 @@ const arquivoExiste = (nome) => existsSync(new URL(nome, RAIZ));
    ambiente sem rede; não são sinal de regressão do site. */
 const RUIDO_EXTERNO = [/fonts\.googleapis|fonts\.gstatic|api\.fontshare/];
 
-test('1 · o endpoint de produção responde status ok com os 3 formulários', async ({ request }) => {
+/* arrayContaining, e não toEqual: o 'bcf-pdf' (task 24) só aparece em produção depois
+   do `npm run deploy`. Exigir a lista exata deixaria o smoke vermelho até lá; exigir
+   os três de sempre continua pegando o que importa — um deploy que derrube um deles. */
+test('1 · o endpoint de produção responde status ok com os formulários de sempre', async ({ request }) => {
     const res = await request.get(endpointDeProducao());
     expect(res.status()).toBe(200);
 
     const corpo = await res.json();
     expect(corpo.status).toBe('ok');
-    expect(corpo.forms).toEqual(['orcamento', 'cadastro', 'lista-espera']);
+    expect(corpo.forms).toEqual(expect.arrayContaining(['orcamento', 'cadastro', 'lista-espera']));
 });
 
 for (const pagina of PAGINAS) {
@@ -106,7 +109,9 @@ for (const pagina of PAGINAS) {
 /* Itens 6 e 7 — substituem o antigo "os 3 ENDPOINT_URL são iguais". Com o
    endpoint em arquivo único, o risco deixou de ser divergência e passou a ser
    ausência: config.js que não carrega derruba os três formulários de uma vez. */
-for (const pagina of PAGINAS_COM_FORMULARIO.concat('contrato.html')) {
+/* bcf-para-pdf.html (task 24) também posta no endpoint, mas não tem #startBtn:
+   entra nos itens 6 e 7, não no 8. */
+for (const pagina of PAGINAS_COM_FORMULARIO.concat('contrato.html', 'bcf-para-pdf.html')) {
     test(`6 · ${pagina} carrega js/config.js com 200 e DEV_MODE desligado`, async ({ page }) => {
         const respostas = [];
         page.on('response', (res) => {

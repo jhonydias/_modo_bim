@@ -154,7 +154,24 @@ export function loadGas(overrides = {}) {
                     .replace('mm', p(data.getMinutes()))
                     .replace('ss', p(data.getSeconds()));
             },
-            sleep() {}
+            sleep() {},
+            /* O Apps Script lança em base64 malformado; o Buffer do Node não —
+               ele ignora o que não entende. Daí a checagem explícita. */
+            base64Decode(texto) {
+                const s = String(texto);
+                if (s.length % 4 !== 0 || !/^[A-Za-z0-9+/]*={0,2}$/.test(s)) {
+                    throw new Error('Could not decode string.');
+                }
+                return Array.from(Buffer.from(s, 'base64'));
+            },
+            newBlob(bytes, contentType, nome) {
+                return {
+                    bytes, contentType, nome,
+                    getBytes: () => bytes,
+                    getContentType: () => contentType,
+                    getName: () => nome
+                };
+            }
         },
 
         ContentService: {
@@ -174,6 +191,9 @@ export function loadGas(overrides = {}) {
                 if (base.MailApp.lancar) throw new Error(base.MailApp.lancar);
                 chamadas.emails.push(opts);
             },
+            /* Cota diária do Gmail gratuito. Troque com sandbox.__mail.cota = 0. */
+            getRemainingDailyQuota() { return base.MailApp.cota; },
+            cota: 100,
             lancar: null
         },
 

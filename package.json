@@ -5,8 +5,10 @@
   "description": "Site _modo_bim (GitHub Pages) + backend Apps Script",
   "type": "module",
   "scripts": {
+    "login": "clasp -A .clasprc.json login",
+    "whoami": "clasp -A .clasprc.json login --status",
     "deploy": "node scripts/deploy.mjs",
-    "pull": "clasp pull",
+    "pull": "clasp -A .clasprc.json pull",
     "check:endpoint": "node scripts/check-endpoint.mjs",
     "build:fonts": "node scripts/build-fonts.mjs",
     "build:images": "node scripts/build-images.mjs",

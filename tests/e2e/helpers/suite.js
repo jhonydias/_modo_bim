@@ -7,7 +7,7 @@ import { expect } from '@playwright/test';
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
-export const PAGINAS = ['index.html', 'cadastro.html', 'lista-espera.html', 'produtos.html', 'kit.html'];
+export const PAGINAS = ['index.html', 'cadastro.html', 'lista-espera.html', 'produtos.html', 'kit.html', 'bcf-para-pdf.html'];
 export const PAGINAS_COM_FORMULARIO = ['cadastro.html', 'lista-espera.html'];
 
 const RAIZ = new URL('../../../', import.meta.url);

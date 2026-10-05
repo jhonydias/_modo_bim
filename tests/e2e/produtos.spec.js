@@ -37,14 +37,15 @@ test('os blocos revelam ao entrar em cena', async ({ page }) => {
     await expect(page.locator('.reveal.in')).toHaveCount(total);
 });
 
-test('a vitrine tem dois produtos, o kit primeiro', async ({ page }) => {
-    await expect(page.locator('.prod-card')).toHaveCount(2);
+test('a vitrine tem três produtos, o kit primeiro', async ({ page }) => {
+    await expect(page.locator('.prod-card')).toHaveCount(3);
     await expect(page.locator('.prod-card').first()).toHaveClass(/prod-card--media/);
 });
 
-/* Task 23 — o card do kit é o único com imagem, e a imagem é a capa. */
+/* Task 23 — o card do kit tem a capa do kit. Desde a task 24 são dois cards com capa. */
 test('o card do kit mostra a capa e aponta para kit.html, na mesma aba', async ({ page }) => {
-    const card = page.locator('a.prod-card--media');
+    await expect(page.locator('a.prod-card--media')).toHaveCount(2);
+    const card = page.locator('a.prod-card--media[href="kit.html"]');
     await expect(card).toHaveCount(1);
     await expect(card).toHaveAttribute('href', 'kit.html');
     await expect(card).not.toHaveAttribute('target', /.+/);
@@ -57,11 +58,28 @@ test('o card do kit mostra a capa e aponta para kit.html, na mesma aba', async (
 });
 
 test('clicar na capa abre a página do kit', async ({ page }) => {
-    const capa = page.locator('a.prod-card--media img');
+    const capa = page.locator('a.prod-card--media[href="kit.html"] img');
     await capa.scrollIntoViewIfNeeded();
     await capa.click();
     await page.waitForURL('**/kit.html');
     await expect(page.locator('h1')).toContainText('Os erros de um projeto BIM');
+});
+
+/* Task 24 — o conversor gratuito, com a capa do outro lado. */
+test('o card do conversor BCF mostra a capa e abre a ferramenta', async ({ page }) => {
+    const card = page.locator('a.prod-card--media[href="bcf-para-pdf.html"]');
+    await expect(card).toHaveCount(1);
+    await expect(card).toHaveClass(/prod-card--flip/);
+    await expect(card.locator('.prod-tag')).toContainText('Gratuito');
+
+    const capa = card.locator('img');
+    await expect(capa).toHaveAttribute('src', 'img/capa-bcf.png');
+    await capa.scrollIntoViewIfNeeded();
+    await expect.poll(() => capa.evaluate((img) => img.complete && img.naturalWidth)).toBe(1080);
+
+    await capa.click();
+    await page.waitForURL('**/bcf-para-pdf.html');
+    await expect(page.locator('h1')).toContainText('Issues do BCF');
 });
 
 test('o card do diagnóstico aponta para o Tally, em nova aba', async ({ page }) => {

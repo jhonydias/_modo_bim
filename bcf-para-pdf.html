@@ -1,246 +1,1559 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BCF → PDF · _modo_bim</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-:root{--wine:#6B1F2A;--cream:#F5EFE6;--olive:#6B7043;--coffee:#3B2A22;--ink:#2a1f1a;--muted:#7a6a60;--line:#e2d8cb;--card:#fffdf9;
- box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cream:#221915;--ink:#f2e9df;--muted:#b9a99c;--line:#44352d;--card:#2d221d;--wine:#b8566a;--olive:#a4a86f}}
-:root[data-theme="dark"]{--cream:#221915;--ink:#f2e9df;--muted:#b9a99c;--line:#44352d;--card:#2d221d;--wine:#b8566a;--olive:#a4a86f}
-*{box-sizing:inherit}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 "Work Sans",system-ui,sans-serif}
-main{max-width:760px;margin:0 auto;padding:28px 20px 60px}
-.brand{font-family:Newsreader,Georgia,serif;font-size:15px;color:var(--wine)}
-.brand i{font-style:italic}
-h1{font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,8vw,52px);line-height:1.05;margin:18px 0 10px}
-h1 em{color:var(--wine)}
-.lead{color:var(--muted);max-width:56ch;margin:0 0 28px}
-.drop{display:block;border:1.5px dashed var(--wine);border-radius:14px;padding:34px 20px;text-align:center;cursor:pointer;background:var(--card)}
-.drop:focus-within{outline:3px solid var(--olive);outline-offset:3px}
-.drop strong{display:block;font-family:Newsreader,serif;font-size:22px;font-weight:600;color:var(--wine)}
-.drop span{color:var(--muted);font-size:14px}
-.drop input{position:absolute;opacity:0;width:1px;height:1px}
-.status{margin:14px 0;color:var(--muted);font-size:14px;min-height:1.4em}
-.status.err{color:var(--wine)}
-#panel{display:none}
-.kick{font-family:Newsreader,serif;font-style:italic;color:var(--olive);font-size:17px;margin:32px 0 10px}
-.opts{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-@media(max-width:560px){.opts{grid-template-columns:1fr}}
-label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
-input[type=text]{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
-.chk{display:flex;gap:8px;align-items:center;font-size:14px}
-.list{border-top:1px solid var(--line)}
-.row{display:grid;grid-template-columns:22px 56px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.row img{width:56px;height:40px;object-fit:cover;border-radius:4px;background:var(--line)}
-.row .t{font-weight:500;line-height:1.3}
-.row .m{font-size:12.5px;color:var(--muted)}
-.tools{display:flex;gap:14px;font-size:13px;margin-bottom:6px}
-.tools button{background:none;border:0;color:var(--wine);font:inherit;cursor:pointer;padding:0;text-decoration:underline}
-.go{margin-top:26px;width:100%;font:600 16px "Work Sans",sans-serif;background:var(--wine);color:#fff;border:0;border-radius:10px;padding:15px;cursor:pointer}
-.go:disabled{opacity:.5;cursor:wait}
-button:focus-visible,input:focus-visible{outline:3px solid var(--olive);outline-offset:2px}
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Converta arquivos .bcf e .bcfzip (BCF 2.1 e 3.0) em um relatório PDF com capa, índice, imagens e comentários das issues. Grátis, direto no navegador." />
+    <link rel="canonical" href="https://modobim.com.br/bcf-para-pdf.html" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#81161E" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="_modo_bim" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content="Conversor BCF para PDF grátis | _modo_bim" />
+    <meta property="og:description" content="Abra o .bcf, escolha as issues e receba no e-mail um relatório em PDF com capa, índice, imagens e comentários." />
+    <meta property="og:url" content="https://modobim.com.br/bcf-para-pdf.html" />
+    <meta property="og:image" content="https://modobim.com.br/img/capa-bcf.png" />
+    <meta property="og:image:width" content="1080" />
+    <meta property="og:image:height" content="1350" />
+    <meta property="og:image:alt" content="Capa do Conversor BCF para PDF da _modo_bim: o título em letras claras sobre fundo vermelho" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Conversor BCF para PDF grátis | _modo_bim" />
+    <meta name="twitter:description" content="Issues do BCF em um PDF pronto para enviar. Grátis." />
+    <meta name="twitter:image" content="https://modobim.com.br/img/capa-bcf.png" />
+    <title>Converter BCF em PDF grátis: issues e imagens | _modo_bim</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <!-- Ferramenta gratuita (task 24): WebApplication ligada ao site e à organização
+         declarados no index.html. offers com preço 0 é o que o Google usa para "grátis". -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Conversor BCF para PDF",
+      "url": "https://modobim.com.br/bcf-para-pdf.html",
+      "description": "Converte arquivos BCF 2.1 e 3.0 em um relatório PDF com capa, resumo por status, índice, imagens e comentários das issues.",
+      "image": "https://modobim.com.br/img/capa-bcf.png",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Qualquer (navegador)",
+      "browserRequirements": "Requer JavaScript",
+      "inLanguage": "pt-BR",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BRL"
+      },
+      "isPartOf": {
+        "@id": "https://modobim.com.br/#site"
+      },
+      "publisher": {
+        "@id": "https://modobim.com.br/#organizacao"
+      }
+    }
+    </script>
+
+    <!-- Fontes self-hosted (task 21 · T4), iguais às de produtos.html: nenhuma origem de
+         terceiro no caminho crítico. Só os dois pesos do primeiro paint são pré-carregados.
+         crossorigin é obrigatório no preload de fonte mesmo em mesma origem. -->
+    <link rel="preload" as="font" type="font/woff2" href="fonts/sentient-400.subset.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin-wght-normal.subset.woff2" crossorigin />
+    <!-- Neue Haas Grotesk (detalhe) é fonte licenciada e não é baixada: --detail cai no
+         fallback Helvetica Neue / Arial, que é do sistema e custa zero byte. -->
+
+    <style>
+        /* ============================================
+           FONTES SELF-HOSTED  (task 21 · T4)
+           Subsets em fonts/, gerados por scripts/build-fonts.mjs.
+           Pesos declarados = os cinco que o site realmente renderiza, medidos nas
+           requisições reais do Lighthouse: Sentient 300i/400/400i/500/700 e Inter
+           variável. Declarar peso que ninguém usa não custa byte, mas mente sobre
+           o design; declarar de menos faz o navegador sintetizar itálico/negrito.
+           ============================================ */
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-400.subset.woff2') format('woff2');
+            font-weight: 400; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-500.subset.woff2') format('woff2');
+            font-weight: 500; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-700.subset.woff2') format('woff2');
+            font-weight: 700; font-style: normal; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-300-italic.subset.woff2') format('woff2');
+            font-weight: 300; font-style: italic; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sentient';
+            src: url('fonts/sentient-400-italic.subset.woff2') format('woff2');
+            font-weight: 400; font-style: italic; font-display: swap;
+        }
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/inter-latin-wght-normal.subset.woff2') format('woff2');
+            font-weight: 100 900; font-style: normal; font-display: swap;
+        }
+
+        /* ============================================
+           DESIGN TOKENS — mesmos do index.html
+           ============================================ */
+        :root {
+            --cereja: #81161E;        /* vermelho principal (paleta oficial) */
+            --cereja-deep: #470000;   /* cereja escuro (paleta oficial) */
+            --cream: #EFEEE9;
+            --cream-2: #E6E3DB;
+            --olive: #5F6245;
+            --olive-deep: #4C4F37;
+
+            /* REGRA DE COR: fundo claro → texto militar com destaques cereja;
+               fundo cereja → texto Cloud Dancer. */
+            --ink: #4C4F37;                      /* texto sobre fundo claro: verde militar escuro */
+            --ink-soft: rgba(76, 79, 55, 0.82);  /* texto secundário */
+            --ink-muted: rgba(76, 79, 55, 0.58); /* texto de apoio */
+            /* AA 4,5:1 sobre --cream e --cream-2 para texto pequeno (task 21 · T11) */
+            --ink-aa: rgba(76, 79, 55, 0.84);
+            --line: rgba(76, 79, 55, 0.2);       /* linhas/divisores */
+
+            --cloud: #EFEEE9;
+            --cloud-soft: rgba(239, 238, 233, 0.72);
+            --cloud-muted: rgba(239, 238, 233, 0.5);
+            --cloud-line: rgba(239, 238, 233, 0.28);
+            /* AA 4,5:1 sobre --cereja para texto pequeno (task 21 · T11) */
+            --cloud-aa: rgba(239, 238, 233, 0.68);
+
+            --serif: 'Sentient', Georgia, 'Times New Roman', serif;   /* títulos / impacto */
+            --sans: 'Inter', system-ui, -apple-system, sans-serif;     /* textos / corpo */
+            --detail: 'Neue Haas Grotesk', 'Helvetica Neue', Arial, sans-serif; /* detalhe / labels */
+
+            --ease: cubic-bezier(0.65, 0.05, 0.36, 1);
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+            --maxw: 1180px;
+            --gutter: clamp(26px, 6vw, 72px);
+            /* só a barra do topo: como em produtos.html, sem o selecionador de seções */
+            --bar-h: 60px;
+        }
+
+        /* ============================================
+           RESET / BASE
+           ============================================ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--bar-h) + 12px); }
+        body {
+            font-family: var(--sans);
+            font-weight: 400;
+            background: var(--cream);
+            color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        img { display: block; max-width: 100%; }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        ul { list-style: none; }
+        [hidden] { display: none !important; }
+
+        /* ============================================
+           SHARED PRIMITIVES
+           ============================================ */
+        .wrap {
+            width: 100%;
+            max-width: var(--maxw);
+            margin: 0 auto;
+            padding-left: var(--gutter);
+            padding-right: var(--gutter);
+        }
+        .section { padding: clamp(72px, 11vw, 150px) 0; }
+
+        .label {
+            font-family: var(--detail);
+            font-size: 11px;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--cereja);
+        }
+
+        /* Títulos: vermelho sobre fundo claro… */
+        h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.015em; line-height: 1.04; color: var(--cereja); }
+        /* …e branco sobre fundo cereja. */
+        .on-cereja h1, .on-cereja h2, .on-cereja h3,
+        .cta-final h1, .cta-final h2, .cta-final h3 { color: var(--cloud); }
+        .display { font-size: clamp(40px, 6.4vw, 84px); }
+        .h-sec { font-size: clamp(30px, 4.4vw, 56px); line-height: 1.08; }
+        em.it { font-style: italic; font-weight: 300; }
+
+        .lead {
+            font-size: clamp(16px, 1.7vw, 19px);
+            color: var(--ink-soft);
+            font-weight: 300;
+            max-width: 56ch;
+        }
+
+        /* Cabeçalho de seção: label + título + lead */
+        .sec-head { max-width: 60ch; margin-bottom: clamp(40px, 6vw, 72px); }
+        .sec-head .h-sec { margin: 16px 0 20px; }
+
+        /* Wordmark */
+        .wordmark {
+            font-family: var(--serif);
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            color: var(--cereja);
+            white-space: nowrap;
+        }
+        .wordmark .b { font-style: italic; font-weight: 400; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--detail);
+            font-size: 13px;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+            padding: 15px 28px;
+            border-radius: 999px;
+            transition: transform 0.35s var(--ease-out), background 0.35s var(--ease), color 0.35s var(--ease), gap 0.35s var(--ease-out), opacity 0.3s var(--ease);
+        }
+        .btn .arr { transition: transform 0.35s var(--ease-out); }
+        .btn:hover .arr { transform: translateX(4px); }
+        .btn-olive { background: var(--olive); color: var(--cloud); }
+        .btn-olive:hover { background: var(--olive-deep); transform: translateY(-2px); gap: 16px; }
+        .btn-cream { background: var(--cream); color: var(--ink); }
+        .btn-cream:hover { transform: translateY(-2px); gap: 16px; }
+        .btn-ghost-light {
+            background: rgba(239, 238, 233, 0.08);
+            color: var(--cloud);
+            border: 1px solid var(--cloud-line);
+        }
+        .btn-ghost-light:hover { background: rgba(239, 238, 233, 0.16); transform: translateY(-2px); }
+        .btn[disabled] { opacity: 0.6; cursor: wait; transform: none; }
+
+        /* Text link with arrow */
+        .tlink {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: clamp(17px, 1.9vw, 21px);
+            color: var(--ink);
+            padding-bottom: 3px;
+            border-bottom: 1px solid var(--ink);
+            transition: gap 0.35s var(--ease-out), opacity 0.3s var(--ease);
+        }
+        .tlink .arr { font-style: normal; transition: transform 0.35s var(--ease-out); }
+        .tlink:hover { gap: 16px; }
+        .tlink:hover .arr { transform: translateX(4px); }
+
+        :focus-visible { outline: 2px solid var(--cereja); outline-offset: 3px; }
+        .on-cereja :focus-visible { outline-color: var(--cloud); }
+
+        /* ============================================
+           NAV — mesma barra do index, sem o selecionador de seções
+           ============================================ */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(239, 238, 233, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+        }
+        .nav-inner {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: var(--bar-h);
+            background: inherit;
+        }
+        .nav-toggle { display: flex; flex-direction: column; gap: 5px; padding: 8px; z-index: 60; }
+        .nav-toggle span { width: 24px; height: 1.5px; background: var(--cereja); transition: transform 0.3s var(--ease), opacity 0.3s var(--ease); }
+        .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+        .nav-toggle.open span:nth-child(2) { opacity: 0; }
+        .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+        .nav-links {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: var(--gutter);
+            z-index: 70;
+            min-width: 248px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 2px;
+            background: var(--cream);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 26px 64px -34px rgba(71, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.3s var(--ease), transform 0.35s var(--ease-out), visibility 0.3s var(--ease);
+        }
+        .nav-links.open { opacity: 1; visibility: visible; transform: translateY(0); }
+        .nav-links a {
+            font-family: var(--detail);
+            font-size: 14px;
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            color: var(--ink-soft);
+            padding: 11px 14px;
+            border-radius: 8px;
+            transition: color 0.3s var(--ease), background 0.3s var(--ease);
+        }
+        .nav-links a:not(.nav-cta):hover { color: var(--cereja); background: var(--cream-2); }
+        .nav-cta {
+            color: var(--cloud) !important;
+            background: var(--cereja);
+            text-align: center;
+            margin-top: 6px;
+            padding: 13px 18px !important;
+            border-radius: 999px;
+            transition: background 0.3s var(--ease) !important;
+        }
+        .nav-cta:hover { background: var(--cereja-deep); }
+
+        /* ============================================
+           HERO — mesma grade do kit.html
+           ============================================ */
+        .hero { border-bottom: 1px solid var(--line); }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 1fr;
+            gap: clamp(32px, 5vw, 72px);
+            align-items: center;
+            min-height: calc(100vh - var(--bar-h));
+            /* só vertical — NÃO usar shorthand aqui, senão zera o gutter lateral do .wrap */
+            padding-top: clamp(40px, 6vw, 80px);
+            padding-bottom: clamp(40px, 6vw, 80px);
+        }
+        .hero-copy .display { margin: 22px 0 26px; max-width: 14ch; font-size: clamp(38px, 5.2vw, 68px); }
+        .hero-copy .lead { margin-bottom: 40px; max-width: 44ch; }
+        .hero-actions { display: flex; align-items: center; gap: 22px 28px; flex-wrap: wrap; }
+        .hero-actions .btn { white-space: nowrap; }
+        .hero-media {
+            position: relative;
+            background: var(--cereja);
+            border-radius: 4px;
+            overflow: hidden;
+            aspect-ratio: 4 / 5;
+            max-height: calc(100vh - var(--bar-h) - 80px);
+            justify-self: center;
+            box-shadow: 0 30px 80px -40px rgba(71, 0, 0, 0.5);
+        }
+        .hero-media img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ============================================
+           CONVERSOR
+           ============================================ */
+        .conversor { background: var(--cream-2); border-bottom: 1px solid var(--line); }
+        .conv { max-width: 880px; }
+
+        /* cartão claro: arquivo, opções e lista */
+        .conv-card {
+            background: var(--cream);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: clamp(24px, 4vw, 52px);
+            box-shadow: 0 28px 60px -42px rgba(71, 0, 0, 0.55);
+        }
+
+        .drop {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+            border: 1.5px dashed var(--cereja);
+            border-radius: 12px;
+            padding: clamp(36px, 6vw, 64px) 20px;
+            cursor: pointer;
+            transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
+        }
+        .drop:hover, .drop.is-over { background: var(--cream-2); }
+        .drop.is-over { border-style: solid; }
+        .drop:focus-within { outline: 2px solid var(--cereja); outline-offset: 3px; }
+        .drop input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+        .drop-ico { width: 46px; height: auto; color: var(--cereja); margin-bottom: 4px; }
+        .drop-title { font-family: var(--serif); font-size: clamp(22px, 2.6vw, 28px); color: var(--cereja); font-weight: 400; }
+        .drop-sub { font-family: var(--detail); font-size: 12px; letter-spacing: 0.06em; color: var(--ink-aa); }
+
+        .status { min-height: 1.6em; margin-top: 16px; font-size: 15px; color: var(--ink-soft); }
+        .status.err { color: var(--cereja); }
+        .privacidade { margin-top: 6px; font-size: 14px; line-height: 1.55; color: var(--ink-aa); font-weight: 300; max-width: 62ch; }
+        .privacidade strong { color: var(--ink); font-weight: 500; }
+
+        .conv-kick {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin: clamp(32px, 4vw, 44px) 0 18px;
+        }
+        .conv-kick .contagem { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: 16px; color: var(--ink-aa); }
+
+        /* Campos claros: mesma linguagem dos formulários do site (label --detail, valor em
+           serif sobre uma linha, barra que cresce no foco), com as cores do fundo claro. */
+        .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; }
+        .field { position: relative; display: flex; flex-direction: column; }
+        .field label {
+            font-family: var(--detail);
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            font-weight: 500;
+            color: var(--ink-aa);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .field input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--line);
+            color: var(--ink);
+            font-family: var(--serif);
+            font-size: 19px;
+            font-weight: 400;
+            padding: 6px 0 10px;
+            outline: none;
+            border-radius: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: border-color 0.3s var(--ease);
+        }
+        .field input::placeholder { color: var(--ink-muted); font-style: italic; font-weight: 300; font-size: 17px; }
+        .field-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--cereja);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s var(--ease-out);
+            pointer-events: none;
+        }
+        .field input:focus + .field-bar { transform: scaleX(1); }
+        .field input:focus-visible { outline: none; }
+
+        .checks { display: flex; flex-wrap: wrap; gap: 14px 32px; margin-top: 26px; }
+        .chk { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; color: var(--ink-soft); cursor: pointer; }
+        .chk input { width: 18px; height: 18px; accent-color: var(--cereja); cursor: pointer; flex-shrink: 0; }
+
+        .tools { display: flex; gap: 20px; }
+        .tools button {
+            font-family: var(--detail);
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            font-weight: 500;
+            color: var(--cereja);
+            padding: 4px 0;
+            border-bottom: 1px solid currentColor;
+        }
+
+        .list {
+            border-top: 1px solid var(--line);
+            max-height: min(62vh, 560px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 20px 72px minmax(0, 1fr);
+            gap: 16px;
+            align-items: center;
+            padding: 12px 8px 12px 2px;
+            border-bottom: 1px solid var(--line);
+            cursor: pointer;
+            transition: background 0.25s var(--ease);
+        }
+        .row:hover { background: var(--cream-2); }
+        .row input { width: 18px; height: 18px; accent-color: var(--cereja); cursor: pointer; }
+        .row .thumb { width: 72px; height: 48px; object-fit: cover; border-radius: 4px; background: var(--cream-2); border: 1px solid var(--line); }
+        .row .t { font-family: var(--serif); font-size: 17px; line-height: 1.3; color: var(--ink); overflow-wrap: anywhere; }
+        .row .t b { color: var(--cereja); font-weight: 400; margin-right: 6px; }
+        .row .m { font-family: var(--detail); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-aa); margin-top: 2px; overflow-wrap: anywhere; }
+
+        .btn-wide { width: 100%; justify-content: center; margin-top: 28px; padding-top: 18px; padding-bottom: 18px; font-size: 14px; }
+
+        /* cartão cereja: e-mail e resultado — o detalhe vermelho com o pattern brilhando */
+        .conv-cereja {
+            position: relative;
+            overflow: hidden;
+            background: var(--cereja);
+            color: var(--cloud);
+            border-radius: 16px;
+            padding: clamp(28px, 5vw, 64px);
+            box-shadow: 0 30px 80px -40px rgba(71, 0, 0, 0.6);
+        }
+        .conv-cereja > *:not(.modo-tex) { position: relative; z-index: 1; }
+        .conv-cereja .label { color: var(--cloud-aa); }
+        .h-card { font-size: clamp(30px, 4vw, 48px); line-height: 1.08; margin: 14px 0 12px; max-width: 18ch; }
+        .resumo { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: clamp(16px, 1.8vw, 19px); color: var(--cloud-soft); margin-bottom: clamp(30px, 4vw, 44px); }
+
+        .conv-cereja .fields { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px 40px; max-width: 720px; }
+        .conv-cereja .field label { color: var(--cloud-soft); }
+        .conv-cereja .field label .req { color: var(--cloud); font-weight: 400; }
+        .conv-cereja .field label .opt { text-transform: lowercase; letter-spacing: 0.05em; font-style: italic; font-weight: 300; color: var(--cloud-aa); }
+        .conv-cereja .field input { color: var(--cloud); border-bottom-color: var(--cloud-line); font-size: 22px; padding: 8px 0 12px; }
+        .conv-cereja .field input::placeholder { color: var(--cloud-muted); font-size: 18px; }
+        .conv-cereja .field-bar { background: var(--cloud); }
+        .field-error { display: none; margin-top: 8px; font-size: 12px; font-style: italic; letter-spacing: 0.04em; color: #FFB4B4; }
+        .field.error input { border-bottom-color: #FFB4B4; }
+        .field.error label { color: #FFB4B4; }
+        .field.error .field-error { display: block; }
+
+        .optin { display: flex; align-items: flex-start; gap: 12px; margin-top: 28px; max-width: 60ch; font-size: 15px; font-weight: 300; color: var(--cloud-soft); cursor: pointer; }
+        .optin input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--cloud); flex-shrink: 0; cursor: pointer; }
+
+        .honeypot { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+        .error-banner {
+            margin-top: 28px;
+            padding: 16px 20px;
+            border: 1px solid #FFB4B4;
+            color: #FFB4B4;
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 16px;
+            line-height: 1.45;
+        }
+        .email-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 18px 28px; margin-top: 32px; }
+        .voltar {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 17px;
+            color: var(--cloud-soft);
+            border-bottom: 1px solid var(--cloud-line);
+            padding-bottom: 2px;
+            transition: color 0.3s var(--ease);
+        }
+        .voltar:hover { color: var(--cloud); }
+        .miudo { margin-top: 26px; font-size: 13px; line-height: 1.55; color: var(--cloud-aa); max-width: 62ch; font-weight: 300; }
+
+        /* resultado */
+        .ok { text-align: center; padding-top: clamp(40px, 6vw, 72px); padding-bottom: clamp(40px, 6vw, 72px); }
+        .ok:focus { outline: none; }
+        .seal {
+            width: 88px;
+            height: 88px;
+            border: 1px solid var(--cloud);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 36px;
+            animation: sealIn 1s var(--ease-out);
+        }
+        .seal svg { width: 34px; height: 34px; stroke: var(--cloud); fill: none; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: drawCheck 0.8s 0.4s var(--ease-out) forwards; }
+        @keyframes sealIn { from { opacity: 0; transform: scale(0.8) rotate(-12deg); } to { opacity: 1; transform: none; } }
+        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+        .ok .h-card { font-style: italic; font-weight: 300; font-size: clamp(48px, 7vw, 84px); margin: 0 auto 20px; }
+        .ok-text { font-size: 16px; font-weight: 300; line-height: 1.6; color: var(--cloud-soft); max-width: 46ch; margin: 0 auto 36px; }
+        .ok-text strong { color: var(--cloud); font-weight: 500; overflow-wrap: anywhere; }
+        .protocolo { display: inline-block; border-top: 1px solid var(--cloud-line); border-bottom: 1px solid var(--cloud-line); padding: 20px 48px; margin-bottom: 40px; }
+        .protocolo .label { display: block; font-size: 10px; margin-bottom: 8px; }
+        .protocolo-num { font-family: var(--serif); font-size: 28px; letter-spacing: 0.04em; color: var(--cloud); }
+        .ok-actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 18px; }
+
+        /* ============================================
+           COMO FUNCIONA — mesmos .step da seção de implementação do index
+           ============================================ */
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 3vw, 40px); }
+        .step { border-top: 1px solid var(--cereja); padding-top: 22px; }
+        .step-num { font-family: var(--serif); font-size: clamp(34px, 4vw, 48px); color: var(--ink); line-height: 1; margin-bottom: 10px; }
+        .step-name { font-family: var(--detail); font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft); }
+        .step-desc { margin-top: 10px; font-size: 15px; line-height: 1.5; font-weight: 300; color: var(--ink-aa); max-width: 32ch; }
+
+        /* ============================================
+           FAQ — mesmo acordeão do index
+           ============================================ */
+        .faq { border-top: 1px solid var(--line); }
+        .faq-grid { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
+        .faq-list { border-top: 1px solid var(--line); }
+        .faq-item { border-bottom: 1px solid var(--line); }
+        .faq-q {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            text-align: left;
+            padding: 26px 0;
+            font-family: var(--serif);
+            font-size: clamp(18px, 2.1vw, 24px);
+            color: var(--ink);
+            transition: color 0.3s var(--ease);
+        }
+        .faq-q:hover { color: var(--cereja); }
+        .faq-icon { position: relative; width: 18px; height: 18px; flex-shrink: 0; }
+        .faq-icon::before, .faq-icon::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            background: var(--cereja);
+            transition: transform 0.4s var(--ease-out);
+        }
+        .faq-icon::before { width: 16px; height: 1.5px; transform: translate(-50%, -50%); }
+        .faq-icon::after { width: 1.5px; height: 16px; transform: translate(-50%, -50%); }
+        .faq-item.open .faq-icon::after { transform: translate(-50%, -50%) scaleY(0); }
+        .faq-a { overflow: hidden; height: 0; transition: height 0.45s var(--ease-out); }
+        .faq-a-inner { padding: 0 0 28px; max-width: 60ch; color: var(--ink-soft); font-weight: 300; font-size: 16px; }
+        .faq-a-inner a { color: var(--cereja); border-bottom: 1px solid currentColor; }
+
+        /* ============================================
+           CTA FINAL
+           ============================================ */
+        .cta-final { position: relative; overflow: hidden; background: var(--cereja); color: var(--cloud); text-align: center; padding: clamp(90px, 14vw, 180px) 0; }
+        .cta-final .wrap { position: relative; z-index: 1; }
+        .cta-final h2 { font-size: clamp(34px, 6vw, 76px); color: var(--cloud); max-width: 16ch; margin: 0 auto 44px; }
+        .cta-final .cur { color: var(--cloud-muted); }
+        .cta-buttons { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+
+        /* ============================================
+           PATTERN — textura de fundo sutil (sobre cereja)
+           ============================================ */
+        .modo-tex {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            height: auto;
+            color: var(--cream);
+            opacity: 0.2;
+            -webkit-mask-image: linear-gradient(102deg, rgba(0,0,0,0.22) 34%, #000 46%, #000 54%, rgba(0,0,0,0.22) 66%);
+            mask-image: linear-gradient(102deg, rgba(0,0,0,0.22) 34%, #000 46%, #000 54%, rgba(0,0,0,0.22) 66%);
+            -webkit-mask-size: 220% 100%;
+            mask-size: 220% 100%;
+            animation: patShimmer 6s linear infinite;
+        }
+        /* cartão do e-mail: um só, sangrando no canto superior direito */
+        .conv-cereja .modo-tex { width: clamp(200px, 26vw, 360px); top: -10%; right: -6%; }
+        /* cta-final: emoldura os dois cantos opostos */
+        .cta-final .modo-tex { width: clamp(220px, 26vw, 420px); }
+        .cta-final .modo-tex--tl { top: -6%; left: -5%; transform: scale(-1, 1); }
+        .cta-final .modo-tex--br { bottom: -6%; right: -5%; }
+        @keyframes patShimmer {
+            from { -webkit-mask-position: 150% 0; mask-position: 150% 0; }
+            to   { -webkit-mask-position: -50% 0; mask-position: -50% 0; }
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer { background: var(--cream); color: var(--ink-soft); padding: 56px 0 40px; }
+        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; padding-bottom: 36px; border-bottom: 1px solid var(--line); }
+        .footer .wordmark { color: var(--cereja); }
+        .footer-nav { display: flex; gap: 28px; flex-wrap: wrap; }
+        .footer-nav a { font-family: var(--detail); font-size: 13px; letter-spacing: 0.04em; color: var(--ink-soft); font-weight: 500; transition: color 0.3s var(--ease); }
+        .footer-nav a:hover { color: var(--cereja); }
+        .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 28px; }
+        .footer-bottom span { font-family: var(--detail); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-aa); }
+
+        /* ============================================
+           SCROLL REVEAL
+           ============================================ */
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
+        .reveal.in { opacity: 1; transform: none; }
+
+        /* Texto que se monta palavra a palavra na primeira vez que entra em cena.
+           O JS quebra o conteúdo de .rt em <span class="rt-w"><i>palavra</i></span>. */
+        .rt { --rt-step: 44ms; }
+        .rt .rt-w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+        .rt .rt-w > i {
+            display: inline-block;
+            font-style: inherit;
+            font-weight: inherit;
+            transform: translateY(115%);
+            opacity: 0;
+            transition: transform 0.95s var(--ease-out), opacity 0.65s var(--ease-out);
+            transition-delay: calc(var(--i, 0) * var(--rt-step));
+        }
+        .rt.in .rt-w > i { transform: none; opacity: 1; }
+
+        /* troca de etapa dentro do conversor */
+        .entra { animation: entra 0.55s var(--ease-out); }
+        @keyframes entra { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .rt .rt-w > i { transform: none; opacity: 1; transition: none; }
+            .modo-tex { animation: none; -webkit-mask-image: none; mask-image: none; }
+            .faq-a { transition: none; }
+            .entra, .seal { animation: none; }
+            .seal svg { animation: none; stroke-dashoffset: 0; }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 900px) {
+            .hero-grid { grid-template-columns: 1fr; min-height: 0; }
+            .hero-media { max-width: 460px; width: 100%; max-height: none; }
+            .steps { grid-template-columns: 1fr; gap: 32px; }
+            .faq-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .opts, .conv-cereja .fields { grid-template-columns: 1fr; }
+            .row { grid-template-columns: 20px 56px minmax(0, 1fr); gap: 12px; }
+            .row .thumb { width: 56px; height: 40px; }
+            .protocolo { padding: 18px 28px; }
+            .protocolo-num { font-size: 22px; }
+            .email-actions .btn, .ok-actions .btn { width: 100%; justify-content: center; }
+        }
+        @media (max-width: 520px) {
+            .nav-links { left: var(--gutter); right: var(--gutter); min-width: 0; }
+            .modo-tex .mb-1 { display: none; }
+            .cta-final .modo-tex { width: clamp(180px, 50vw, 260px); }
+            .hero-actions .btn { width: 100%; justify-content: center; }
+        }
+    </style>
 </head>
 <body>
-<main>
- <div class="brand">_modo_<i>b</i>im</div>
- <h1>Issues do BCF, <em>em PDF</em></h1>
- <p class="lead">Abra um arquivo .bcf ou .bcfzip (BCF 2.1 ou 3.0). Tudo é processado no seu navegador — o arquivo não é enviado para lugar nenhum.</p>
 
- <label class="drop" id="drop">
-  <input type="file" id="file" accept=".bcf,.bcfzip,.zip">
-  <strong>Escolher arquivo BCF</strong>
-  <span>ou arraste e solte aqui</span>
- </label>
- <div class="status" id="status"></div>
+<!-- ============================================ PATTERN (ativo vetorial reutilizável) ============================================
+     Mesmo símbolo do index.html: blocos de linhas horizontais que sobem em degraus diagonais.
+     A cor vem de currentColor. -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <symbol id="modoPattern" viewBox="0 0 220 200">
+        <g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square">
+            <g class="mb mb-1">
+                <line x1="10" y1="184" x2="30" y2="184"/><line x1="36" y1="184" x2="46" y2="184"/>
+                <line x1="10" y1="176" x2="24" y2="176"/><line x1="30" y1="176" x2="42" y2="176"/>
+                <line x1="14" y1="168" x2="34" y2="168"/>
+            </g>
+            <g class="mb mb-2">
+                <line x1="48" y1="148" x2="92" y2="148"/>
+                <line x1="48" y1="140" x2="80" y2="140"/><line x1="86" y1="140" x2="100" y2="140"/>
+                <line x1="52" y1="132" x2="96" y2="132"/>
+                <line x1="48" y1="124" x2="88" y2="124"/>
+            </g>
+            <g class="mb mb-3">
+                <line x1="96" y1="108" x2="150" y2="108"/>
+                <line x1="96" y1="100" x2="158" y2="100"/>
+                <line x1="100" y1="92" x2="150" y2="92"/>
+                <line x1="96" y1="84" x2="160" y2="84"/>
+                <line x1="104" y1="76" x2="148" y2="76"/>
+            </g>
+            <g class="mb mb-4">
+                <line x1="150" y1="64" x2="212" y2="64"/>
+                <line x1="150" y1="56" x2="208" y2="56"/>
+                <line x1="146" y1="48" x2="212" y2="48"/>
+                <line x1="152" y1="40" x2="206" y2="40"/>
+                <line x1="150" y1="32" x2="210" y2="32"/>
+                <line x1="156" y1="24" x2="200" y2="24"/>
+            </g>
+        </g>
+    </symbol>
+</svg>
 
- <section id="panel">
-  <div class="kick">_relatório</div>
-  <div class="opts">
-   <label class="f">Título<input type="text" id="rtitle" value="Relatório de issues"></label>
-   <label class="f">Projeto<input type="text" id="rproj"></label>
-   <label class="f">Rodapé (direita)<input type="text" id="rfoot" value="_modo_bim"></label>
-   <div style="display:flex;flex-direction:column;gap:8px;justify-content:flex-end">
-    <label class="chk"><input type="checkbox" id="perpage" checked> Uma issue por página</label>
-    <label class="chk"><input type="checkbox" id="incc" checked> Incluir comentários</label>
-   </div>
-  </div>
+<!-- ============================================ NAV ============================================ -->
+<header class="nav">
+    <div class="wrap nav-inner">
+        <a href="index.html" class="wordmark" aria-label="_modo_bim, início">_modo_<span class="b">b</span>im</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="navLinks">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-links" id="navLinks">
+            <a href="index.html#nossos-servicos">nossos serviços</a>
+            <a href="index.html#implementacoes">implementações</a>
+            <a href="index.html#treinamentos">treinamentos</a>
+            <a href="produtos.html">produtos</a>
+            <a href="index.html#equipe">quem somos</a>
+            <a href="index.html#faq">dúvidas</a>
+            <a href="cadastro.html" class="nav-cta">Solicite uma proposta</a>
+        </nav>
+    </div>
+</header>
 
-  <div class="kick">_issues</div>
-  <div class="tools"><button id="all">Marcar todas</button><button id="none">Desmarcar todas</button></div>
-  <div class="list" id="list"></div>
-  <button class="go" id="go">Gerar PDF</button>
- </section>
+<main id="top">
+
+    <!-- ============================================ HERO ============================================ -->
+    <section class="hero">
+        <div class="wrap hero-grid">
+            <div class="hero-copy">
+                <span class="label">Ferramenta gratuita</span>
+                <h1 class="display rt">Issues do BCF em um PDF <em class="it">pronto para enviar.</em></h1>
+                <p class="lead">Abra o arquivo .bcf, escolha as issues e receba no seu e-mail um relatório com capa, índice, imagens e comentários — para levar à reunião de coordenação ou mandar para quem não abre software BIM.</p>
+                <div class="hero-actions">
+                    <a href="#conversor" class="btn btn-olive">Converter meu BCF <span class="arr">→</span></a>
+                    <a href="#como-funciona" class="tlink">como funciona <span class="arr">→</span></a>
+                </div>
+            </div>
+            <div class="hero-media reveal">
+                <img src="img/capa-bcf.png" width="1080" height="1350" alt="Capa do Conversor BCF para PDF da _modo_bim" fetchpriority="high" />
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ CONVERSOR ============================================
+         Três etapas no mesmo lugar (task 24 §02):
+           #passoArquivo  arquivo → opções → lista de issues → "Gerar PDF e receber por e-mail"
+           #passoEmail    cartão cereja pedindo o e-mail; ao enviar, gera o PDF e manda ao backend
+           #passoOk       resultado: enviado, ou (code ENVIO_FALHOU) o download como plano B
+         Clicar em gerar NUNCA baixa o arquivo: o e-mail é o preço da ferramenta. -->
+    <section class="section conversor" id="conversor">
+        <div class="wrap">
+            <div class="sec-head reveal">
+                <span class="label">_conversor</span>
+                <h2 class="h-sec rt">Solte o arquivo. <em class="it">O relatório sai pronto.</em></h2>
+                <p class="lead">Funciona com .bcf e .bcfzip nas versões 2.1 e 3.0 — o formato aberto de issues da buildingSMART.</p>
+            </div>
+
+            <div class="conv reveal" id="conv">
+
+                <!-- ETAPA 1 · arquivo, opções e issues -->
+                <div class="conv-card" id="passoArquivo">
+                    <label class="drop" id="drop">
+                        <input type="file" id="file" accept=".bcf,.bcfzip,.zip" />
+                        <svg class="drop-ico" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
+                        <span class="drop-title">Escolher arquivo BCF</span>
+                        <span class="drop-sub">ou arraste e solte aqui · .bcf ou .bcfzip</span>
+                    </label>
+                    <p class="status" id="status" role="status" aria-live="polite"></p>
+                    <p class="privacidade">Seu arquivo .bcf é lido aqui, <strong>no seu navegador</strong>, e não é enviado a lugar nenhum. Só o PDF gerado passa pelo nosso servidor, para ser anexado ao e-mail — ele não fica salvo na nossa base de contatos.</p>
+
+                    <div id="panel" hidden>
+                        <div class="conv-kick"><span class="label">_relatório</span></div>
+                        <div class="opts">
+                            <div class="field">
+                                <label for="rtitle">Título</label>
+                                <input type="text" id="rtitle" value="Relatório de issues" maxlength="120" />
+                                <span class="field-bar"></span>
+                            </div>
+                            <div class="field">
+                                <label for="rproj">Projeto</label>
+                                <input type="text" id="rproj" maxlength="120" placeholder="nome do projeto" />
+                                <span class="field-bar"></span>
+                            </div>
+                            <div class="field">
+                                <label for="rfoot">Rodapé (à direita)</label>
+                                <input type="text" id="rfoot" value="_modo_bim" maxlength="60" />
+                                <span class="field-bar"></span>
+                            </div>
+                        </div>
+                        <div class="checks">
+                            <label class="chk"><input type="checkbox" id="perpage" checked /> Uma issue por página</label>
+                            <label class="chk"><input type="checkbox" id="incc" checked /> Incluir comentários</label>
+                        </div>
+
+                        <div class="conv-kick">
+                            <span class="label">_issues <span class="contagem" id="contagem"></span></span>
+                            <div class="tools"><button type="button" id="all">marcar todas</button><button type="button" id="none">desmarcar todas</button></div>
+                        </div>
+                        <div class="list" id="list"></div>
+                        <p class="status err" id="erroLista" role="alert"></p>
+                        <button type="button" class="btn btn-olive btn-wide" id="go">Gerar PDF e receber por e-mail <span class="arr">→</span></button>
+                    </div>
+                </div>
+
+                <!-- ETAPA 2 · e-mail -->
+                <form class="conv-cereja on-cereja" id="passoEmail" novalidate hidden>
+                    <svg class="modo-tex" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
+                    <span class="label">_último passo</span>
+                    <h3 class="h-card">Para onde mandamos <em class="it">o seu PDF?</em></h3>
+                    <p class="resumo" id="resumo"></p>
+
+                    <div class="fields">
+                        <div class="field" id="campoEmail">
+                            <label for="email">E-mail <span class="req">*</span></label>
+                            <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="voce@escritorio.com.br" maxlength="254" />
+                            <span class="field-bar"></span>
+                            <span class="field-error">Informe um e-mail válido — é para ele que o PDF vai.</span>
+                        </div>
+                        <div class="field">
+                            <label for="nome">Nome <span class="opt">opcional</span></label>
+                            <input type="text" id="nome" name="nome" autocomplete="name" placeholder="como podemos te chamar" maxlength="80" />
+                            <span class="field-bar"></span>
+                        </div>
+                    </div>
+                    <label class="optin"><input type="checkbox" id="optin" name="optin" /> Quero receber conteúdos e novidades da _modo_bim por e-mail.</label>
+                    <input type="text" name="website_url" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+                    <div class="error-banner" id="erroEnvio" role="alert" hidden></div>
+                    <div class="email-actions">
+                        <button type="submit" class="btn btn-cream" id="enviar">Enviar para meu e-mail <span class="arr">→</span></button>
+                        <button type="button" class="voltar" id="voltar">← revisar issues</button>
+                    </div>
+                    <p class="miudo">Usamos o seu e-mail para mandar o PDF e registrar o pedido. Conteúdos da _modo_bim só chegam se você marcar a opção acima.</p>
+                </form>
+
+                <!-- ETAPA 3 · resultado -->
+                <div class="conv-cereja on-cereja ok" id="passoOk" tabindex="-1" hidden>
+                    <svg class="modo-tex" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
+                    <div class="seal" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></div>
+                    <h3 class="h-card" id="okTitulo">Enviado.</h3>
+                    <p class="ok-text" id="okTexto"></p>
+                    <div class="protocolo">
+                        <span class="label">Protocolo</span>
+                        <span class="protocolo-num" id="okProtocolo"></span>
+                    </div>
+                    <div class="ok-actions">
+                        <button type="button" class="btn btn-cream" id="baixar" hidden>Baixar o PDF aqui <span class="arr">→</span></button>
+                        <button type="button" class="btn btn-cream" id="outro">Converter outro arquivo <span class="arr">→</span></button>
+                        <a href="kit.html" class="btn btn-ghost-light">conhecer o Kit de Projeto BIM <span class="arr">→</span></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ COMO FUNCIONA ============================================ -->
+    <section class="section" id="como-funciona">
+        <div class="wrap">
+            <div class="sec-head reveal">
+                <span class="label">Como funciona</span>
+                <h2 class="h-sec rt">Do arquivo à caixa de entrada <em class="it">em três passos.</em></h2>
+            </div>
+            <div class="steps">
+                <div class="step reveal">
+                    <div class="step-num">01</div>
+                    <h3 class="step-name">Abra o arquivo</h3>
+                    <p class="step-desc">Escolha o .bcf ou .bcfzip exportado do seu software. Ele é lido aqui, no navegador.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-num">02</div>
+                    <h3 class="step-name">Escolha as issues</h3>
+                    <p class="step-desc">Marque o que entra no relatório e ajuste título, projeto e rodapé.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-num">03</div>
+                    <h3 class="step-name">Receba no e-mail</h3>
+                    <p class="step-desc">O PDF chega com capa, resumo por status, índice e cada issue com imagem e comentários.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ FAQ ============================================ -->
+    <section class="section faq" id="faq">
+        <div class="wrap faq-grid">
+            <div class="reveal">
+                <span class="label">FAQ</span>
+                <h2 class="h-sec" style="margin-top:16px;">Perguntas <em class="it">frequentes.</em></h2>
+            </div>
+            <div class="faq-list reveal">
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">É gratuito mesmo? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Sim. Em troca, pedimos só o seu e-mail: é para ele que o PDF vai.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Meu arquivo BCF vai para algum servidor? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Não. O .bcf é aberto e lido no seu navegador. O que viaja é só o PDF pronto, para ser anexado ao e-mail — e ele não fica salvo na nossa base de contatos.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Quais arquivos funcionam? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Arquivos .bcf e .bcfzip nas versões 2.1 e 3.0, o formato aberto da buildingSMART para troca de issues. É o que exportam ferramentas como Archicad, Solibri, BIMcollab e Trimble Connect, e o Revit com um plugin de BCF.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Por que vocês pedem meu e-mail? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Porque a ferramenta é gratuita e é assim que a gente se apresenta: o PDF chega no seu e-mail, com um protocolo. Conteúdos e novidades da _modo_bim só chegam se você marcar a opção.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">O e-mail não chegou. E agora? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">Confira as pastas de spam e promoções — o remetente é _modo_bim. Se não estiver lá em alguns minutos, gere de novo conferindo o endereço digitado.</div></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">Tem limite de tamanho? <span class="faq-icon"></span></button>
+                    <div class="faq-a"><div class="faq-a-inner">O PDF pode ter até 15 MB, o limite seguro para um anexo de e-mail. As imagens são otimizadas, então isso costuma caber dezenas de issues. Se passar, a ferramenta avisa: é só desmarcar algumas issues ou gerar em partes.</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ FINAL CTA ============================================ -->
+    <section class="cta-final">
+        <svg class="modo-tex modo-tex--tl" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
+        <svg class="modo-tex modo-tex--br" viewBox="0 0 220 200" aria-hidden="true" focusable="false"><use href="#modoPattern"/></svg>
+        <div class="wrap">
+            <h2 class="reveal rt">Menos issue começa num projeto bem combinado.<span class="cur">_</span></h2>
+            <div class="cta-buttons reveal">
+                <a href="kit.html" class="btn btn-cream">conhecer o Kit de Projeto BIM <span class="arr">→</span></a>
+                <a href="produtos.html" class="btn btn-ghost-light">ver outros produtos <span class="arr">→</span></a>
+            </div>
+        </div>
+    </section>
+
 </main>
 
+<!-- ============================================ FOOTER ============================================ -->
+<footer class="footer">
+    <div class="wrap">
+        <div class="footer-top">
+            <a href="index.html" class="wordmark">_modo_<span class="b">b</span>im</a>
+            <nav class="footer-nav">
+                <a href="index.html#nossos-servicos">nossos serviços</a>
+                <a href="index.html#implementacoes">implementações</a>
+                <a href="index.html#treinamentos">treinamentos</a>
+                <a href="produtos.html">produtos</a>
+                <a href="index.html#equipe">quem somos</a>
+                <a href="cadastro.html">proposta</a>
+                <a href="lista-espera.html">lista de espera</a>
+            </nav>
+        </div>
+        <div class="footer-bottom">
+            <span>belém · pará · brasil</span>
+            <span>© <span id="year"></span> _modo_bim</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Endpoint do backend: fonte única, igual aos formulários (task 20). -->
+<script src="js/config.js"></script>
 <script>
-const $=s=>document.querySelector(s);
-let topics=[];
-const kids=(el,n)=>el?[...el.children].filter(c=>c.localName===n):[];
-const kid=(el,n)=>kids(el,n)[0];
-const txt=(el,n)=>{const k=kid(el,n);return k?k.textContent.trim():''};
-const deep=(el,n)=>[...el.getElementsByTagName('*')].filter(e=>e.localName===n);
-const parseX=s=>new DOMParser().parseFromString(s,'application/xml');
-const fdate=s=>{if(!s)return'';const d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('pt-BR')};
-const fdt=s=>{if(!s)return'';const d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
-const size=url=>new Promise(r=>{const i=new Image();i.onload=()=>r({w:i.naturalWidth,h:i.naturalHeight});i.onerror=()=>r(null);i.src=url});
-function status(m,err){const s=$('#status');s.textContent=m;s.className='status'+(err?' err':'')}
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-async function load(file){
- status('Lendo '+file.name+'…');$('#panel').style.display='none';
- let zip;
- try{zip=await JSZip.loadAsync(file)}catch(e){status('Não foi possível abrir: o arquivo não parece ser um BCF (zip).',true);return}
- const names=Object.keys(zip.files);
- const pf=names.find(p=>/project\.bcfp$/i.test(p));
- let proj='';
- if(pf){const d=parseX(await zip.file(pf).async('string'));const n=deep(d,'Name')[0];proj=n?n.textContent.trim():''}
- $('#rproj').value=proj;
- topics=[];
- for(const p of names.filter(p=>/(^|\/)markup\.bcf$/i.test(p))){
-  const folder=p.replace(/markup\.bcf$/i,'');
-  const d=parseX(await zip.file(p).async('string'));
-  const t=deep(d,'Topic')[0]; if(!t)continue;
-  const labels=kids(t,'Labels').flatMap(l=>{const i=kids(l,'Label');return i.length?i.map(x=>x.textContent.trim()):[l.textContent.trim()]}).filter(Boolean);
-  const assigned=kids(t,'AssignedTo').map(a=>a.textContent.trim()).filter(Boolean).join(', ');
-  const comments=deep(d,'Comment').filter(c=>kid(c,'Date')).map(c=>({date:txt(c,'Date'),author:txt(c,'Author'),text:txt(c,'Comment')})).filter(c=>c.text).sort((a,b)=>a.date.localeCompare(b.date));
-  let snaps=deep(d,'Snapshot').map(s=>s.textContent.trim()).filter(Boolean);
-  if(!snaps.length){const f=names.find(k=>k.startsWith(folder)&&/snapshot\.(png|jpe?g)$/i.test(k));if(f)snaps=[f.slice(folder.length)]}
-  const images=[];
-  for(const s of [...new Set(snaps)]){
-   const f=zip.file(folder+s)||zip.file(s); if(!f)continue;
-   const jpg=/\.jpe?g$/i.test(s);
-   const url='data:image/'+(jpg?'jpeg':'png')+';base64,'+await f.async('base64');
-   const dim=await size(url); if(dim)images.push({url,fmt:jpg?'JPEG':'PNG',...dim});
-  }
-  topics.push({type:t.getAttribute('TopicType')||'',status:t.getAttribute('TopicStatus')||'',title:txt(t,'Title')||'(sem título)',
-   priority:txt(t,'Priority'),index:txt(t,'Index'),labels:labels.join(', '),created:txt(t,'CreationDate'),author:txt(t,'CreationAuthor'),
-   modified:txt(t,'ModifiedDate'),assigned,due:txt(t,'DueDate'),stage:txt(t,'Stage'),desc:txt(t,'Description'),comments,images,on:true});
- }
- if(!topics.length){status('Nenhuma issue encontrada neste arquivo.',true);return}
- topics.sort((a,b)=>((+a.index||1e9)-(+b.index||1e9))||a.created.localeCompare(b.created));
- render();
- status(topics.length+' issue'+(topics.length>1?'s':'')+' encontrada'+(topics.length>1?'s':'')+'.');
- $('#panel').style.display='block';
-}
+    /* ============================================ MENU HAMBÚRGUER ============================================ */
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    const closeMenu = () => {
+        navLinks.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+    };
+    navToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = navLinks.classList.toggle('open');
+        navToggle.classList.toggle('open', open);
+        navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('click', (e) => {
+        if (navLinks.classList.contains('open') && !navLinks.contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
-function render(){
- const L=$('#list');L.innerHTML='';
- topics.forEach((t,i)=>{
-  const r=document.createElement('label');r.className='row';
-  const c=document.createElement('input');c.type='checkbox';c.checked=t.on;c.onchange=()=>t.on=c.checked;
-  const im=document.createElement(t.images[0]?'img':'div');if(t.images[0]){im.src=t.images[0].url;im.alt=''}else im.style.cssText='width:56px;height:40px;border-radius:4px;background:var(--line)';
-  const tx=document.createElement('div');
-  const a=document.createElement('div');a.className='t';a.textContent='#'+(t.index||i+1)+'  '+t.title;
-  const b=document.createElement('div');b.className='m';b.textContent=[t.status,t.priority,t.assigned,fdate(t.created)].filter(Boolean).join(' / ');
-  tx.append(a,b);r.append(c,im,tx);L.append(r);
- });
-}
+    /* ============================================ FAQ ACCORDION ============================================ */
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const q = item.querySelector('.faq-q');
+        const a = item.querySelector('.faq-a');
+        q.addEventListener('click', () => {
+            const isOpen = item.classList.contains('open');
+            document.querySelectorAll('.faq-item.open').forEach(other => {
+                if (other !== item) {
+                    other.classList.remove('open');
+                    other.querySelector('.faq-a').style.height = '0px';
+                    other.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+                }
+            });
+            if (isOpen) {
+                item.classList.remove('open');
+                a.style.height = '0px';
+                q.setAttribute('aria-expanded', 'false');
+            } else {
+                item.classList.add('open');
+                a.style.height = a.firstElementChild.offsetHeight + 'px';
+                q.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
 
-function buildPDF(){
- const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
- const W=210,H=297,M=16,CW=W-2*M,BOT=H-18;
- const C={wine:[107,31,42],cream:[245,239,230],olive:[107,112,67],coffee:[59,42,34],gray:[120,108,100],line:[226,216,203],ink:[40,30,26]};
- const sel=topics.filter(t=>t.on);
- const title=$('#rtitle').value.trim()||'Relatório de issues';
- const proj=$('#rproj').value.trim(), foot=$('#rfoot').value.trim(), perPage=$('#perpage').checked, incC=$('#incc').checked;
- let y=M;
- const font=(f,s,c,st='normal')=>{doc.setFont(f,st);doc.setFontSize(s);doc.setTextColor(...c)};
- const newPage=()=>{doc.addPage();y=M};
- const need=h=>{if(y+h>BOT)newPage()};
- const para=(text,x,w,lh)=>{for(const l of doc.splitTextToSize(text,w)){need(lh);doc.text(l,x,y,{baseline:'top'});y+=lh}};
+    /* ============================================ SCROLL REVEAL + TEXTO QUE SE MONTA ============================================ */
+    /* Mesmo splitReveal do index: quebra .rt em palavras animáveis, preservando <em> e <span>. */
+    function splitReveal(root) {
+        let i = 0;
+        (function walk(node) {
+            [...node.childNodes].forEach(child => {
+                if (child.nodeType === Node.TEXT_NODE) {
+                    if (!child.nodeValue.trim()) return;
+                    const frag = document.createDocumentFragment();
+                    child.nodeValue.split(/(\s+)/).forEach(part => {
+                        if (!part) return;
+                        if (!part.trim()) { frag.appendChild(document.createTextNode(part)); return; }
+                        const piece = document.createElement('span');
+                        piece.className = 'rt-w';
+                        piece.style.setProperty('--i', i++);
+                        const inner = document.createElement('i');
+                        inner.textContent = part;
+                        piece.appendChild(inner);
+                        frag.appendChild(piece);
+                    });
+                    node.replaceChild(frag, child);
+                } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'BR') {
+                    walk(child);
+                }
+            });
+        })(root);
+    }
+    if (!reducedMotion) document.querySelectorAll('.rt').forEach(splitReveal);
 
- // capa
- doc.setFillColor(...C.wine);doc.rect(0,0,W,120,'F');
- font('times',11,C.cream,'italic');doc.text('_relatório BCF',M,22,{baseline:'top'});
- font('times',30,C.cream);let ty=48;
- for(const l of doc.splitTextToSize(title,CW)){doc.text(l,M,ty,{baseline:'top'});ty+=12}
- if(proj){font('helvetica',12,C.cream);doc.text(proj,M,ty+4,{baseline:'top'})}
- font('helvetica',10,C.cream);doc.text('Gerado em '+new Date().toLocaleDateString('pt-BR')+'  |  '+sel.length+' issue'+(sel.length>1?'s':''),M,106,{baseline:'top'});
- y=134;
- const counts={};sel.forEach(t=>{const k=t.status||'Sem status';counts[k]=(counts[k]||0)+1});
- font('times',15,C.olive,'italic');doc.text('_resumo por status',M,y,{baseline:'top'});y+=9;
- Object.entries(counts).forEach(([k,v])=>{font('helvetica',10.5,C.ink);doc.text(k,M,y,{baseline:'top'});doc.text(String(v),M+CW,y,{baseline:'top',align:'right'});y+=6;doc.setDrawColor(...C.line);doc.line(M,y-1.5,M+CW,y-1.5)});
- y+=8;font('times',15,C.olive,'italic');need(12);doc.text('_índice',M,y,{baseline:'top'});y+=9;
- sel.forEach((t,i)=>{
-  font('helvetica',9.5,C.ink);const lines=doc.splitTextToSize(t.title,CW-62);need(lines.length*4.6+2);
-  doc.setTextColor(...C.wine);doc.text('#'+(t.index||i+1),M,y,{baseline:'top'});
-  doc.setTextColor(...C.ink);doc.text(lines,M+12,y,{baseline:'top'});
-  doc.setTextColor(...C.gray);doc.text([t.status,t.priority].filter(Boolean).join(' / '),M+CW,y,{baseline:'top',align:'right'});
-  y+=lines.length*4.6+2;
- });
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal, .rt').forEach(el => io.observe(el));
 
- // issues
- sel.forEach((t,i)=>{
-  if(i===0||perPage)newPage();else{need(60);y+=8}
-  font('times',16,C.cream);const tl=doc.splitTextToSize(t.title,CW-26);const hh=8+tl.length*6.5;
-  need(hh+20);doc.setFillColor(...C.wine);doc.rect(M,y,CW,hh,'F');
-  font('helvetica',10,C.cream,'bold');doc.text('#'+(t.index||i+1),M+5,y+5,{baseline:'top'});
-  font('times',16,C.cream);doc.text(tl,M+21,y+4,{baseline:'top'});y+=hh+6;
-  const meta=[['Status',t.status],['Prioridade',t.priority],['Tipo',t.type],['Responsável',t.assigned],['Criado por',t.author],['Criado em',fdate(t.created)],['Prazo',fdate(t.due)],['Etapa',t.stage],['Rótulos',t.labels]].filter(m=>m[1]);
-  const cw=CW/3;
-  for(let k=0;k<meta.length;k+=3){
-   let rh=0;const row=meta.slice(k,k+3).map(m=>{font('helvetica',9.5,C.ink);const v=doc.splitTextToSize(m[1],cw-4);rh=Math.max(rh,4+v.length*4.4);return[m[0],v]});
-   need(rh+2);
-   row.forEach(([lab,v],j)=>{const x=M+j*cw;font('helvetica',7.5,C.gray);doc.text(lab,x,y,{baseline:'top'});font('helvetica',9.5,C.ink);doc.text(v,x,y+3.6,{baseline:'top'})});
-   y+=rh+3;
-  }
-  doc.setDrawColor(...C.line);doc.line(M,y,M+CW,y);y+=5;
-  t.images.forEach(im=>{
-   const maxH=perPage?110:95;let w=CW,h=w*im.h/im.w;if(h>maxH){h=maxH;w=h*im.w/im.h}
-   need(h+5);const x=M+(CW-w)/2;
-   try{doc.addImage(im.url,im.fmt,x,y,w,h,undefined,'FAST');doc.setDrawColor(...C.line);doc.rect(x,y,w,h)}catch(e){}
-   y+=h+6;
-  });
-  if(t.desc){need(14);font('times',12,C.olive,'italic');doc.text('_descrição',M,y,{baseline:'top'});y+=6;font('helvetica',10,C.ink);para(t.desc,M,CW,4.8);y+=4}
-  if(incC&&t.comments.length){
-   need(14);font('times',12,C.olive,'italic');doc.text('_comentários ('+t.comments.length+')',M,y,{baseline:'top'});y+=7;
-   t.comments.forEach(c=>{
-    need(12);const y0=y;
-    font('helvetica',8.5,C.wine,'bold');doc.text([c.author,fdt(c.date)].filter(Boolean).join('  |  '),M+4,y,{baseline:'top'});y+=4.6;
-    font('helvetica',9.5,C.ink);para(c.text,M+4,CW-4,4.5);
-    doc.setDrawColor(...C.olive);doc.setLineWidth(.6);if(y>y0)doc.line(M,y0,M,y-1);doc.setLineWidth(.2);y+=3;
-   });
-  }
- });
-
- const n=doc.getNumberOfPages();
- for(let p=2;p<=n;p++){doc.setPage(p);doc.setDrawColor(...C.line);doc.line(M,H-12,M+CW,H-12);
-  font('helvetica',8,C.gray);doc.text(title+(proj?' — '+proj:''),M,H-9,{baseline:'top'});
-  doc.text(p+' / '+n,W/2,H-9,{baseline:'top',align:'center'});
-  font('times',9,C.wine,'italic');if(foot)doc.text(foot,M+CW,H-9,{baseline:'top',align:'right'})}
- return doc;
-}
-
-let downloads=null;
-(async()=>{try{if(window.claude&&claude.use)downloads=await claude.use('downloads')}catch(e){}})();
-
-$('#go').onclick=async()=>{
- if(!topics.some(t=>t.on)){status('Marque ao menos uma issue.',true);return}
- const b=$('#go');b.disabled=true;b.textContent='Gerando…';
- try{
-  await new Promise(r=>setTimeout(r,30));
-  const doc=buildPDF();
-  const name=(($('#rproj').value.trim()||'issues')+'_BCF').replace(/[^\w\-]+/g,'_')+'.pdf';
-  if(downloads){
-   try{await downloads.save({filename:name,data:doc.output('blob')});status('PDF salvo.')}
-   catch(e){status(e&&e.code==='declined'?'Download cancelado.':'Não foi possível salvar o PDF aqui.',e&&e.code!=='declined')}
-  }else{doc.save(name);status('PDF gerado.')}
- }catch(e){status('Erro ao gerar o PDF: '+e.message,true)}
- b.disabled=false;b.textContent='Gerar PDF';
-};
-$('#file').onchange=e=>{const f=e.target.files[0];if(f)load(f)};
-const dz=$('#drop');
-dz.ondragover=e=>{e.preventDefault()};
-dz.ondrop=e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f)load(f)};
-$('#all').onclick=()=>{topics.forEach(t=>t.on=true);render()};
-$('#none').onclick=()=>{topics.forEach(t=>t.on=false);render()};
+    document.getElementById('year').textContent = new Date().getFullYear();
 </script>
+
+<script>
+/* ============================================================
+ *  CONVERSOR BCF → PDF (task 24)
+ * ============================================================
+ *  Parser e montagem do PDF vêm do commit 11ba6fc. O que mudou:
+ *   · as bibliotecas são do próprio site e só baixam quando a pessoa
+ *     escolhe um arquivo (js/vendor/README.md);
+ *   · snapshots viram JPEG de no máximo 1600 px — PNG cru estourava o
+ *     limite de anexo de e-mail com poucas issues;
+ *   · o PDF não é mais baixado: vai em base64 para o backend, que o
+ *     anexa no e-mail de quem pediu (tipo 'bcf-pdf' do Code.gs).
+ * ============================================================ */
+(() => {
+    const CONFIG = window.MODOBIM_CONFIG || {};
+    const ENDPOINT_URL = CONFIG.ENDPOINT_URL || '';
+    const DEV_MODE = CONFIG.DEV_MODE === true;
+    const FORM_TYPE = 'bcf-pdf';
+
+    const VENDOR = ['js/vendor/jszip-3.10.1.min.js', 'js/vendor/jspdf-2.5.1.umd.min.js'];
+    const PDF_MAX_BYTES = 15 * 1024 * 1024;   // = CONFIG.BCF_PDF_MAX_BYTES do Code.gs
+    const IMG_MAX_LADO = 1600;
+    const IMG_QUALIDADE = 0.82;
+
+    const $ = (s) => document.querySelector(s);
+    const passos = { arquivo: $('#passoArquivo'), email: $('#passoEmail'), ok: $('#passoOk') };
+
+    let topics = [];
+    let arquivoNome = '';
+    let ultimoPdf = null;   // { blob, nome } — só para o plano B do ENVIO_FALHOU
+
+    /* ---------- utilidades ---------- */
+    const kids = (el, n) => el ? [...el.children].filter(c => c.localName === n) : [];
+    const kid = (el, n) => kids(el, n)[0];
+    const txt = (el, n) => { const k = kid(el, n); return k ? k.textContent.trim() : ''; };
+    const deep = (el, n) => [...el.getElementsByTagName('*')].filter(e => e.localName === n);
+    const parseX = (s) => new DOMParser().parseFromString(s, 'application/xml');
+    const fdate = (s) => { if (!s) return ''; const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('pt-BR'); };
+    const fdt = (s) => { if (!s) return ''; const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); };
+    const mb = (n) => (n / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+    const plural = (n, um, varios) => n + ' ' + (n === 1 ? um : varios);
+    const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const quadro = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+    const erroNosso = (msg) => Object.assign(new Error(msg), { nosso: true });
+
+    function status(msg, erro) {
+        const s = $('#status');
+        s.textContent = msg;
+        s.classList.toggle('err', Boolean(erro));
+    }
+
+    function mostrar(qual) {
+        Object.entries(passos).forEach(([k, el]) => { el.hidden = k !== qual; });
+        const el = passos[qual];
+        if (!reducedMotion) { el.classList.remove('entra'); void el.offsetWidth; el.classList.add('entra'); }
+        const topo = el.getBoundingClientRect().top;
+        if (topo < 60 || topo > window.innerHeight * 0.6) {
+            el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+        }
+    }
+
+    /* ---------- bibliotecas sob demanda ---------- */
+    let libs = null;
+    function carregarLibs() {
+        if (!libs) {
+            libs = Promise.all(VENDOR.map(src => new Promise((ok, falha) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.onload = ok;
+                s.onerror = () => falha(new Error('não carregou ' + src));
+                document.head.appendChild(s);
+            })));
+            libs.catch(() => { libs = null; });   // deixa tentar de novo
+        }
+        return libs;
+    }
+
+    /* ---------- imagem: qualquer formato → JPEG enxuto ---------- */
+    async function paraJpeg(bytes, tipo) {
+        const url = URL.createObjectURL(new Blob([bytes], { type: tipo }));
+        try {
+            const img = await new Promise((ok, falha) => {
+                const i = new Image();
+                i.onload = () => ok(i);
+                i.onerror = falha;
+                i.src = url;
+            });
+            const escala = Math.min(1, IMG_MAX_LADO / Math.max(img.naturalWidth, img.naturalHeight));
+            const w = Math.max(1, Math.round(img.naturalWidth * escala));
+            const h = Math.max(1, Math.round(img.naturalHeight * escala));
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#ffffff';            // PNG com transparência não vira fundo preto
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            return { url: c.toDataURL('image/jpeg', IMG_QUALIDADE), w, h };
+        } catch (e) {
+            return null;
+        } finally {
+            URL.revokeObjectURL(url);
+        }
+    }
+
+    /* ---------- leitura do BCF ---------- */
+    async function load(file) {
+        passos.arquivo.querySelector('#panel').hidden = true;
+        $('#erroLista').textContent = '';
+        arquivoNome = file.name;
+        status('Preparando o conversor…');
+        try {
+            await carregarLibs();
+        } catch (e) {
+            status('Não foi possível carregar o conversor. Verifique sua conexão e tente de novo.', true);
+            return;
+        }
+
+        status('Lendo ' + file.name + '…');
+        let zip;
+        try { zip = await JSZip.loadAsync(file); }
+        catch (e) { status('Não foi possível abrir: o arquivo não parece ser um BCF (.bcf ou .bcfzip).', true); return; }
+
+        const names = Object.keys(zip.files);
+        const pf = names.find(p => /project\.bcfp$/i.test(p));
+        let proj = '';
+        if (pf) { const d = parseX(await zip.file(pf).async('string')); const n = deep(d, 'Name')[0]; proj = n ? n.textContent.trim() : ''; }
+        $('#rproj').value = proj;
+
+        topics = [];
+        for (const p of names.filter(p => /(^|\/)markup\.bcf$/i.test(p))) {
+            const folder = p.replace(/markup\.bcf$/i, '');
+            const d = parseX(await zip.file(p).async('string'));
+            const t = deep(d, 'Topic')[0]; if (!t) continue;
+            const labels = kids(t, 'Labels').flatMap(l => { const i = kids(l, 'Label'); return i.length ? i.map(x => x.textContent.trim()) : [l.textContent.trim()]; }).filter(Boolean);
+            const assigned = kids(t, 'AssignedTo').map(a => a.textContent.trim()).filter(Boolean).join(', ');
+            const comments = deep(d, 'Comment').filter(c => kid(c, 'Date')).map(c => ({ date: txt(c, 'Date'), author: txt(c, 'Author'), text: txt(c, 'Comment') })).filter(c => c.text).sort((a, b) => a.date.localeCompare(b.date));
+            let snaps = deep(d, 'Snapshot').map(s => s.textContent.trim()).filter(Boolean);
+            if (!snaps.length) { const f = names.find(k => k.startsWith(folder) && /snapshot\.(png|jpe?g)$/i.test(k)); if (f) snaps = [f.slice(folder.length)]; }
+            const images = [];
+            for (const s of [...new Set(snaps)]) {
+                const f = zip.file(folder + s) || zip.file(s); if (!f) continue;
+                const tipo = /\.jpe?g$/i.test(s) ? 'image/jpeg' : 'image/png';
+                const img = await paraJpeg(await f.async('uint8array'), tipo);
+                if (img) images.push(img);
+            }
+            topics.push({
+                type: t.getAttribute('TopicType') || '', status: t.getAttribute('TopicStatus') || '', title: txt(t, 'Title') || '(sem título)',
+                priority: txt(t, 'Priority'), index: txt(t, 'Index'), labels: labels.join(', '), created: txt(t, 'CreationDate'), author: txt(t, 'CreationAuthor'),
+                modified: txt(t, 'ModifiedDate'), assigned, due: txt(t, 'DueDate'), stage: txt(t, 'Stage'), desc: txt(t, 'Description'), comments, images, on: true
+            });
+        }
+        if (!topics.length) { status('Nenhuma issue encontrada neste arquivo.', true); return; }
+        topics.sort((a, b) => ((+a.index || 1e9) - (+b.index || 1e9)) || a.created.localeCompare(b.created));
+        render();
+        status(plural(topics.length, 'issue encontrada', 'issues encontradas') + ' em ' + file.name + '.');
+        $('#panel').hidden = false;
+    }
+
+    function contar() {
+        const n = topics.filter(t => t.on).length;
+        $('#contagem').textContent = '· ' + n + ' de ' + topics.length;
+        if (n) $('#erroLista').textContent = '';
+    }
+
+    function render() {
+        const L = $('#list');
+        L.innerHTML = '';
+        topics.forEach((t, i) => {
+            const r = document.createElement('label'); r.className = 'row';
+            const c = document.createElement('input'); c.type = 'checkbox'; c.checked = t.on;
+            c.onchange = () => { t.on = c.checked; contar(); };
+            let im;
+            if (t.images[0]) { im = document.createElement('img'); im.src = t.images[0].url; im.alt = ''; }
+            else { im = document.createElement('span'); }
+            im.className = 'thumb';
+            const tx = document.createElement('div');
+            const a = document.createElement('div'); a.className = 't';
+            const n = document.createElement('b'); n.textContent = '#' + (t.index || i + 1);
+            a.append(n, document.createTextNode(t.title));
+            const b = document.createElement('div'); b.className = 'm';
+            b.textContent = [t.status, t.priority, t.assigned, fdate(t.created)].filter(Boolean).join(' · ');
+            tx.append(a, b); r.append(c, im, tx); L.append(r);
+        });
+        contar();
+    }
+
+    /* ---------- montagem do PDF (cores oficiais da marca) ---------- */
+    function buildPDF() {
+        const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const W = 210, H = 297, M = 16, CW = W - 2 * M, BOT = H - 18;
+        const C = { wine: [129, 22, 30], cream: [239, 238, 233], olive: [95, 98, 69], gray: [112, 114, 96], line: [214, 213, 204], ink: [76, 79, 55] };
+        const sel = topics.filter(t => t.on);
+        const title = $('#rtitle').value.trim() || 'Relatório de issues';
+        const proj = $('#rproj').value.trim(), foot = $('#rfoot').value.trim(), perPage = $('#perpage').checked, incC = $('#incc').checked;
+        let y = M;
+        const font = (f, s, c, st = 'normal') => { doc.setFont(f, st); doc.setFontSize(s); doc.setTextColor(...c); };
+        const newPage = () => { doc.addPage(); y = M; };
+        const need = h => { if (y + h > BOT) newPage(); };
+        const para = (text, x, w, lh) => { for (const l of doc.splitTextToSize(text, w)) { need(lh); doc.text(l, x, y, { baseline: 'top' }); y += lh; } };
+
+        // capa
+        doc.setFillColor(...C.wine); doc.rect(0, 0, W, 120, 'F');
+        font('times', 11, C.cream, 'italic'); doc.text('_relatório BCF', M, 22, { baseline: 'top' });
+        font('times', 30, C.cream); let ty = 48;
+        for (const l of doc.splitTextToSize(title, CW)) { doc.text(l, M, ty, { baseline: 'top' }); ty += 12; }
+        if (proj) { font('helvetica', 12, C.cream); doc.text(proj, M, ty + 4, { baseline: 'top' }); }
+        font('helvetica', 10, C.cream); doc.text('Gerado em ' + new Date().toLocaleDateString('pt-BR') + '  |  ' + sel.length + ' issue' + (sel.length > 1 ? 's' : ''), M, 106, { baseline: 'top' });
+        y = 134;
+        const counts = {}; sel.forEach(t => { const k = t.status || 'Sem status'; counts[k] = (counts[k] || 0) + 1; });
+        font('times', 15, C.olive, 'italic'); doc.text('_resumo por status', M, y, { baseline: 'top' }); y += 9;
+        Object.entries(counts).forEach(([k, v]) => { font('helvetica', 10.5, C.ink); doc.text(k, M, y, { baseline: 'top' }); doc.text(String(v), M + CW, y, { baseline: 'top', align: 'right' }); y += 6; doc.setDrawColor(...C.line); doc.line(M, y - 1.5, M + CW, y - 1.5); });
+        y += 8; font('times', 15, C.olive, 'italic'); need(12); doc.text('_índice', M, y, { baseline: 'top' }); y += 9;
+        sel.forEach((t, i) => {
+            font('helvetica', 9.5, C.ink); const lines = doc.splitTextToSize(t.title, CW - 62); need(lines.length * 4.6 + 2);
+            doc.setTextColor(...C.wine); doc.text('#' + (t.index || i + 1), M, y, { baseline: 'top' });
+            doc.setTextColor(...C.ink); doc.text(lines, M + 12, y, { baseline: 'top' });
+            doc.setTextColor(...C.gray); doc.text([t.status, t.priority].filter(Boolean).join(' / '), M + CW, y, { baseline: 'top', align: 'right' });
+            y += lines.length * 4.6 + 2;
+        });
+
+        // issues
+        sel.forEach((t, i) => {
+            if (i === 0 || perPage) newPage(); else { need(60); y += 8; }
+            font('times', 16, C.cream); const tl = doc.splitTextToSize(t.title, CW - 26); const hh = 8 + tl.length * 6.5;
+            need(hh + 20); doc.setFillColor(...C.wine); doc.rect(M, y, CW, hh, 'F');
+            font('helvetica', 10, C.cream, 'bold'); doc.text('#' + (t.index || i + 1), M + 5, y + 5, { baseline: 'top' });
+            font('times', 16, C.cream); doc.text(tl, M + 21, y + 4, { baseline: 'top' }); y += hh + 6;
+            const meta = [['Status', t.status], ['Prioridade', t.priority], ['Tipo', t.type], ['Responsável', t.assigned], ['Criado por', t.author], ['Criado em', fdate(t.created)], ['Prazo', fdate(t.due)], ['Etapa', t.stage], ['Rótulos', t.labels]].filter(m => m[1]);
+            const cw = CW / 3;
+            for (let k = 0; k < meta.length; k += 3) {
+                let rh = 0; const row = meta.slice(k, k + 3).map(m => { font('helvetica', 9.5, C.ink); const v = doc.splitTextToSize(m[1], cw - 4); rh = Math.max(rh, 4 + v.length * 4.4); return [m[0], v]; });
+                need(rh + 2);
+                row.forEach(([lab, v], j) => { const x = M + j * cw; font('helvetica', 7.5, C.gray); doc.text(lab, x, y, { baseline: 'top' }); font('helvetica', 9.5, C.ink); doc.text(v, x, y + 3.6, { baseline: 'top' }); });
+                y += rh + 3;
+            }
+            doc.setDrawColor(...C.line); doc.line(M, y, M + CW, y); y += 5;
+            t.images.forEach(im => {
+                const maxH = perPage ? 110 : 95; let w = CW, h = w * im.h / im.w; if (h > maxH) { h = maxH; w = h * im.w / im.h; }
+                need(h + 5); const x = M + (CW - w) / 2;
+                try { doc.addImage(im.url, 'JPEG', x, y, w, h, undefined, 'FAST'); doc.setDrawColor(...C.line); doc.rect(x, y, w, h); } catch (e) { /* imagem ilegível: segue sem ela */ }
+                y += h + 6;
+            });
+            if (t.desc) { need(14); font('times', 12, C.olive, 'italic'); doc.text('_descrição', M, y, { baseline: 'top' }); y += 6; font('helvetica', 10, C.ink); para(t.desc, M, CW, 4.8); y += 4; }
+            if (incC && t.comments.length) {
+                need(14); font('times', 12, C.olive, 'italic'); doc.text('_comentários (' + t.comments.length + ')', M, y, { baseline: 'top' }); y += 7;
+                t.comments.forEach(c => {
+                    need(12); const y0 = y;
+                    font('helvetica', 8.5, C.wine, 'bold'); doc.text([c.author, fdt(c.date)].filter(Boolean).join('  |  '), M + 4, y, { baseline: 'top' }); y += 4.6;
+                    font('helvetica', 9.5, C.ink); para(c.text, M + 4, CW - 4, 4.5);
+                    doc.setDrawColor(...C.olive); doc.setLineWidth(.6); if (y > y0) doc.line(M, y0, M, y - 1); doc.setLineWidth(.2); y += 3;
+                });
+            }
+        });
+
+        const n = doc.getNumberOfPages();
+        for (let p = 2; p <= n; p++) {
+            doc.setPage(p); doc.setDrawColor(...C.line); doc.line(M, H - 12, M + CW, H - 12);
+            font('helvetica', 8, C.gray); doc.text(title + (proj ? ' — ' + proj : ''), M, H - 9, { baseline: 'top' });
+            doc.text(p + ' / ' + n, W / 2, H - 9, { baseline: 'top', align: 'center' });
+            font('times', 9, C.wine, 'italic'); if (foot) doc.text(foot, M + CW, H - 9, { baseline: 'top', align: 'right' });
+        }
+        return doc;
+    }
+
+    const nomeDoPdf = () => (($('#rproj').value.trim() || 'issues') + '_BCF').replace(/[^\w\-]+/g, '_') + '.pdf';
+
+    const blobParaBase64 = (blob) => new Promise((ok, falha) => {
+        const r = new FileReader();
+        r.onload = () => ok(String(r.result).split(',')[1] || '');
+        r.onerror = () => falha(r.error);
+        r.readAsDataURL(blob);
+    });
+
+    function baixar() {
+        if (!ultimoPdf) return;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(ultimoPdf.blob);
+        a.download = ultimoPdf.nome;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+    }
+
+    /* ---------- etapa e-mail ---------- */
+    const form = passos.email;
+    const emailInput = $('#email');
+    const campoEmail = $('#campoEmail');
+    const botaoEnviar = $('#enviar');
+    const rotuloEnviar = botaoEnviar.innerHTML;
+
+    function erroEnvio(msg) {
+        const b = $('#erroEnvio');
+        b.textContent = msg || '';
+        b.hidden = !msg;
+    }
+
+    function ocupado(sim, texto) {
+        botaoEnviar.disabled = sim;
+        $('#voltar').disabled = sim;
+        botaoEnviar.innerHTML = sim ? texto : rotuloEnviar;
+        form.setAttribute('aria-busy', sim ? 'true' : 'false');
+    }
+
+    function resultado(tipo, protocolo, email) {
+        const ok = tipo === 'ok';
+        $('#okTitulo').textContent = ok ? 'Enviado.' : 'Quase lá.';
+        const texto = $('#okTexto');
+        texto.textContent = '';
+        if (ok) {
+            const forte = document.createElement('strong'); forte.textContent = email;
+            texto.append('Mandamos o PDF para ', forte, '. Se não aparecer em alguns minutos, confira o spam e a aba de promoções.');
+        } else {
+            texto.textContent = 'Seu pedido foi registrado, mas o e-mail não saiu agora. Seu PDF está pronto: baixe aqui mesmo.';
+        }
+        $('#okProtocolo').textContent = protocolo || '—';
+        $('#baixar').hidden = ok;
+        $('#outro').hidden = !ok;
+        mostrar('ok');
+        passos.ok.focus({ preventScroll: true });
+    }
+
+    $('#go').addEventListener('click', () => {
+        const sel = topics.filter(t => t.on);
+        if (!sel.length) { $('#erroLista').textContent = 'Marque ao menos uma issue.'; return; }
+        const proj = $('#rproj').value.trim();
+        $('#resumo').textContent = plural(sel.length, 'issue', 'issues') + (proj ? ' · ' + proj : '') + ' · ' + arquivoNome;
+        erroEnvio('');
+        mostrar('email');
+        setTimeout(() => emailInput.focus({ preventScroll: true }), reducedMotion ? 0 : 350);
+    });
+
+    $('#voltar').addEventListener('click', () => mostrar('arquivo'));
+
+    emailInput.addEventListener('blur', () => {
+        const v = emailInput.value.trim();
+        campoEmail.classList.toggle('error', Boolean(v) && !validarEmail(v));
+    });
+    emailInput.addEventListener('input', () => campoEmail.classList.remove('error'));
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        erroEnvio('');
+        const email = emailInput.value.trim();
+        if (!validarEmail(email)) {
+            campoEmail.classList.add('error');
+            emailInput.focus();
+            return;
+        }
+        if (form.querySelector('[name="website_url"]').value) {
+            console.warn('Honeypot triggered');
+            return;
+        }
+
+        ocupado(true, 'Gerando o PDF…');
+        try {
+            if (!ENDPOINT_URL && !DEV_MODE) {
+                // js/config.js não carregou: sem esta guarda, cairíamos no ramo DEV
+                // e mostraríamos "Enviado." sem mandar nada.
+                throw erroNosso('Configuração do site não carregou. Recarregue a página e tente de novo.');
+            }
+            await quadro();   // deixa o botão mostrar "Gerando…" antes do trabalho pesado
+            const doc = buildPDF();
+            const blob = doc.output('blob');
+            ultimoPdf = { blob, nome: nomeDoPdf() };
+            if (blob.size > PDF_MAX_BYTES) {
+                throw erroNosso('O PDF ficou com ' + mb(blob.size) + ' MB e o limite por e-mail é 15 MB. Volte e desmarque algumas issues — ou gere o relatório em partes.');
+            }
+
+            ocupado(true, 'Enviando…');
+            const nome = $('#nome').value.trim();
+            const payload = {
+                email,
+                nome,
+                optin: $('#optin').checked,
+                projeto: $('#rproj').value.trim(),
+                titulo: $('#rtitle').value.trim(),
+                qtdIssues: String(topics.filter(t => t.on).length),
+                arquivoBcf: arquivoNome,
+                pdfNome: ultimoPdf.nome,
+                pdfBase64: await blobParaBase64(blob),
+                tipo: FORM_TYPE,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+
+            let r;
+            if (DEV_MODE) {
+                console.log('📤 Payload (modo dev):', { ...payload, pdfBase64: '(' + payload.pdfBase64.length + ' caracteres)' });
+                await new Promise(res => setTimeout(res, 800));
+                r = { success: true, protocolo: 'BP-2026-DEV' };
+            } else {
+                const res = await fetch(ENDPOINT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                r = await res.json();
+            }
+
+            if (r.success) {
+                resultado('ok', r.protocolo, email);
+            } else if (r.code === 'ENVIO_FALHOU') {
+                // lead gravado, e-mail não saiu: o download é o plano B
+                resultado('fallback', r.protocolo, email);
+            } else {
+                throw erroNosso((r.errors && r.errors.length) ? r.errors.join(' · ') : (r.error || 'Envio recusado pelo servidor.'));
+            }
+        } catch (err) {
+            console.error('Erro ao enviar:', err);
+            erroEnvio(err.nosso ? err.message : 'Não foi possível enviar. Verifique sua conexão e tente de novo.');
+        } finally {
+            ocupado(false);
+        }
+    });
+
+    /* ---------- resultado ---------- */
+    $('#baixar').addEventListener('click', baixar);
+    $('#outro').addEventListener('click', () => {
+        topics = [];
+        ultimoPdf = null;
+        $('#file').value = '';
+        $('#list').innerHTML = '';
+        $('#panel').hidden = true;
+        status('');
+        mostrar('arquivo');
+        // e-mail e nome ficam preenchidos para a próxima conversão (só em memória)
+    });
+
+    /* ---------- arquivo ---------- */
+    $('#file').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) load(f); });
+    const dz = $('#drop');
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('is-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('is-over'));
+    dz.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dz.classList.remove('is-over');
+        const f = e.dataTransfer.files[0];
+        if (f) load(f);
+    });
+    $('#all').addEventListener('click', () => { topics.forEach(t => t.on = true); render(); });
+    $('#none').addEventListener('click', () => { topics.forEach(t => t.on = false); render(); });
+})();
+</script>
+
 </body>
 </html>

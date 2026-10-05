@@ -12,7 +12,7 @@
  * Uso: npm run deploy
  */
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
@@ -22,7 +22,20 @@ const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // implantações; é o mesmo trecho AKfyc... da URL em js/config.js.
 const DEPLOYMENT_ID = 'AKfycbyRHztm-hPx5A_k4-BCxOQje0Stq-ifz_VGU4u3Z7fbOy2_rAmfWB8vQ0lfvIdbZso';
 
+/* Autenticação POR PROJETO: o token fica em .clasprc.json na raiz do repo
+ * (ignorado pelo git), não no ~/.clasprc.json global. Assim o clasp deste
+ * projeto usa sempre a conta dona do Apps Script, mesmo que a máquina esteja
+ * logada em outra conta para outros projetos — foi o 403 "The caller does not
+ * have permission" da task 24. Login: npm run login. */
+const AUTH = join(RAIZ, '.clasprc.json');
+
 function clasp(...args) {
+    if (!existsSync(AUTH)) {
+        console.error('\n✗ Sem login deste projeto (' + AUTH + ').');
+        console.error('  Rode `npm run login` e entre com a conta dona do Apps Script.\n');
+        process.exit(1);
+    }
+    args = ['-A', AUTH, ...args];
     console.log('\n$ clasp ' + args.join(' '));
     try {
         // O binário do clasp no Windows é um .cmd, que o Node só executa via
@@ -41,7 +54,7 @@ function clasp(...args) {
         console.error('\n✗ O comando `clasp ' + args[0] + '` falhou. Checklist de setup:\n');
         console.error('  1. npm install');
         console.error('  2. Apps Script API ligada em https://script.google.com/home/usersettings');
-        console.error('  3. npx clasp login');
+        console.error('  3. npm run login  (login deste projeto, com a conta dona do script)');
         console.error('  4. .clasp.json na raiz, com o scriptId e "rootDir": "script"\n');
         console.error('  Detalhes em tasks/20/task_text.md §02.');
         process.exit(1);

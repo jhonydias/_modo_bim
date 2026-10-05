@@ -3,13 +3,19 @@
  *  _modo_bim — Backend Apps Script
  *  2026
  * ============================================================
- *  Recebe três tipos de formulário (HTML hospedados no GitHub
+ *  Recebe quatro tipos de envio (HTML hospedados no GitHub
  *  Pages) e armazena em abas separadas da mesma planilha,
  *  gerando protocolo único e disparando e-mails de confirmação.
  *
  *    tipo: 'orcamento'     → aba "Orçamentos"      · OR-2026-NNNN
  *    tipo: 'cadastro'      → aba "Cadastros"       · MB-2026-NNNN
  *    tipo: 'lista-espera'  → aba "Lista de Espera" · LE-2026-NNNN
+ *    tipo: 'bcf-pdf'       → aba "BCF → PDF"       · BP-2026-NNNN
+ *
+ *  'bcf-pdf' é a ferramenta gratuita bcf-para-pdf.html (task 24):
+ *  o PDF é gerado no navegador e chega aqui em base64 só para ser
+ *  anexado ao e-mail de quem pediu. O e-mail é o lead. O PDF nunca
+ *  é gravado em planilha, fila ou log — ver extrairAnexo_().
  *
  *  'orcamento' é o funil de entrada (cadastro.html, linkado na landing):
  *  diagnóstico do cenário + agendamento da reunião de alinhamento.
@@ -40,7 +46,20 @@ const CONFIG = {
 
     // Espelha cada envio para o Notion (software oficial da _modo_bim).
     // A planilha continua como registro de segurança e fonte do protocolo.
-    SEND_TO_NOTION: true
+    SEND_TO_NOTION: true,
+
+    // Teto do PDF do conversor BCF (bytes decodificados). O anexo do
+    // MailApp vai até 25 MB por mensagem; 15 deixa margem para o MIME
+    // e mantém o upload aceitável no celular. O front confere o mesmo
+    // número antes de enviar (bcf-para-pdf.html · PDF_MAX_BYTES).
+    BCF_PDF_MAX_BYTES: 15 * 1024 * 1024,
+
+    // Teto GLOBAL de e-mails do conversor por hora. O rate limit comum é
+    // por destinatário; sem este, alguém poderia usar o endpoint para
+    // disparar PDFs arbitrários, em nome da _modo_bim, para uma lista de
+    // endereços — e ainda queimar a cota diária (100) do site inteiro.
+    // Acima do teto o lead é gravado e o front oferece o download.
+    BCF_MAX_ENVIOS_HORA: 30
 };
 
 /* ============================================================
@@ -53,6 +72,8 @@ const CONFIG = {
  *    NOTION_DB_ORCAMENTOS    → ID do database "Orçamentos"
  *    NOTION_DB_CADASTROS     → ID do database "Cadastros"
  *    NOTION_DB_LISTA_ESPERA  → ID do database "Lista de Espera"
+ *    NOTION_DB_LEADS_BCF     → ID do database "Leads · BCF → PDF"
+ *                              (opcional: sem ele o lead fica só na planilha)
  *
  *  Passo a passo completo em tasks/08/notion-integracao.md
  * ============================================================ */
@@ -163,6 +184,30 @@ const FORMS = {
             objetivo: 'Objetivo / Dificuldade',
             bimclub: 'BIMClub'
         }
+    },
+    'bcf-pdf': {
+        SHEET_NAME: 'BCF → PDF',
+        NOTION_DB_KEY: 'NOTION_DB_LEADS_BCF',
+        // Sem database configurado, pula o Notion em vez de enfileirar: a
+        // fila receberia um item por lead, tentado 5 vezes cada. Configurar
+        // a Propriedade do script liga o espelhamento sem deploy.
+        NOTION_OPCIONAL: true,
+        PROTOCOL_PREFIX: 'BP',
+        LABEL: 'Conversor BCF → PDF',
+        // Fluxo próprio: e-mail com o PDF anexado, sem aviso ao admin
+        // (ver finalizarBcfPdf_).
+        ANEXO_PDF: true,
+        COLUMNS: [
+            'Timestamp', 'Protocolo',
+            'E-mail', 'Nome', 'Aceita Conteúdos',
+            'Projeto', 'Título do Relatório', 'Issues', 'Arquivo BCF', 'PDF (KB)',
+            'Envio',
+            'User Agent'
+        ],
+        // O e-mail é o único preço da ferramenta (task 24 §01).
+        REQUIRED: {
+            email: 'E-mail'
+        }
     }
 };
 
@@ -193,6 +238,11 @@ function doPost(e) {
             return jsonResponse_({ success: false, error: 'Tipo de formulário inválido' });
         }
 
+        // O PDF do conversor sai do payload ANTES da sanitização: ela corta
+        // toda string em 500 caracteres, e daqui em diante `data` pode ir
+        // inteiro para a Fila Notion e para o log.
+        const anexo = extrairAnexo_(data);
+
         // Sanitização
         data = sanitizeData_(data);
 
@@ -208,6 +258,14 @@ function doPost(e) {
 
         // Validação server-side
         const validation = validatePayload_(data, formConfig);
+        let pdf = null;
+        if (formConfig.ANEXO_PDF) {
+            pdf = validarAnexoPdf_(anexo);
+            if (!pdf.ok) {
+                validation.valid = false;
+                validation.errors.push(pdf.error);
+            }
+        }
         if (!validation.valid) {
             logEvent_('VALIDAÇÃO', tipo, '', 'Dados inválidos', {
                 email: data.email || '',
@@ -227,11 +285,16 @@ function doPost(e) {
         // Protocolo
         const protocolo = generateProtocol_(formConfig);
 
+        // Conversor BCF: grava, manda o PDF e responde por conta própria
+        if (formConfig.ANEXO_PDF) {
+            return jsonResponse_(finalizarBcfPdf_(data, pdf, protocolo, formConfig, tipo));
+        }
+
         // Insere linha
         appendToSheet_(data, protocolo, formConfig);
 
         // Notion (não bloqueante: falha vai para a fila de reenvio)
-        if (CONFIG.SEND_TO_NOTION) {
+        if (notionAtivo_(formConfig)) {
             sendToNotion_(data, protocolo, formConfig);
         }
 
@@ -339,6 +402,15 @@ function buildRow_(d, timestamp, protocolo, formConfig) {
             d.userAgent || ''
         ];
     }
+    if (formConfig.PROTOCOL_PREFIX === 'BP') {
+        return [
+            timestamp, protocolo,
+            d.email || '', d.nome || '', simNao_(d.optin),
+            d.projeto || '', d.titulo || '', d.qtdIssues || '', d.arquivoBcf || '', d.pdfKB || '',
+            d.envio || '',
+            d.userAgent || ''
+        ];
+    }
     // Lista de espera
     return [
         timestamp, protocolo,
@@ -379,6 +451,16 @@ function sendToNotion_(data, protocolo, formConfig) {
         queueNotionRetry_(data, protocolo, formConfig, String(err));
         return { ok: false, error: String(err) };
     }
+}
+
+/**
+ * Espelhar no Notion? Sempre, exceto quando o formulário é NOTION_OPCIONAL e
+ * o database dele ainda não foi configurado nas Propriedades do script.
+ */
+function notionAtivo_(formConfig) {
+    if (!CONFIG.SEND_TO_NOTION) return false;
+    if (!formConfig.NOTION_OPCIONAL) return true;
+    return Boolean(PropertiesService.getScriptProperties().getProperty(formConfig.NOTION_DB_KEY));
 }
 
 /**
@@ -471,6 +553,22 @@ function buildNotionProps_(d, protocolo, formConfig) {
             'Estado':              nSelect_(d.estado),
             'Status':              nSelect_('Novo'),
             'User Agent':          nText_(d.userAgent)
+        };
+    }
+
+    if (formConfig.PROTOCOL_PREFIX === 'BP') {
+        return {
+            // nome é opcional no formulário: sem ele, o título da página é o e-mail
+            'Lead':               nTitle_(d.nome || d.email),
+            'Protocolo':          nText_(protocolo),
+            'Recebido em':        nDate_(recebidoEm),
+            'E-mail':             nEmail_(d.email),
+            'Aceita Conteúdos':   nSelect_(simNao_(d.optin)),
+            'Projeto':            nText_(d.projeto),
+            'Issues':             nNumber_(d.qtdIssues),
+            'Envio':              nSelect_(d.envio),
+            'Status':             nSelect_('Novo'),
+            'User Agent':         nText_(d.userAgent)
         };
     }
 
@@ -723,6 +821,9 @@ function validatePayload_(data, formConfig) {
         if (data.qtdPessoas && !validarQuantidade_(data.qtdPessoas)) errors.push('Quantidade de pessoas inválida');
         if (data.reuniao1 && !validarDataHora_(data.reuniao1)) errors.push('1ª opção de reunião inválida');
         if (data.reuniao2 && !validarDataHora_(data.reuniao2)) errors.push('2ª opção de reunião inválida');
+    } else if (formConfig.PROTOCOL_PREFIX === 'BP') {
+        // O anexo é validado à parte (validarAnexoPdf_): ele já saiu de `data`.
+        if (data.qtdIssues && !validarQuantidade_(data.qtdIssues)) errors.push('Quantidade de issues inválida');
     } else {
         // Lista de espera
         if (data.telefone && !validarTelefone_(data.telefone)) errors.push('Telefone inválido');
@@ -983,6 +1084,199 @@ function sendClientEmail_(data, protocolo, formConfig) {
 }
 
 /* ============================================================
+ *  CONVERSOR BCF → PDF (task 24)
+ * ============================================================
+ *  O PDF é gerado no navegador (bcf-para-pdf.html) e chega em
+ *  `pdfBase64`. Ele existe aqui só para virar anexo: é tirado do
+ *  payload antes da sanitização e nunca é gravado em planilha,
+ *  fila do Notion ou log.
+ *
+ *  Ordem: valida → grava a linha (Envio = Pendente) → manda o
+ *  e-mail → marca o Envio → Notion → responde. A linha é gravada
+ *  ANTES do e-mail de propósito: se o envio falhar, o lead já está
+ *  salvo e o front oferece o download como plano B.
+ * ============================================================ */
+
+const BCF_ENVIO = {
+    PENDENTE: 'Pendente',
+    ENVIADO: 'Enviado',
+    COTA: 'Cota esgotada',
+    FALHOU: 'Falhou'
+};
+
+/** Tira o PDF do payload (mutando `data`) e devolve o base64 cru. */
+function extrairAnexo_(data) {
+    const b64 = data && typeof data.pdfBase64 === 'string' ? data.pdfBase64 : '';
+    if (data) delete data.pdfBase64;
+    return b64;
+}
+
+/**
+ * Decodifica e confere o anexo: base64 válido, começa com "%PDF-" e cabe
+ * no teto. Devolve { ok, bytes } ou { ok:false, error }.
+ */
+function validarAnexoPdf_(b64) {
+    const maxMB = Math.round(CONFIG.BCF_PDF_MAX_BYTES / 1024 / 1024);
+    const limpo = String(b64 || '').replace(/^data:application\/pdf;base64,/, '').replace(/\s+/g, '');
+    if (!limpo) return { ok: false, error: 'PDF ausente' };
+
+    // conta barata antes de decodificar: 4 caracteres base64 = 3 bytes
+    if (Math.floor(limpo.length * 3 / 4) > CONFIG.BCF_PDF_MAX_BYTES + 2) {
+        return { ok: false, error: 'PDF acima de ' + maxMB + ' MB' };
+    }
+
+    let bytes;
+    try {
+        bytes = Utilities.base64Decode(limpo);
+    } catch (err) {
+        return { ok: false, error: 'PDF inválido' };
+    }
+
+    // "%PDF-" = 37 80 68 70 45
+    const assinatura = [37, 80, 68, 70, 45];
+    if (!bytes || bytes.length < assinatura.length || assinatura.some((b, i) => bytes[i] !== b)) {
+        return { ok: false, error: 'O arquivo enviado não é um PDF' };
+    }
+    if (bytes.length > CONFIG.BCF_PDF_MAX_BYTES) {
+        return { ok: false, error: 'PDF acima de ' + maxMB + ' MB' };
+    }
+    return { ok: true, bytes: bytes };
+}
+
+/** Nome de anexo seguro: sem acento, sem barra, até 80 caracteres, termina em .pdf. */
+function nomeArquivoPdf_(nome) {
+    const base = String(nome || '')
+        .replace(/\.pdf$/i, '')
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^\w\-.]+/g, '_')
+        .replace(/^[_.]+|[_.]+$/g, '')
+        .substring(0, 76);
+    return (base || 'issues_BCF') + '.pdf';
+}
+
+/** Checkbox do front → texto legível na planilha e no Notion. */
+function simNao_(v) {
+    return (v === true || v === 'true' || v === 'Sim' || v === 'sim') ? 'Sim' : 'Não';
+}
+
+/**
+ * Grava o lead, tenta o e-mail com o anexo e devolve o objeto de resposta.
+ * Nunca lança por causa do e-mail: falha vira code 'ENVIO_FALHOU'.
+ */
+function finalizarBcfPdf_(data, pdf, protocolo, formConfig, tipo) {
+    data.pdfKB = String(Math.max(1, Math.round(pdf.bytes.length / 1024)));
+    data.envio = BCF_ENVIO.PENDENTE;
+    appendToSheet_(data, protocolo, formConfig);
+    const linha = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(formConfig.SHEET_NAME).getLastRow();
+
+    let detalhe = null;
+    try {
+        // A cota do Gmail gratuito é do projeto inteiro (100/dia). Conferir antes
+        // evita uma exceção e deixa a causa registrada com o nome certo.
+        if (MailApp.getRemainingDailyQuota() < 1 || !reservarEnvioBcf_()) {
+            data.envio = BCF_ENVIO.COTA;
+        } else {
+            sendBcfPdfEmail_(data, pdf, protocolo);
+            data.envio = BCF_ENVIO.ENVIADO;
+        }
+    } catch (mailErr) {
+        data.envio = BCF_ENVIO.FALHOU;
+        detalhe = String(mailErr);
+    }
+
+    marcarEnvio_(formConfig, linha, data.envio);
+    if (data.envio !== BCF_ENVIO.ENVIADO) {
+        logEvent_('AVISO', tipo, protocolo, 'PDF do conversor não enviado: ' + data.envio,
+            { email: data.email, erro: detalhe });
+    }
+
+    if (notionAtivo_(formConfig)) {
+        sendToNotion_(data, protocolo, formConfig);
+    }
+
+    if (data.envio === BCF_ENVIO.ENVIADO) {
+        return { success: true, protocolo: protocolo, tipo: tipo, message: 'PDF enviado por e-mail' };
+    }
+    return {
+        success: false,
+        code: 'ENVIO_FALHOU',
+        protocolo: protocolo,
+        tipo: tipo,
+        error: 'Não conseguimos enviar o e-mail agora.'
+    };
+}
+
+/**
+ * Conta um envio no balde da hora corrente. false quando o teto global
+ * (CONFIG.BCF_MAX_ENVIOS_HORA) já foi atingido.
+ */
+function reservarEnvioBcf_() {
+    const cache = CacheService.getScriptCache();
+    const key = 'bcf_envios_' + Math.floor(Date.now() / 3600000);
+    const atual = parseInt(cache.get(key) || '0');
+    if (atual >= CONFIG.BCF_MAX_ENVIOS_HORA) return false;
+    cache.put(key, String(atual + 1), 3600);
+    return true;
+}
+
+/** Atualiza a célula "Envio" da linha recém-gravada. Nunca lança. */
+function marcarEnvio_(formConfig, linha, valor) {
+    try {
+        const col = formConfig.COLUMNS.indexOf('Envio') + 1;
+        SpreadsheetApp.getActiveSpreadsheet().getSheetByName(formConfig.SHEET_NAME)
+            .getRange(linha, col).setValue(valor);
+    } catch (err) {
+        Logger.log('Falha ao marcar envio (linha ' + linha + '): ' + err);
+    }
+}
+
+function sendBcfPdfEmail_(data, pdf, protocolo) {
+    // texto livre vindo do front entra curto no e-mail (ver BCF_MAX_ENVIOS_HORA)
+    const projeto = String(data.projeto || '').substring(0, 120);
+    const nome = String(data.nome || '').substring(0, 80);
+    const n = Number(data.qtdIssues) || 0;
+    const issues = n ? (n + (n === 1 ? ' issue' : ' issues')) : 'as issues selecionadas';
+    const saudacao = nome ? 'Olá, ' + escapeHtml_(nome) + '.' : 'Olá.';
+    const nomeAnexo = nomeArquivoPdf_(data.pdfNome || (projeto ? projeto + '_BCF' : ''));
+
+    const html = `
+    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #EFEEE9;">
+        <div style="background: #81161E; color: #EFEEE9; padding: 56px 40px; text-align: center;">
+            <div style="font-family: Georgia, serif; font-size: 42px; letter-spacing: 0.02em;">_modo_bim</div>
+            <div style="font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.75; margin-top: 10px;">conversor BCF → PDF</div>
+        </div>
+        <div style="padding: 56px 40px 40px; color: #470000; text-align: center;">
+            <h1 style="font-family: Georgia, serif; font-style: italic; font-size: 42px; color: #81161E; margin: 0 0 16px; font-weight: 400;">Seu PDF chegou.</h1>
+            <p style="font-size: 16px; line-height: 1.6; color: #470000; max-width: 400px; margin: 0 auto 32px;">
+                ${saudacao} Em anexo está o relatório com ${escapeHtml_(issues)}${projeto ? ' de <strong>' + escapeHtml_(projeto) + '</strong>' : ''}, pronto para encaminhar à equipe ou levar para a reunião de coordenação.
+            </p>
+            <div style="border-top: 1px solid rgba(71,0,0,0.2); border-bottom: 1px solid rgba(71,0,0,0.2); padding: 18px; display: inline-block; margin-bottom: 40px;">
+                <div style="font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: #470000; margin-bottom: 6px;">Protocolo</div>
+                <div style="font-family: Georgia, serif; font-size: 22px; color: #81161E;">${escapeHtml_(protocolo)}</div>
+            </div>
+            <p style="font-size: 15px; line-height: 1.6; color: #470000; max-width: 420px; margin: 0 auto 8px;">
+                Issue boa começa num projeto bem combinado. O <a href="https://modobim.com.br/kit.html" style="color: #81161E;">Kit de Projeto BIM</a> reúne o que precisa ser definido antes de modelar — e no <a href="https://chat.whatsapp.com/DPEoInYVkh6J0Af3Xw2A3Q" style="color: #81161E;">BIM Club</a> a conversa continua.
+            </p>
+        </div>
+        <div style="padding: 0 40px 32px; color: #470000; text-align: center; font-size: 12px; line-height: 1.6; opacity: 0.75;">
+            Você recebeu este e-mail porque pediu o relatório em modobim.com.br/bcf-para-pdf.html.
+        </div>
+        <div style="background: #470000; color: #EFEEE9; padding: 20px 40px; text-align: center; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;">
+            ${CONFIG.COMPANY_NAME}
+        </div>
+    </div>
+    `;
+
+    MailApp.sendEmail({
+        to: data.email,
+        subject: 'Seu relatório BCF em PDF · ' + (projeto || protocolo),
+        htmlBody: html,
+        name: CONFIG.COMPANY_NAME,
+        attachments: [Utilities.newBlob(pdf.bytes, 'application/pdf', nomeAnexo)]
+    });
+}
+
+/* ============================================================
  *  HELPERS
  * ============================================================ */
 
@@ -1144,6 +1438,31 @@ function testeListaEspera() {
     const protocolo = generateProtocol_(formConfig);
     appendToSheet_(fakeData, protocolo, formConfig);
     Logger.log('✅ Lista de Espera OK — Protocolo: ' + protocolo);
+}
+
+/**
+ * Conversor BCF: grava uma linha de teste e manda um PDF de verdade para o
+ * ADMIN_EMAIL. Serve para autorizar o escopo de anexo e conferir o e-mail.
+ */
+function testeBcfPdf() {
+    const pdf = Utilities.newBlob('<h1>Teste do conversor BCF</h1>', 'text/html').getAs('application/pdf');
+    const fakeData = {
+        tipo: 'bcf-pdf',
+        email: CONFIG.ADMIN_EMAIL,
+        nome: '[TESTE] Maria das Graças',
+        optin: true,
+        projeto: 'Residencial Glimmerock',
+        titulo: 'Relatório de issues',
+        qtdIssues: '3',
+        arquivoBcf: 'teste.bcfzip',
+        pdfNome: 'Residencial_Glimmerock_BCF.pdf',
+        userAgent: 'Teste manual via editor'
+    };
+    const formConfig = FORMS['bcf-pdf'];
+    ensureSheetExists_(formConfig);
+    const protocolo = generateProtocol_(formConfig);
+    const r = finalizarBcfPdf_(fakeData, { ok: true, bytes: pdf.getBytes() }, protocolo, formConfig, 'bcf-pdf');
+    Logger.log((r.success ? '✅ ' : '❌ ') + 'BCF → PDF — ' + JSON.stringify(r));
 }
 
 /**

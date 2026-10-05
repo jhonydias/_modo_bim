@@ -107,7 +107,7 @@ describe('paridade de validadores entre front e backend', () => {
 });
 
 describe('validatePayload_', () => {
-    it.each(['orcamento', 'lista-espera', 'cadastro'])(
+    it.each(['orcamento', 'lista-espera', 'cadastro', 'bcf-pdf'])(
         'payload completo de %s é válido', (tipo) => {
             const r = gas.validatePayload_(PAYLOAD_POR_TIPO[tipo](), gas.FORMS[tipo]);
             expect(r.errors).toEqual([]);
@@ -115,7 +115,7 @@ describe('validatePayload_', () => {
         }
     );
 
-    it.each(['orcamento', 'lista-espera', 'cadastro'])(
+    it.each(['orcamento', 'lista-espera', 'cadastro', 'bcf-pdf'])(
         'cada obrigatório removido de %s vira erro com o rótulo em português', (tipo) => {
             const config = gas.FORMS[tipo];
             for (const [campo, rotulo] of Object.entries(config.REQUIRED)) {
